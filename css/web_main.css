@@ -1,0 +1,27 @@
+html, body {
+	background-color: #ffffff;
+	height: 100%;
+
+}
+
+
+#__progress__ {
+	z-index: 9999999999;
+	position: fixed;
+	display:none;
+	top: 0; left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #000000;
+	opacity: 0.5
+}
+
+#__progress__ .loading {
+	margin-top: 20%;margin-left:40%;width:20%;opacity: 1;background-color: #ffffff;padding:20px;border-radius: 10px;
+	color: #000000;
+	font-size: 18px;
+}
+
+.prepare-error, .deploy-error {
+	background: #ff7171;
+}

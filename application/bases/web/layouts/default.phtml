@@ -1,0 +1,106 @@
+<?php
+
+use Jet\MVC_Layout;
+use Jet\MVC;
+use Jet\Tr;
+use Jet\UI;
+use Jet\Locale;
+use Jet\Auth;
+
+/**
+ * @var MVC_Layout $this
+ */
+
+require 'parts/init_libs.php';
+?>
+<!DOCTYPE html>
+<html lang="<?= MVC::getLocale()->getLanguage() ?>">
+<head>
+	<?php require 'parts/head.phtml'; ?>
+</head>
+<body>
+
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<a class="navbar-brand" href="<?= MVC::getHomePage()->getURLPath() ?>">Easy Deployer</a>
+
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavBar"
+		        aria-controls="mainNavBar" aria-expanded="false" aria-label="">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div class="collapse navbar-collapse" id="mainNavBar">
+			<ul class="nav navbar-nav">
+			</ul>
+
+			<ul class="navbar-nav ml-auto">
+
+				<?php /*
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+					   aria-haspopup="true" aria-expanded="false">
+						<span><?= UI::flag( Locale::getCurrentLocale() ) ?></span>
+					</a>
+					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+						<?php foreach( MVC::getBase()->getLocales() as $locale ): ?>
+							<a class="dropdown-item"
+							   href="<?= MVC::getBase()->getHomepage($locale)->getURLPath() ?>">
+								<?= UI::flag( $locale ) ?>
+								<?= $locale->getName( $locale ) ?>
+							</a>
+						<?php endforeach; ?>
+					</div>
+				</li>
+                */ ?>
+
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="user-menu" role="button" data-toggle="dropdown"
+					   aria-haspopup="true" aria-expanded="false">
+						<?= UI::icon( 'user' ) ?>
+						<?= Auth::getCurrentUser()->getUsername() ?>
+					</a>
+					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="user-menu">
+						
+						<?php if(
+							($ua_page=MVC::getPage( 'user-account' )) &&
+							$ua_page->accessAllowed()
+						): ?>
+						<a class="dropdown-item" href="<?= $ua_page->getURL() ?>">
+							<?= UI::icon( 'cog' ) ?>
+							<?= Tr::_( 'Change password' ) ?>
+						</a>
+						<div class="dropdown-divider"></div>
+
+						<a class="dropdown-item"
+						   href="<?= $ua_page->getURL( [], ['logout' => 'logout'] ) ?>">
+							<?= UI::icon( 'sign-out-alt' ) ?>
+							<?= Tr::_( 'Logout' ) ?>
+						</a>
+						<?php endif; ?>
+					</div>
+				</li>
+
+			</ul>
+		</div>
+	</nav>
+
+	<?php
+	require_once 'parts/breadcrumb_navigation.phtml';
+	require_once 'parts/messages.phtml';
+	?>
+
+	
+	<div class="container-fluid h-100">
+		<jet_layout_main_position/>
+	</div>
+
+	<div id="__progress__">
+		<div class="loading text-center">
+			<div id="__progress_prc__"></div>
+			<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+			<span class="sr-only"></span>
+		</div>
+	</div>
+
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+<?php
+/**
+ *
+ * @copyright Copyright (c) Miroslav Marek <mirek.marek@web-jet.cz>
+ * @license http://www.php-jet.net/license/license.txt
+ * @author Miroslav Marek <mirek.marek@web-jet.cz>
+ */
+
+namespace Jet;
+
+/**
+ *
+ */
+#[Config_Definition]
+abstract class DataModel_Backend_Config extends Config_Section
+{
+
+}

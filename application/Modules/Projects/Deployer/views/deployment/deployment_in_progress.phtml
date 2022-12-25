@@ -1,0 +1,36 @@
+<?php
+namespace JetApplicationModule\Projects\Deployer;
+
+use Jet\MVC_View;
+use Jet\Tr;
+use Jet\UI_messages;
+
+/**
+ * @var MVC_View   $this
+ * @var Controller_Main $controller;
+ */
+
+$controller = $this->controller;
+
+$current_project = $controller->getCurrentProject();
+$current_deployment = $controller->getCurrentDeployment();
+
+require __DIR__.'/../lj/head.phtml';
+?>
+	<br><br>
+	<?=UI_messages::createSuccess(Tr::_('Deployment has been started'))->setCloseable(false)?>
+	<p>
+		<?=Tr::_('It will take some time. <b>Please be patient.</b>')?>
+	</p>
+<?php
+require __DIR__.'/../lj/foot.phtml';
+?>
+<script>
+	setTimeout(function () {
+		$('#__progress__').show();
+	}, 10);
+	
+	setTimeout(function () {
+		location = '<?=$this->getRaw('deploy_URL')?>';
+	}, 1000);
+</script>

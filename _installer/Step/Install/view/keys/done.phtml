@@ -1,0 +1,15 @@
+<?php
+namespace JetApplication\Installer;
+
+use Jet\Tr;
+use Jet\MVC_View;
+use Jet\UI_messages;
+
+/**
+ * @var MVC_View $this
+ */
+
+?>
+<h2><?=Tr::_('Creating encryption keys')?></h2>
+
+<?=UI_messages::createSuccess(Tr::_('Done'))->setCloseable(false);?>

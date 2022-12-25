@@ -1,0 +1,38 @@
+<?php
+use Jet\SysConf_URI;
+
+require_once 'parts/init_libs.php';
+?>
+<!DOCTYPE html>
+<html>
+<head>
+	<title><?= $this->getString( 'page_title', 'Easy Deployer Administration' ) ?></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<jet_layout_meta_tags/>
+	<jet_layout_css/>
+	<jet_layout_javascripts/>
+
+	<link rel="icon" href="<?= SysConf_URI::getImages() ?>favicon.png" type="image/png">
+
+	<style>
+		html, body {
+			background: #c9c9c9;
+			background: linear-gradient(#aaaaaa, #ffffff);
+		}
+	</style>
+
+</head>
+<body>
+
+<div class="container h-100">
+	<div class="row align-items-center h-100">
+		<div class="col-12 justify-content-center">
+			<jet_layout_main_position/>
+		</div>
+	</div>
+</div>
+
+
+</body>
+</html>

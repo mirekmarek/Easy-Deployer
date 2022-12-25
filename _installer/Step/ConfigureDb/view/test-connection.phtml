@@ -1,0 +1,32 @@
+<?php
+namespace JetApplication\Installer;
+
+use Jet\MVC_View;
+use Jet\Tr;
+
+use Jet\UI_messages;
+use Jet\Db_Backend_PDO_Config;
+
+/**
+ * @var MVC_View $this
+ * @var Db_Backend_PDO_Config $config
+ */
+$config = $this->getRaw( 'config' );
+
+?>
+
+<?= Installer::buttonBack() ?>
+
+<h3><?= Tr::_( 'Connection \'%CONNECTION%\' Test', ['CONNECTION' => $this->getString( 'connection_name' )] ); ?></h3>
+
+
+<?php if( $this->getBool( 'OK' ) ): ?>
+	<?= UI_messages::createInfo( Tr::_( 'OK! Database connection works correctly.' ) ) ?>
+<?php else: ?>
+	<?= UI_messages::createDanger( Tr::_( 'Error connecting to database:' ) . $this->getString( 'error_message' ) ) ?>
+<?php endif; ?>
+
+
+<?php if( $this->getBool( 'OK' ) ):
+	echo Installer::continueForm();
+endif; ?>

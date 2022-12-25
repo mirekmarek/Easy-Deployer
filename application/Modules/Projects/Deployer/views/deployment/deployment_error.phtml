@@ -1,0 +1,55 @@
+<?php
+namespace JetApplicationModule\Projects\Deployer;
+
+use Jet\MVC;
+use Jet\MVC_View;
+use Jet\Tr;
+use Jet\UI;
+use Jet\UI_button;
+use Jet\UI_messages;
+
+/**
+ * @var MVC_View   $this
+ * @var Controller_Main $controller;
+ */
+
+$controller = $this->controller;
+
+$current_project = $controller->getCurrentProject();
+$current_deployment = $controller->getCurrentDeployment();
+
+require __DIR__.'/../lj/head.phtml';
+?>
+	<br><br>
+<?=UI_messages::createDanger(Tr::_('Error during deployment. Details below.'))->setCloseable(false)?>
+	<br>
+
+<?=UI::button(Tr::_('Try again'))->setUrl(MVC::getPage()->getURL(GET_params: [
+	'project' => $current_project->getCode(),
+	'deployment' => $current_deployment->getId(),
+	'action' => 'deploy_again'
+]))->setClass(UI_button::CLASS_PRIMARY)?>
+	
+	<?php if($current_deployment->getDeployedFiles()): ?>
+	<br>
+	<hr>
+	<h3><?=Tr::_('Deployed files')?></h3>
+
+	<table class="table table-striped">
+		<?php foreach($current_deployment->getDeployedFiles() as $file): ?>
+			<tr>
+				<td><?=$file?></td>
+			</tr>
+		<?php endforeach; ?>
+	</table>
+	<?php endif; ?>
+
+	<br>
+	<hr>
+	<h3><?=Tr::_('Log of deployment')?></h3>
+	<?=$current_deployment->getDeployLog();?>
+
+
+	
+	<?php
+require __DIR__.'/../lj/foot.phtml';

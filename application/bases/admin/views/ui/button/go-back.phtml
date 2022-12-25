@@ -1,0 +1,42 @@
+<?php
+
+use Jet\UI_button;
+use Jet\UI;
+use Jet\MVC_View;
+use Jet\Http_Request;
+
+/**
+ * @var MVC_View $this
+ * @var UI_button $b
+ */
+$b = $this->getRaw( 'element' );
+
+if( !$b->getLabel() ) {
+	$b->setLabel( UI::_( 'Go back' ) );
+}
+
+if( !$b->getIcon() ) {
+	$b->setIcon( 'chevron-left' );
+}
+
+if( !$b->getClass() ) {
+	$b->setClass( UI_button::CLASS_LIGHT );
+}
+
+$URL = $b->getUrl();
+
+if( !$URL ) {
+	$URL = Http_Request::currentURI( [], [
+		'id',
+		'action'
+	] );
+	
+}
+
+$label = trim($b->getLabel());
+$label = $label ? '&nbsp;'.$label : '';
+$icon = $b->getIcon() ? UI::icon( $b->getIcon() ) : '';
+
+$b->setBaseCssClass( 'btn btn-'.$b->getClass().' btn-'.$b->getSize() );
+
+?><a href="<?= $URL ?>" <?=$b->renderTagAttributes()?>><?=$icon.$label?></a> <?php

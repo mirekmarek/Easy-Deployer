@@ -1,0 +1,139 @@
+<?php
+namespace JetApplication\Installer;
+
+use Jet\MVC_Layout;
+use Jet\Tr;
+use Jet\UI_messages;
+use Jet\SysConf_URI;
+
+/**
+ * @var Installer_Step_Controller[] $steps
+ * @var MVC_Layout $this
+ */
+$steps = $this->getRaw( 'steps' );
+
+$this->requireJavascriptFile( 'https://code.jquery.com/jquery-3.5.1.js' );
+$this->requireCssFile( 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css' );
+$this->requireCssFile( 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css' );
+$this->requireCssFile( SysConf_URI::getCss() . 'flags.css' );
+
+
+?>
+<html>
+<head>
+	<title><?= Tr::_( 'Easy Deployer' ); ?></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<jet_layout_meta_tags/>
+	<jet_layout_css/>
+	<jet_layout_javascripts/>
+
+	<style>
+
+		html, body, .container {
+			height: 100%;
+		}
+
+		header {
+			background-color: #000000;
+			color: #ffffff;
+			font-size: 16px;
+			font-weight: bolder;
+			padding: 10px;
+			margin-left: -15px;
+			margin-right: -15px;
+			margin-bottom: 20px;
+		}
+
+
+		.progress-area {
+			background-color: #5c5c5c;
+		}
+
+		.step {
+			padding: 5px;
+		}
+
+		.step-prev {
+
+		}
+
+		.step-prev a {
+			color: #cccccc;
+		}
+
+		.step-current {
+			background-color: #0f0f0f;
+			color: #c9c9c9;
+			padding: 5px;
+			font-weight: bolder;
+			border-radius: 5px;
+		}
+
+		.step-next {
+			color: #999999;
+		}
+
+		.step-sub {
+			padding-left: 10px;
+		}
+
+		.main {
+			background-color: #ffffff;
+			min-height: 100%;
+		}
+
+	</style>
+
+</head>
+<body>
+
+
+<div class="container-fluid">
+	<div class="row h-100">
+		<div class="col-md-2 progress-area">
+			<header>
+				<?= Tr::_( 'Easy Deployer' ); ?>
+			</header>
+
+			<?php foreach( $steps as $step ):
+				$class = '';
+				if( $step->getIsSubStep() ) {
+					$class = ' step-sub';
+				}
+				?>
+				<?php if( $step->getIsPast() ): ?>
+				<div class="step step-prev<?= $class; ?>">
+					<?php if( $step->getIsAvailable() ): ?>
+						<a href="<?= $step->getURL(); ?>"><?= $step->getLabel(); ?></a>
+					<?php else: ?>
+						<?= $step->getLabel(); ?>
+					<?php endif; ?>
+				</div>
+			<?php endif; ?>
+				<?php if( $step->getIsCurrent() ): ?>
+				<div class="step step-current<?= $class; ?>"><?= $step->getLabel(); ?></div>
+			<?php endif; ?>
+				<?php if( $step->getIsFuture() ): ?>
+				<div class="step step-next<?= $class; ?>"><?= $step->getLabel(); ?></div>
+			<?php endif; ?>
+			<?php endforeach; ?>
+		</div>
+		<div class="col-md-10 main">
+			<h1><?= Installer::getCurrentStepController()->getLabel() ?></h1>
+			<hr/>
+			<div id="system-messages-area">
+				<?php
+				foreach( UI_messages::get() as $msg ):
+					echo $msg;
+				endforeach;
+				?>
+			</div>
+
+			<jet_layout_main_position/>
+		</div>
+	</div>
+
+</div>
+
+</body>
+</html>

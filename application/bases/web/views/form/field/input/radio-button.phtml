@@ -1,0 +1,32 @@
+<?php
+use Jet\MVC_View;
+use Jet\Form_Renderer_Field_Input_RadioButton;
+use Jet\Form_Field_RadioButton;
+
+/**
+ * @var MVC_View $this
+ * @var Form_Renderer_Field_Input_RadioButton $r
+ * @var Form_Field_RadioButton $field
+ */
+$r = $this->getRaw( 'renderer' );
+$field = $r->getField();
+
+if( $field->getLastErrorCode() ) {
+	$r->addCustomCssClass( 'is-invalid' );
+}
+
+$container_class = ($field->getIsReadonly()) ? 'radio disabled' : 'radio';
+
+
+foreach( $field->getSelectOptions() as $key => $option ):
+	$r->setCurrentOption( $key, $option );
+	
+	if(!$option->getSelectOptionCssClass()) {
+		$option->setSelectOptionCssClass('form-check-label');
+	}
+	?>
+	<div class="<?= $container_class ?>">
+		<input <?=$r->renderTagAttributes()?>/>
+		<label for="<?= $r->getFieldId() ?>" <?=$option->getSelectOptionCss()?>><?= $option ?></label>
+	</div>
+<?php endforeach; ?>

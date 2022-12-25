@@ -1,0 +1,35 @@
+<?php
+
+use Jet\UI_button;
+use Jet\UI;
+use Jet\MVC_View;
+
+/**
+ * @var MVC_View $this
+ * @var UI_button $b
+ */
+$b = $this->getRaw( 'element' );
+
+if( !$b->getLabel() ) {
+	$b->setLabel( UI::_( 'Edit' ) );
+}
+
+if( !$b->getIcon() ) {
+	$b->setIcon( 'edit' );
+}
+
+if( !$b->getClass() ) {
+	$b->setClass( UI_button::CLASS_LIGHT );
+}
+
+$label = trim($b->getLabel());
+$label = $label ? '&nbsp;'.$label : '';
+$icon = $b->getIcon() ? UI::icon( $b->getIcon() ) : '';
+
+$b->setBaseCssClass( 'btn btn-'.$b->getClass().' btn-'.$b->getSize() );
+
+if( $b->getUrl() ):
+	?><a href="<?= $b->getUrl() ?>" <?=$b->renderTagAttributes()?>><?=$icon.$label?></a> <?php
+else:
+	?><button type="<?= $b->getType() ?>" <?=$b->renderTagAttributes()?>><?=$icon.$label?></button> <?php
+endif;

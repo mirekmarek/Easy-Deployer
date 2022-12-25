@@ -1,0 +1,21 @@
+<?php
+
+use Jet\MVC_View;
+use Jet\Form_Renderer_Field_Label;
+
+/**
+ * @var MVC_View $this
+ * @var Form_Renderer_Field_Label $r
+ */
+$r = $this->getRaw( 'renderer' );
+
+if( !$r->getBaseCssClasses() ) {
+	$r->setBaseCssClass( 'col-form-label' );
+}
+
+$r->setWidthCssClassesCreator(function( $size, $width ) {
+	return 'col-' . $size . '-' . $width;
+} );
+
+?>
+<div <?=$r->renderTagAttributes()?>></div>

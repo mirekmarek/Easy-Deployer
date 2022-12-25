@@ -1,0 +1,36 @@
+<?php
+namespace JetApplication\Installer;
+
+use Jet\Form;
+use Jet\Form_Renderer;
+use Jet\Mailing;
+use Jet\MVC_View;
+use Jet\Tr;
+
+/**
+ * @var MVC_View $this
+ * @var Form $form
+ */
+
+
+$form = $this->getRaw( 'form' );
+$form->renderer()->setDefaultLabelWidth( [Form_Renderer::LJ_SIZE_MEDIUM => 1] );
+$config = Mailing::getConfig();
+?>
+<h3><?= Tr::_( 'Set the mail sender' ) ?></h3>
+<?= $form->start() ?>
+
+<?php foreach( $config->getSenders() as $sender_id=>$sender ): ?>
+	<fieldset style="padding-left: 60px;">
+		<?php if($sender_id!=Mailing::DEFAULT_SENDER_ID): ?>
+		<legend><?= $sender_id ?></legend>
+		<?php endif; ?>
+
+		<?= $form->field( '/senders/' . $sender_id . '/email' ) ?>
+		<?= $form->field( '/senders/' . $sender_id . '/name' ) ?>
+	</fieldset>
+<?php endforeach; ?>
+
+<?= Installer::buttonNext() ?>
+
+<?= $form->end() ?>

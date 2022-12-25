@@ -1,0 +1,19 @@
+<?php
+use Jet\MVC_Layout;
+use Jet\MVC;
+
+/**
+ * @var MVC_Layout $this
+ */
+
+require 'parts/init_libs.php';
+?>
+<!DOCTYPE html>
+<html lang="<?= MVC::getLocale()->getLanguage() ?>">
+<head>
+	<?php require 'parts/head.phtml'; ?>
+</head>
+<body>
+	<jet_layout_main_position/>
+</body>
+</html>

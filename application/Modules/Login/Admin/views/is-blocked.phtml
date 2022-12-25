@@ -1,0 +1,31 @@
+<?php
+
+use Jet\Tr;
+use Jet\UI;
+use Jet\UI_icon;
+
+?>
+
+<div class="card">
+	<h5 class="card-header">
+		<?= Tr::_( 'Account is blocked' ) ?>
+		<?php require '_language_select.phtml'; ?>
+	</h5>
+	<div class="card-body">
+
+		<table>
+			<tr>
+				<td style="padding: 5px;">
+					<?= UI::icon( 'times-circle' )->setSize( UI_icon::SIZE_EXTRA_LARGE ) ?>
+				</td>
+				<td>
+					<?= Tr::_( '<b>Your account is blocked!</b><br/>Please contact your system administrator.' ); ?>
+				</td>
+			</tr>
+		</table>
+
+		<div style="padding-top: 10px">
+			<a href="?logout" class="btn btn-light"><?= Tr::_( 'Logout' ); ?></a>
+		</div>
+	</div>
+</div>

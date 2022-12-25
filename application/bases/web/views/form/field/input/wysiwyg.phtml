@@ -1,0 +1,76 @@
+<?php
+
+use Jet\MVC_View;
+use Jet\Form_Renderer_Field_Input_WYSIWYG;
+use Jet\Form_Field_WYSIWYG;
+
+/**
+ * @var MVC_View $this
+ * @var Form_Renderer_Field_Input_WYSIWYG $r
+ * @var Form_Field_WYSIWYG $field
+ */
+$r = $this->getRaw( 'renderer' );
+$field = $r->getField();
+
+
+
+//-----------------------------------------------------------------------------------
+
+//$r->appendEditorCSSFile( '//cdn.tiny.cloud/1/no-api-key/tinymce/5/skins/lightgray/skin.min.css');
+$r->appendEditorJavaScriptFile('//cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js');
+$r->setEditorInitializeCodeGenerator( function( Form_Field_WYSIWYG $field, array $editor_config ) : string {
+	
+	$editor_config['selector'] = '#' . $field->getId();
+	
+	if( $field->getIsReadonly() ) {
+		$editor_config['readonly'] = 1;
+	}
+	
+	return 'tinymce.init(' . json_encode( $editor_config ) . ')';
+} );
+
+if( !$r->getEditorConfig() ) {
+	$r->setEditorConfig([
+		
+		'mode'                    => 'exact',
+		//'theme'                   => 'silver',
+		//'skin'                    => false,
+		'apply_source_formatting' => true,
+		'remove_linebreaks'       => false,
+		'entity_encoding'         => 'raw',
+		'convert_urls'            => false,
+		'verify_html'             => true,
+		
+		'force_br_newlines' => false,
+		'force_p_newlines'  => false,
+		'forced_root_block' => '',
+		
+		
+		//'plugins'       => 'advlist autolink lists link image charmap print preview hr anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking save table contextmenu directionality template paste textcolor colorpicker textpattern imagetools',
+		'paste_as_text'     => true,
+		
+		//'content_css' => '/css/wysiwyg.css',
+	]);
+}
+
+
+//-----------------------------------------------------------------------------------
+/*
+$r->appendEditorCSSFile( '//cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css');
+$r->appendEditorJavaScriptFile('//cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.js');
+$r->setEditorInitializeCodeGenerator( function( Form_Field_WYSIWYG $field, array $editor_config ) : string {
+    return '$("#'.$field->getId().'").summernote('.json_encode($editor_config).');';
+});
+
+if( !$r->getEditorConfig() ) {
+	$r->setEditorConfig([
+		'height' => 500,
+	]);
+}
+
+*/
+//-----------------------------------------------------------------------------------
+
+?>
+<textarea <?=$r->renderTagAttributes()?>><?= $field->getValueRaw() ?></textarea>
+<script><?= $r->generateEditorInitializeCode(); ?></script>

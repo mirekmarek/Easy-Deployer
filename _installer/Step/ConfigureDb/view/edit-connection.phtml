@@ -1,0 +1,27 @@
+<?php
+namespace JetApplication\Installer;
+
+use Jet\Form;
+use Jet\Form_Renderer;
+use Jet\MVC_View;
+
+/**
+ * @var MVC_View $this
+ * @var Form $form
+ */
+$form = $this->getRaw( 'form' );
+$form->renderer()->setDefaultLabelWidth( [Form_Renderer::LJ_SIZE_MEDIUM => 2] );
+
+?>
+<?= $form->start() ?>
+<?= $form->message() ?>
+
+<?php foreach( $form->getFields() as $field ):
+	echo $field;
+endforeach; ?>
+
+
+<?= Installer::buttonNext(); ?>
+
+<?= $form->end() ?>
+

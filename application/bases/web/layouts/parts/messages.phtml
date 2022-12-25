@@ -1,0 +1,12 @@
+<?php
+use Jet\UI_messages;
+?>
+<div class="row">
+	<div class="col-md-12" id="system-messages-area">
+		<?php
+		foreach( UI_messages::get() as $msg ):
+			echo $msg;
+		endforeach;
+		?>
+	</div>
+</div>

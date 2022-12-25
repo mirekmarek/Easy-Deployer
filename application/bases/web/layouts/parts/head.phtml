@@ -1,0 +1,20 @@
+<?php
+
+use Jet\MVC_Layout;
+use Jet\MVC;
+use Jet\SysConf_URI;
+
+/**
+ * @var MVC_Layout $this
+ */
+?>
+<title><?= MVC::getBase()->getLocalizedData( MVC::getLocale() )->getTitle() ?>
+	: <?= MVC::getPage()->getTitle() ?></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="content-language" content="<?= MVC::getLocale()->getLanguage() ?>"/>
+
+<jet_layout_meta_tags/>
+<jet_layout_css/>
+<jet_layout_javascripts/>
+
+<link rel="icon" href="<?= SysConf_URI::getImages() ?>favicon.png" type="image/png">

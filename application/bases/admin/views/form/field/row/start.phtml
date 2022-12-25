@@ -1,0 +1,16 @@
+<?php
+
+use Jet\MVC_View;
+use Jet\Form_Renderer_Field_Row;
+
+/**
+ * @var MVC_View $this
+ * @var Form_Renderer_Field_Row $r
+ */
+$r = $this->getRaw( 'renderer' );
+
+if( !$r->getBaseCssClasses() ) {
+	$r->setBaseCssClass( 'form-group row' );
+}
+?>
+<div <?=$r->renderTagAttributes()?>>

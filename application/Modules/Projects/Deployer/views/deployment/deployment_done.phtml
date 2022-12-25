@@ -1,0 +1,36 @@
+<?php
+namespace JetApplicationModule\Projects\Deployer;
+
+use Jet\Locale;
+use Jet\MVC_View;
+use Jet\Tr;
+use Jet\UI_messages;
+
+/**
+ * @var MVC_View   $this
+ * @var Controller_Main $controller;
+ */
+
+$controller = $this->controller;
+
+$current_project = $controller->getCurrentProject();
+$current_deployment = $controller->getCurrentDeployment();
+
+require __DIR__.'/../lj/head.phtml';
+?>
+	<br>
+	<?=UI_messages::createSuccess(Tr::_('Deployment is successfully done!'))->setCloseable(false)?>
+
+	<?=Tr::_('Data and time: %DT%', ['DT'=>Locale::dateAndTime( $current_deployment->getDoneDateTime() )])?>
+
+	<h3><?=Tr::_('Deployed files')?></h3>
+
+	<table class="table table-striped">
+		<?php foreach($current_deployment->getDeployedFiles() as $file): ?>
+		<tr>
+			<td><?=$file?></td>
+		</tr>
+		<?php endforeach; ?>
+	</table>
+<?php
+require __DIR__.'/../lj/foot.phtml';

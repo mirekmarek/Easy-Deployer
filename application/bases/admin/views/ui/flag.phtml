@@ -1,0 +1,19 @@
+<?php
+
+use Jet\UI_flag;
+use Jet\MVC_View;
+
+/**
+ * @var MVC_View $this
+ * @var UI_flag $f
+ */
+$f = $this->getRaw( 'element' );
+
+
+$title = $f->getLocale()->getRegionName() . ' - ' . $f->getLocale()->getLanguageName();
+$region = strtolower( $f->getLocale()->getRegion() );
+
+$f->setBaseCssClass('flag flag-'.$region);
+$f->setCustomTagAttribute('title', $title);
+?>
+<span <?=$f->renderTagAttributes()?>></span>

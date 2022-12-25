@@ -1,0 +1,25 @@
+<?php
+
+use Jet\MVC_View;
+use Jet\Form_Renderer_Field_Input_Number;
+use Jet\Form_Field_Float;
+
+/**
+ * @var MVC_View $this
+ * @var Form_Renderer_Field_Input_Number $r
+ * @var Form_Field_Float $field
+ */
+$r = $this->getRaw( 'renderer' );
+$field = $r->getField();
+
+$r->setInputType('number');
+
+if( !$r->getBaseCssClasses() ) {
+	$r->setBaseCssClass( 'form-control' );
+}
+
+if( $field->getLastErrorCode() ) {
+	$r->addCustomCssClass( 'is-invalid' );
+}
+?>
+<input <?=$r->renderTagAttributes()?>/>

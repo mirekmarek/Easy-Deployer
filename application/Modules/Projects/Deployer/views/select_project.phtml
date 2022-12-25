@@ -1,0 +1,28 @@
+<?php
+namespace JetApplicationModule\Projects\Deployer;
+
+use Jet\MVC;
+use Jet\MVC_View;
+use Jet\Tr;
+use JetApplication\Project;
+
+/**
+ * @var MVC_View   $this
+ */
+?>
+
+<div class="col-12">
+	<br>
+	<br>
+	<h5><?=Tr::_('Select project')?></h5>
+	<ul class="list-group">
+		
+		<?php foreach(Project::getListOfCurrentUser() as $project ):
+			?>
+			<li class="list-group-item">
+				<a href="<?=MVC::getPage()->getURL(GET_params: ['project'=>$project->getCode()])?>"><?=$project->getName()?></a>
+			</li>
+		<?php
+		endforeach; ?>
+	</ul>
+</div>

@@ -1,0 +1,25 @@
+<?php
+
+use Jet\MVC_View;
+use Jet\Form_Renderer_Field_Input_Checkbox;
+
+/**
+ * @var MVC_View $this
+ * @var Form_Renderer_Field_Input_Checkbox $r
+ */
+$r = $this->getRaw( 'renderer' );
+$field = $r->getField();
+
+if( !$r->getBaseCssClasses() ) {
+	$r->setBaseCssClass( 'checkbox' );
+}
+
+if( $field->getLastErrorCode() ) {
+	$r->addCustomCssClass( 'is-invalid' );
+}
+?>
+<div class="<?= implode(' ', $r->getCssClasses()) ?>">
+	<input <?=$r->renderTagAttributes()?>/>
+
+	<label class="form-check-label" for="<?= $field->getId() ?>"><?= $r->getField()->getLabel() ?></label>
+</div>

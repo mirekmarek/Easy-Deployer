@@ -1,0 +1,31 @@
+<?php
+
+use Jet\UI_icon;
+use Jet\MVC_View;
+
+/**
+ * @var MVC_View $this
+ * @var UI_icon $i
+ */
+$i = $this->getRaw( 'element' );
+
+$res = '';
+
+$style = '';
+
+$font_size = match($i->getSize()) {
+	UI_icon::SIZE_EXTRA_SMALL => 0.5,
+	UI_icon::SIZE_SMALL => 0.75,
+	UI_icon::SIZE_NORMAL => 1,
+	UI_icon::SIZE_LARGE => 1.5,
+	UI_icon::SIZE_EXTRA_LARGE => 2,
+	UI_icon::SIZE_ULTRA_LARGE => 3
+};
+
+
+$i->addCustomCssStyle( 'font-size:' . $font_size . 'rem;' );
+$i->setBaseCssClass('fa fa-'. $i->getIcon() );
+$i->setCustomTagAttribute('title', $i->getTitle());
+
+$tag = $i->getTag();
+?><<?=$tag.$i->renderTagAttributes()?>></<?= $tag ?>>

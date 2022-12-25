@@ -1,0 +1,110 @@
+<?php
+
+use Jet\MVC;
+use Jet\MVC_View;
+use Jet\Form;
+use Jet\Form_Renderer;
+use Jet\Tr;
+use Jet\UI;
+
+/**
+* @var MVC_View $this
+* @var Form $form
+*/
+
+$form = $this->getRaw( 'form' );
+
+$form->renderer()->setDefaultLabelWidth( [
+	Form_Renderer::LJ_SIZE_EXTRA_SMALL => 12,
+	Form_Renderer::LJ_SIZE_SMALL => 12,
+	Form_Renderer::LJ_SIZE_MEDIUM => 2,
+	Form_Renderer::LJ_SIZE_LARGE => 2
+] );
+
+$form->renderer()->setDefaultFieldWidth( [
+	Form_Renderer::LJ_SIZE_EXTRA_SMALL => 12,
+	Form_Renderer::LJ_SIZE_SMALL => 12,
+	Form_Renderer::LJ_SIZE_MEDIUM => 10,
+	Form_Renderer::LJ_SIZE_LARGE => 8
+] );
+
+$form->field( 'allowed_extensions' )->input()->addCustomCssStyle('height: 200px;');
+$form->field( 'blacklist' )->input()->addCustomCssStyle('height: 400px;');
+
+if(!$form->field( 'code' )->getIsReadonly()) {
+	$form->field('name')->input()->addJsAction('onkeyup', 'generateCode(this.value)');
+	$form->field('code')->input()->addJsAction('onkeyup', 'generateCode(this.value)');
+	
+}
+
+$form->field('code')->input()->addCustomCssStyle('opacity: 0.3');
+$form->field('code')->label()->addCustomCssStyle('opacity: 0.3');
+
+$form->field('notes')->input()->addCustomCssStyle('height: 300px;');
+
+?>
+
+
+<?= $form->start(); ?>
+
+<div class="row toolbar" id="main-toolbar">
+	<div class="col-md-12">
+		<?= UI::button_goBack()->setUrl( MVC::getPage()->getURLPath() ) ?>
+		<?php if( !$form->getIsReadonly() ): ?>
+			<?= UI::button_save() ?>
+		<?php endif; ?>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12" id="main-col">
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div class="col-md-10">
+				<h3><?= Tr::_('Main info')?></h3>
+			</div>
+		</div>
+
+		<?= $form->field( 'name' ) ?>
+		<?= $form->field( 'code' ) ?>
+		<?= $form->field( 'project_role_access' ) ?>
+		<?= $form->field( 'notes' ) ?>
+
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div class="col-md-10">
+				<h3><?= Tr::_('Files')?></h3>
+			</div>
+		</div>
+		
+		<?= $form->field( 'source_dir' ) ?>
+		<?= $form->field( 'allowed_extensions' ) ?>
+		<?= $form->field( 'blacklist' ) ?>
+
+
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div class="col-md-10">
+				<h3><?= Tr::_('Production server connection')?></h3>
+			</div>
+		</div>
+		
+		<?= $form->field( 'connection_type' ) ?>
+		<?= $form->field( 'connection_host' ) ?>
+		<?= $form->field( 'connection_username' ) ?>
+		<?= $form->field( 'connection_password' ) ?>
+		<?= $form->field( 'connection_base_path' ) ?>
+	</div>
+</div>
+<?= $form->end(); ?>
+
+<script type="text/javascript">
+	function generateCode( name ) {
+		$.ajax({
+			url: '?generate_code='+encodeURIComponent(name),
+			dataType: 'json'
+		}).done(function(result) {
+			$('#add_form__code').val( result['code'] );
+		});
+	}
+</script>

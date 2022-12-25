@@ -1,0 +1,23 @@
+<?php
+
+use Jet\UI_dataGrid;
+use Jet\MVC_View;
+
+/**
+ * @var MVC_View $this
+ * @var UI_dataGrid $grid
+ */
+$grid = $this->getRaw( 'element' );
+
+?>
+<table class="table table-striped">
+	<thead>
+	<?= $grid->header(); ?>
+	</thead>
+	<tbody>
+	<?= $grid->body() ?>
+	</tbody>
+	<tfoot>
+	<?= $grid->footer() ?>
+	</tfoot>
+</table>

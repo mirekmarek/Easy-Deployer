@@ -1,0 +1,29 @@
+<?php
+namespace JetApplication\Installer;
+
+use Jet\Locale;
+use Jet\MVC;
+use Jet\Tr;
+use JetApplication\Application_Admin;use JetApplication\Application_Web;
+
+$getPageURL = function( string $id ) : string
+{
+	return MVC::getPage(
+		page_id: $id,
+		locale: Locale::getCurrentLocale(),
+		base_id: Application_Admin::getBaseId()
+	)->getURL();
+}
+?>
+<style>
+	li {
+		padding: 10px;
+	}
+</style>
+<?= Tr::_( 'DONE_TEXT', [
+	'URL_DEVELOPERS' => $getPageURL('developers-users'),
+	'URL_ROLES' => $getPageURL('developers-roles'),
+	'URL_PROJECTS' => $getPageURL('projects'),
+	'URL_DEPLOYER' => Application_Web::getBase()->getHomepage(Locale::getCurrentLocale())->getURL(),
+	'INSTALL_DIR' => dirname(__DIR__, 3)
+] ); ?>

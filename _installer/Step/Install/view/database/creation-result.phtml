@@ -1,0 +1,36 @@
+<?php
+
+namespace JetApplication\Installer;
+
+use Jet\Tr;
+use Jet\MVC_View;
+
+/**
+ * @var MVC_View $this
+ */
+?>
+
+<h2><?=Tr::_('Creating database')?></h2>
+<table class="table table-striped">
+	<thead>
+	<tr>
+		<th><?= Tr::_( 'Class' ); ?></th>
+		<th><?= Tr::_( 'Result' ); ?></th>
+	</tr>
+	</thead>
+	<?php foreach( $this->getRaw( 'result' ) as $class => $state ): ?>
+		<tr>
+			<td><?= $class; ?></td>
+			<?php if( $state === true ): ?>
+				<td>
+					<div class="OK">OK</div>
+				</td>
+			<?php else: ?>
+				<td>
+					<div class="error"><?= $state; ?></div>
+				</td>
+			<?php endif; ?>
+		</tr>
+	<?php endforeach; ?>
+</table>
+

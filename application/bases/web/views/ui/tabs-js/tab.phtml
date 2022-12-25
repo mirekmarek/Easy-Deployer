@@ -1,0 +1,23 @@
+<?php
+
+use Jet\UI_tabsJS_tab;
+use Jet\MVC_View;
+
+/**
+ * @var MVC_View $this
+ * @var UI_tabsJS_tab $t
+ */
+$t = $this->getRaw( 'element' );
+
+if($t->getIsSelected()) {
+	$t->setBaseCssClass('nav-link active');
+	
+} else {
+	$t->setBaseCssClass('nav-link');
+}
+
+$t->setDataAttribute('toggle', 'tab');
+$t->setCustomTagAttribute('href', '#'.$t->content()->getId());
+
+?>
+<li class="nav-item"><a <?=$t->renderTagAttributes()?>><?= $t->getTitle() ?></a></li>

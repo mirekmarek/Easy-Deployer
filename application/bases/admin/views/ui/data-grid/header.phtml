@@ -1,0 +1,19 @@
+<?php
+
+use Jet\UI_dataGrid_header;
+use Jet\MVC_View;
+
+/**
+ * @var MVC_View $this
+ * @var UI_dataGrid_header $header
+ */
+$header = $this->getRaw( 'element' );
+$grid = $header->getGrid();
+?>
+<?=$header->getPrepend()?>
+<tr <?=$header->renderTagAttributes()?>>
+	<?php foreach( $grid->getColumns() as $column ):
+		echo $column;
+	endforeach; ?>
+</tr>
+<?=$header->getAppend()?>

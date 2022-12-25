@@ -1,0 +1,21 @@
+<?php
+use Jet\MVC_View;
+use Jet\Form_Renderer_Form;
+
+/**
+ * @var MVC_View $this
+ * @var Form_Renderer_Form $r
+ */
+$r = $this->getRaw( 'renderer' );
+$form = $r->getForm();
+
+
+if(!$r->getBaseCssClasses()) {
+	$r->setBaseCssClass('form-horizontal');
+}
+
+?>
+<form <?=$r->renderTagAttributes()?>>
+<?php if( !$form->getIsReadonly() ): ?>
+	<input type="hidden" name="<?=$form->getSentKey()?>" value="<?=$form->getName();?>">
+<?php endif; ?>

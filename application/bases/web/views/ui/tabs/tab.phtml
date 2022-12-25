@@ -1,0 +1,18 @@
+<?php
+
+use Jet\UI_tabs_tab;
+use Jet\MVC_View;
+
+/**
+ * @var MVC_View $this
+ * @var UI_tabs_tab $t
+ */
+$t = $this->getRaw( 'element' );
+
+if($t->getIsSelected()) {
+	$t->setBaseCssClass('nav-link active');
+} else {
+	$t->setBaseCssClass('nav-link');
+}
+?>
+<li class="nav-item"><a <?=$t->renderTagAttributes()?>><?= $t->getTitle() ?></a></li>

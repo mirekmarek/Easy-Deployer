@@ -1,0 +1,36 @@
+<?php
+
+use Jet\MVC_Layout;
+use Jet\MVC;
+use Jet\Tr;
+
+/**
+ * @var MVC_Layout $this
+ */
+
+require 'parts/init_libs.php';
+?>
+<!DOCTYPE html>
+<html lang="<?= MVC::getLocale()->getLanguage() ?>">
+<head>
+	<?php require 'parts/head.phtml'; ?>
+</head>
+<body>
+<div class="container-fluid">
+	<div class="page-header card text-white bg-dark">
+		<div class="card-body">
+			<h1><?= Tr::_( 'Easy Deployer' ) ?></h1>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-6 offset-md-3 col-sm-8 offset-sm-2">
+			<br><br>
+
+			<jet_layout_main_position/>
+		</div>
+	</div>
+
+</div>
+</body>
+</html>

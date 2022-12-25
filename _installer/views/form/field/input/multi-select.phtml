@@ -1,0 +1,33 @@
+<?php
+
+use Jet\MVC_View;
+use Jet\Form_Renderer_Field_Input_MultiSelect;
+use Jet\Form_Field_MultiSelect;
+use Jet\Data_Text;
+
+/**
+ * @var MVC_View $this
+ * @var Form_Renderer_Field_Input_MultiSelect $r
+ * @var Form_Field_MultiSelect $field
+ */
+$r = $this->getRaw( 'renderer' );
+$field = $r->getField();
+
+if( !$r->getBaseCssClasses() ) {
+	$r->setBaseCssClass( 'form-control' );
+}
+
+
+if( $field->getLastErrorCode() ) {
+	$r->addCustomCssClass( 'is-invalid' );
+}
+?>
+<select <?=$r->renderTagAttributes()?>>
+	<?php foreach( $field->getSelectOptions() as $val => $label ):
+		
+		$css = $label->getSelectOptionCss();
+		$selected = $field->optionIsSelected($val) ? ' selected="selected"' : '';
+		
+		?><option value="<?=Data_Text::htmlSpecialChars( $val )?>" <?=$css.$selected?>><?=Data_Text::htmlSpecialChars( $label )?></option><?php
+	endforeach; ?>
+</select>

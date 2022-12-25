@@ -1,0 +1,20 @@
+<?php
+
+use Jet\MVC_View;
+use Jet\Form_Renderer_Field;
+
+/**
+ * @var MVC_View $this
+ * @var Form_Renderer_Field $r
+ */
+$r = $this->getRaw( 'renderer' );
+
+echo
+	$r->row()->start() .
+		$r->label() .
+		$r->container()->start() .
+			$r->input() .
+			$r->help() .
+			$r->error() .
+		$r->container()->end() .
+	$r->row()->end();

@@ -1,0 +1,17 @@
+<?php
+
+use Jet\MVC_View;
+use Jet\Form_Renderer_Field_Container;
+
+/**
+ * @var MVC_View $this
+ * @var Form_Renderer_Field_Container $r
+ */
+$r = $this->getRaw( 'renderer' );
+
+$r->setWidthCssClassesCreator(function( $size, $width ) {
+	return 'col-' . $size . '-' . $width;
+});
+
+?>
+<div <?=$r->renderTagAttributes()?>>
