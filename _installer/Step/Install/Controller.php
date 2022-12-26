@@ -76,7 +76,7 @@ class Installer_Step_Install_Controller extends Installer_Step_Controller
 		
 		try {
 			$app_conf->saveConfigFile();
-		} catch( Exception $e ) {
+		} catch( \Exception $e ) {
 			$this->view->setVar('keys_error',
 				UI_messages::createDanger(
 					Tr::_( 'Something went wrong: %error%', ['error' => $e->getMessage()], Translator::COMMON_DICTIONARY )
@@ -176,7 +176,7 @@ class Installer_Step_Install_Controller extends Installer_Step_Controller
 			$result[$class] = true;
 			try {
 				DataModel_Helper::create( $class );
-			} catch( Exception $e ) {
+			} catch( \Exception $e ) {
 				$result[$class] = $e->getMessage();
 				$OK = false;
 			}
@@ -272,6 +272,9 @@ class Installer_Step_Install_Controller extends Installer_Step_Controller
 		
 		
 		$this->render( 'bases/done' );
+		
+		usleep(500);
+		
 		return true;
 	}
 	
