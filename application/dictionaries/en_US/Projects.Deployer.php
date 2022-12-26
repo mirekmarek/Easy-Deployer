@@ -47,4 +47,7 @@ return [
 	'File uploading failed! File: %REMOTE_PATH%' => '',
 	'Change password' => '',
 	'Logout' => '',
+	'Error during deployment preparation. Details below.' => '',
+	'Try again' => '',
+	'Log of deployment preparation' => '',
 ];
