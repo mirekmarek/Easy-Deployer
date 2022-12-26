@@ -3,6 +3,7 @@
 use Jet\MVC_Layout;
 use Jet\MVC;
 use Jet\Tr;
+use Jet\Translator;
 use Jet\UI;
 use Jet\Locale;
 use Jet\Auth;
@@ -66,14 +67,14 @@ require 'parts/init_libs.php';
 						): ?>
 						<a class="dropdown-item" href="<?= $ua_page->getURL() ?>">
 							<?= UI::icon( 'cog' ) ?>
-							<?= Tr::_( 'Change password' ) ?>
+							<?= Tr::_( 'Change password', dictionary: Translator::COMMON_DICTIONARY ) ?>
 						</a>
 						<div class="dropdown-divider"></div>
 
 						<a class="dropdown-item"
 						   href="<?= $ua_page->getURL( [], ['logout' => 'logout'] ) ?>">
 							<?= UI::icon( 'sign-out-alt' ) ?>
-							<?= Tr::_( 'Logout' ) ?>
+							<?= Tr::_( 'Logout', dictionary: Translator::COMMON_DICTIONARY ) ?>
 						</a>
 						<?php endif; ?>
 					</div>

@@ -286,7 +286,21 @@ class Deployment extends DataModel
 	
 	public function getStateLabel() : string
 	{
-		return $this->state;
+		switch($this->state) {
+			case static::STATE_PREPARATION_STARTED:
+				return '<span class="badge badge-secondary">'.Tr::_('Preparation started').'</span>';
+			case static::STATE_PREPARATION_ERROR:
+				return '<span class="badge badge-danger">'.Tr::_('Preparation error').'</span>';
+			case static::STATE_PREPARATION_DONE:
+				return '<span class="badge badge-info">'.Tr::_('Preparation done').'</span>';
+			case static::STATE_DEPLOYMENT_STARTED:
+				return '<span class="badge badge-primary">'.Tr::_('Deployment started').'</span>';
+			case static::STATE_DEPLOYMENT_ERROR:
+				return '<span class="badge badge-danger">'.Tr::_('Deployment error').'</span>';
+			case static::STATE_DEPLOYMENT_DONE:
+				return '<span class="badge badge-success">'.Tr::_('Deployment done').'</span>';
+		
+		}
 	}
 
 	/**

@@ -17,6 +17,7 @@ use Jet\Form_Definition;
 use Jet\Form_Field;
 use Jet\Form_Field_Input;
 use Jet\Data_DateTime;
+use Jet\Form_Field_MultiSelect;
 use Jet\Locale;
 use Jet\Mailing_Email_Template;
 
@@ -953,6 +954,14 @@ class Auth_Developer_User extends DataModel implements Auth_User_Interface
 		if( !$this->_form_add ) {
 			$form = $this->_getForm();
 			$form->setName( 'add_user' );
+			
+			/**
+			 * @var Form_Field_MultiSelect $field
+			 */
+			$field = $form->getField('roles');
+			$field->setDefaultValue(
+				array_keys($field->getSelectOptions())
+			);
 
 			$this->_form_add = $form;
 

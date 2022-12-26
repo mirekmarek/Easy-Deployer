@@ -34,10 +34,11 @@ class Mailing_Backend_Default extends Mailing_Backend_Abstract
 		}
 		
 		return mail(
-			$to,
-			$subject,
-			$message,
-			$header
+			to: $to,
+			subject: $subject,
+			message: $message,
+			additional_headers: $header,
+			additional_params: "-f ".$email->getSenderEmail()
 		);
 
 	}

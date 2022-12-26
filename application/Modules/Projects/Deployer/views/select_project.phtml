@@ -21,6 +21,8 @@ use JetApplication\Project;
 			?>
 			<li class="list-group-item">
 				<a href="<?=MVC::getPage()->getURL(GET_params: ['project'=>$project->getCode()])?>"><?=$project->getName()?></a>
+				<br>
+				<?=nl2br($project->getNotes())?>
 			</li>
 		<?php
 		endforeach; ?>

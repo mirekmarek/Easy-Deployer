@@ -743,6 +743,7 @@ tmp';
 		$code = Data_Text::removeAccents($name);
 		$code = str_replace( ' ', '-', $code );
 		$code = preg_replace( '~([-]{2,})~', '-', $code );
+		$code = strtolower($code);
 		
 		$replace = [
 			'!',

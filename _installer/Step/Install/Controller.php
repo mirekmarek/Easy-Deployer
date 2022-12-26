@@ -12,6 +12,7 @@ use Jet\Application_Modules;
 use Jet\DataModel_Helper;
 use Jet\Factory_MVC;
 use Jet\Exception;
+use Jet\Locale;
 use Jet\MVC;
 use Jet\SysConf_URI;
 use Jet\Tr;
@@ -283,6 +284,22 @@ class Installer_Step_Install_Controller extends Installer_Step_Controller
 			$role = new Auth_Developer_Role();
 			$role->setId( $id );
 			$role->setName($name);
+			
+			$locale = Locale::getCurrentLocale();
+			$base = Application_Web::getBase();
+			
+			$homepage = $base->getHomepage( $locale );
+			
+			$pages = [];
+			$pages[] = $homepage->getKey();
+			foreach($homepage->getChildren() as $ch) {
+				$pages[] = $ch->getKey();
+			}
+			
+			$role->setPrivilege(
+				Auth_Developer_Role::PRIVILEGE_VISIT_PAGE,
+				$pages
+			);
 			
 			$role->save();
 		}

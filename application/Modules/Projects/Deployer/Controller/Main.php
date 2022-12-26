@@ -33,6 +33,8 @@ class Controller_Main extends MVC_Controller_Default
 	
 	public function resolve(): bool|string
 	{
+		Tr::setCurrentDictionary( $this->module->getModuleManifest()->getName() );
+		
 		$GET = Http_Request::GET();
 		
 		if(
