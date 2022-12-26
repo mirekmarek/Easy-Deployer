@@ -20,4 +20,8 @@ return [
 	'The system is compatible. Please take care about warnings!' => '',
 	'Multibyte String extension' => '',
 	'PHP Multibyte String extension must be activated' => '',
+	'FTP extension' => '',
+	'PHP FTP must be activated' => '',
+	'SSL' => '',
+	'PHP SSL support must be available' => '',
 ];

@@ -58,6 +58,6 @@ class Installer_Step_Final_Controller extends Installer_Step_Controller
 			$this->render( 'error' );
 		}
 	}
-
+	
 
 }

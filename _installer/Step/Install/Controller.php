@@ -12,7 +12,6 @@ use Jet\Application_Modules;
 use Jet\DataModel_Helper;
 use Jet\Factory_MVC;
 use Jet\Exception;
-use Jet\Locale;
 use Jet\MVC;
 use Jet\SysConf_URI;
 use Jet\Tr;
@@ -53,9 +52,7 @@ class Installer_Step_Install_Controller extends Installer_Step_Controller
 			if($this->database()) {
 				if($this->modules()) {
 					if($this->bases()) {
-						if($this->mainDeveloperRole()) {
-							$this->done();
-						}
+						$this->done();
 					}
 				}
 			}
@@ -273,43 +270,9 @@ class Installer_Step_Install_Controller extends Installer_Step_Controller
 		
 		$this->render( 'bases/done' );
 		
-		usleep(500);
-		
 		return true;
 	}
 	
-	public function mainDeveloperRole() : bool
-	{
-		$id = 'main';
-		$name = 'Main';
-		
-		if(!Auth_Developer_Role::idExists('main')) {
-			$role = new Auth_Developer_Role();
-			$role->setId( $id );
-			$role->setName($name);
-			
-			$locale = Locale::getCurrentLocale();
-			$base = Application_Web::getBase();
-			
-			$homepage = $base->getHomepage( $locale );
-			
-			$pages = [];
-			$pages[] = $homepage->getKey();
-			foreach($homepage->getChildren() as $ch) {
-				$pages[] = $ch->getKey();
-			}
-			
-			$role->setPrivilege(
-				Auth_Developer_Role::PRIVILEGE_VISIT_PAGE,
-				$pages
-			);
-			
-			$role->save();
-		}
-		
-		
-		return true;
-	}
 	
 	public function done() : void
 	{

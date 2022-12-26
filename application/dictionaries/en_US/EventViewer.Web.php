@@ -30,4 +30,5 @@ return [
 	'User name:' => '',
 	'Context object name:' => '',
 	'Context object:' => '',
+	'Event viewer - Deployer' => '',
 ];
