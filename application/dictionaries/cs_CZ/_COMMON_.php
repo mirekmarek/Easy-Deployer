@@ -7,7 +7,6 @@ return [
 	'Home page' => 'Hlavní stránka',
 	'%FROM% - %TO% / total count: %COUNT%' => '%FROM% - %TO% / celkem: %COUNT%',
 	'Go back' => 'Zpět',
-	'Secret area!' => 'Tajná oblast!',
 	'Next' => 'Další',
 	'Last' => 'Poslední',
 	'Firts' => 'První',
