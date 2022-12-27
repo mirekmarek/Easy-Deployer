@@ -28,8 +28,6 @@ use Jet\IO_Dir;
 )]
 class Project extends DataModel
 {
-	const CONNECTION_TYPE_FTP = 'FTP';
-	
 	/**
 	 * @var ?Form
 	 */
@@ -153,8 +151,8 @@ tmp';
 		label: 'Connection type:',
 		is_required: true,
 		select_options_creator: [
-			self::class,
-			'getConnectionTypes'
+			Deployment_Backend::class,
+			'getAvailableBackends'
 		],
 		error_messages: [
 			Form_Field::ERROR_CODE_EMPTY => 'Please select connection type',
@@ -267,13 +265,6 @@ tmp';
 		]
 	)]
 	protected string $notes = '';
-	
-	public static function getConnectionTypes() : array
-	{
-		return [
-			self::CONNECTION_TYPE_FTP => 'FTP',
-		];
-	}
 	
 	public static function getRoles() : array
 	{
@@ -590,6 +581,7 @@ tmp';
 				openssl_cipher_iv_length(Application_Web_Config::CIPHER_ALGO)
 			
 			);
+			$tag = '';
 			$encrypted = openssl_encrypt(
 				data: $value,
 				cipher_algo: Application_Web_Config::CIPHER_ALGO,

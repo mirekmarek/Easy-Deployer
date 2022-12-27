@@ -22,6 +22,7 @@ use Jet\Tr;
  */
 class Installer_Step_Final_Controller extends Installer_Step_Controller
 {
+	const CURRENT_VERSION = '1';
 
 	/**
 	 * @var string
@@ -44,7 +45,7 @@ class Installer_Step_Final_Controller extends Installer_Step_Controller
 			Installer_Step_Install_Controller::basesCreated()
 		) {
 			try {
-				IO_File::write( $install_symptom_file_path, Data_DateTime::now()->toString() );
+				IO_File::write( $install_symptom_file_path, static::CURRENT_VERSION.'|'.Data_DateTime::now()->toString() );
 			} catch( Exception $e ) {
 				UI_messages::danger( Tr::_( 'Something went wrong: %error%', ['error' => $e->getMessage()], Translator::COMMON_DICTIONARY ) );
 				$OK = false;

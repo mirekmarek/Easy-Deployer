@@ -1,6 +1,7 @@
 <?php
 namespace JetApplication;
 
+use FTP\Connection as FTP_Connection;
 use Jet\Debug_ErrorHandler;
 use Jet\IO_Dir;
 use Jet\IO_Dir_Exception;
@@ -12,10 +13,20 @@ class Deployment_Backend_FTP extends Deployment_Backend
 {
 
 	/**
-	 * @var resource
+	 * @var resource|FTP_Connection
 	 */
 	protected $connection;
-
+	
+	public static function isAvailable(): bool
+	{
+		return extension_loaded( 'ftp' );
+	}
+	
+	public static function getLabel() : string
+	{
+		return 'FTP';
+	}
+	
 	public function connect( ?string &$error_message ): bool
 	{
 
@@ -229,7 +240,7 @@ class Deployment_Backend_FTP extends Deployment_Backend
 					$created = Debug_ErrorHandler::doItSilent(function() use ($dir) {
 						$dir_path = $this->deployment->getProject()->getConnectionBasePath().'/'.$dir;
 						
-						if (ftp_nlist($this->connection, $dir_path) == false) {
+						if( !ftp_nlist($this->connection, $dir_path) ) {
 							return ftp_mkdir($this->connection,$dir_path  );
 						} else {
 							return true;

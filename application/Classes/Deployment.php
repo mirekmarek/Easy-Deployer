@@ -14,7 +14,6 @@ use Jet\IO_Dir;
 use Jet\IO_Dir_Exception;
 use Jet\IO_File;
 use Jet\Locale;
-use Jet\SysConf_Path;
 use Jet\Tr;
 
 /**
@@ -286,21 +285,16 @@ class Deployment extends DataModel
 	
 	public function getStateLabel() : string
 	{
-		switch($this->state) {
-			case static::STATE_PREPARATION_STARTED:
-				return '<span class="badge badge-secondary">'.Tr::_('Preparation started').'</span>';
-			case static::STATE_PREPARATION_ERROR:
-				return '<span class="badge badge-danger">'.Tr::_('Preparation error').'</span>';
-			case static::STATE_PREPARATION_DONE:
-				return '<span class="badge badge-info">'.Tr::_('Preparation done').'</span>';
-			case static::STATE_DEPLOYMENT_STARTED:
-				return '<span class="badge badge-primary">'.Tr::_('Deployment started').'</span>';
-			case static::STATE_DEPLOYMENT_ERROR:
-				return '<span class="badge badge-danger">'.Tr::_('Deployment error').'</span>';
-			case static::STATE_DEPLOYMENT_DONE:
-				return '<span class="badge badge-success">'.Tr::_('Deployment done').'</span>';
+		return match ($this->state) {
+			static::STATE_PREPARATION_STARTED => '<span class="badge badge-secondary">' . Tr::_( 'Preparation started' ) . '</span>',
+			static::STATE_PREPARATION_ERROR => '<span class="badge badge-danger">' . Tr::_( 'Preparation error' ) . '</span>',
+			static::STATE_PREPARATION_DONE => '<span class="badge badge-info">' . Tr::_( 'Preparation done' ) . '</span>',
+			static::STATE_DEPLOYMENT_STARTED => '<span class="badge badge-primary">' . Tr::_( 'Deployment started' ) . '</span>',
+			static::STATE_DEPLOYMENT_ERROR => '<span class="badge badge-danger">' . Tr::_( 'Deployment error' ) . '</span>',
+			static::STATE_DEPLOYMENT_DONE => '<span class="badge badge-success">' . Tr::_( 'Deployment done' ) . '</span>',
+			default => '',
+		};
 		
-		}
 	}
 
 	/**
@@ -526,9 +520,10 @@ class Deployment extends DataModel
 	public function getBackend() : Deployment_Backend
 	{
 		if( !$this->backend ) {
-			$class = __NAMESPACE__.'\Deployment_Backend_'.$this->getProject()->getConnectionType();
-			
-			$this->backend = new $class( $this );
+			$this->backend = Deployment_Backend::get(
+				$this->getProject()->getConnectionType(),
+				$this
+			);
 		}
 		
 		return $this->backend;
