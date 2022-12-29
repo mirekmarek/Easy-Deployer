@@ -229,7 +229,7 @@ class Deployment_Backend_FTP extends Deployment_Backend
 		
 		
 		$this->deployment->prepareEvent('Downloading started');
-		$backup_dir = $this->deployment->getBackupDirPath();
+		$backup_dir = $this->deployment->getBackupDirPath( true );
 		if(!$backup_dir) {
 			return false;
 		}

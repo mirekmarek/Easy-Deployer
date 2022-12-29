@@ -22,15 +22,16 @@ $current_deployment = $controller->getCurrentDeployment();
 
 
 $deleteBtn = function( Deployment $deployment ) use ($current_project) {
-	echo UI::button_delete(' ')
-		->setSize(UI_button::SIZE_EXTRA_SMALL)
-		->setUrl(MVC::getPage()->getURL(
-			GET_params: [
-				'project'=>$current_project->getCode(),
-				'deployment' => $deployment->getId(),
-				'action' => 'delete_deployment',
-			]))
-		->addJsAction('onclick', "return confirm('".Tr::_('Do you really want do delete this deployment?')."')");
+	?><a
+		href="<?=MVC::getPage()->getURL(
+		GET_params: [
+			'project'=>$current_project->getCode(),
+			'deployment' => $deployment->getId(),
+			'action' => 'delete_deployment',
+		])?>"
+		onclick="return confirm('<?=Tr::_('Do you really want do delete this deployment?')?>')"
+		class="text-danger"
+	><?=UI::icon('trash')?></a><?php
 };
 
 $deploymentDeleted = function( Deployment $deployment ) {

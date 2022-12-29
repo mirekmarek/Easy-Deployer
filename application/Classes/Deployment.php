@@ -572,32 +572,33 @@ class Deployment extends DataModel
 	
 	
 	
-	public function getBackupDirPath() : string|bool
+	public function getBackupDirPath( bool $create=false ) : string|bool
 	{
 		if(!$this->backup_dir_path) {
-			$this->backup_dir_path = Application_Deployer::getDeploymentsDir().$this->project_code.'/'.$this->id.'_'.$this->start_date_time->format('YmdHis').'/';
+			$this->backup_dir_path = Application_Deployer::getDeploymentsDir().$this->project_code.'/'.$this->id.'/';
 			
 
-			$this->prepareEvent('Creating backup directory');
-			
-			try {
-				/*
-				if(IO_Dir::exists($this->backup_dir_path)) {
-					IO_Dir::remove($this->backup_dir_path);
+			if($create) {
+				$this->prepareEvent('Creating backup directory');
+				
+				try {
+					if(IO_Dir::exists($this->backup_dir_path)) {
+						IO_Dir::remove($this->backup_dir_path);
+					}
+					
+					IO_Dir::create($this->backup_dir_path);
+				} catch(IO_Dir_Exception $e ) {
+					$this->prepareError('Unable to create directory %DIR%, Error message: %ERROR%', [
+						'DIR' => $this->backup_dir_path,
+						'ERROR' => $e->getMessage()
+					]);
+					
+					return false;
 				}
-				*/
 				
-				IO_Dir::create($this->backup_dir_path);
-			} catch(IO_Dir_Exception $e ) {
-				$this->prepareError('Unable to create directory %DIR%, Error message: %ERROR%', [
-					'DIR' => $this->backup_dir_path,
-					'ERROR' => $e->getMessage()
-				]);
+				$this->prepareEvent('Backup directory has been created');
 				
-				return false;
 			}
-			
-			$this->prepareEvent('Backup directory has been created');
 		}
 		
 		return $this->backup_dir_path;
@@ -1184,7 +1185,7 @@ class Deployment extends DataModel
 		}
 		
 		$dir = $this->getBackupDirPath();
-		
+
 		try {
 			IO_Dir::remove($dir);
 		} /** @noinspection PhpUnusedLocalVariableInspection */
