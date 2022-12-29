@@ -75,7 +75,7 @@ class Deployment_Diff
 		
 	}
 	
-	protected function _getList( string $base_dir, string $dir, array &$result )
+	protected function _getList( string $base_dir, string $dir, array &$result ) : void
 	{
 		
 		if( $this->project->dirIsBlacklisted( $dir ) ) {

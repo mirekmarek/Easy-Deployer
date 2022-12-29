@@ -8,7 +8,6 @@
 
 namespace JetApplication;
 
-use Jet\Application_Module;
 use Jet\Application_Modules;
 use Jet\DataModel;
 use Jet\DataModel_Definition;
