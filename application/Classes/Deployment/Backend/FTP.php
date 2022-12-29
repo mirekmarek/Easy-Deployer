@@ -211,72 +211,6 @@ class Deployment_Backend_FTP extends Deployment_Backend
 
 		return true;
 	}
-
-	public function uploadFiles( string $local_base_dir, array $files ) : bool
-	{
-		foreach( $files as $file ) {
-			$local_path = $local_base_dir.$file;
-			$remote_path = $this->deployment->getProject()->getConnectionBasePath().'/'.$file;
-
-			$this->deployment->deployEvent('Uploading file: %LOCAL_PATH% -> %REMOTE_PATH%', [
-				'LOCAL_PATH' => $local_path,
-				'REMOTE_PATH' => $remote_path
-			]);
-
-			$dirs = array();
-
-			$dir_name = $file;
-
-			while( ($dir_name = dirname($dir_name)) ) {
-				if($dir_name=='.') {
-					break;
-				}
-
-				$dirs[] = $dir_name;
-			}
-
-			if($dirs) {
-				foreach( $dirs as $dir ) {
-					$created = Debug_ErrorHandler::doItSilent(function() use ($dir) {
-						$dir_path = $this->deployment->getProject()->getConnectionBasePath().'/'.$dir;
-						
-						if( !ftp_nlist($this->connection, $dir_path) ) {
-							return ftp_mkdir($this->connection,$dir_path  );
-						} else {
-							return true;
-						}
-					});
-					
-					if(!$created) {
-						$this->deployment->deployError('Unable to create target directory %DIR%, Error: %ERROR%', [
-							'DIR' => $dir,
-							'ERROR' => Debug_ErrorHandler::getLastError()->getMessage()
-						]);
-						
-						return false;
-					}
-				}
-			}
-			
-			$res = Debug_ErrorHandler::doItSilent(function() use ($remote_path, $local_path) {
-				return ftp_put( $this->connection, $remote_path, $local_path, FTP_BINARY );
-			});
-			
-			if(!$res) {
-				$this->deployment->deployError('File uploading failed! File: %REMOTE_PATH%', [
-					'REMOTE_PATH' => $remote_path
-				]);
-				
-				return false;
-			}
-			
-			$this->deployment->addDeployedFile( $file );
-			
-			$this->deployment->deployEvent('OK');
-		}
-		
-		return true;
-	}
 	
 	public function prepare() : bool
 	{
@@ -312,26 +246,119 @@ class Deployment_Backend_FTP extends Deployment_Backend
 		return true;
 	}
 	
-	public function deploy() : bool
+	
+	protected function _upload( string $local_base_dir, array $files, callable $logEvent, callable $logError, callable $addUploadedFile ) : bool
 	{
-		$this->deployment->deployEvent('Connecting to a FTP');
+		$logEvent('Connecting to a FTP');
 		
 		
 		if(!$this->connect( $error_message )) {
-			$this->deployment->deployError('Unable to connect FTP: %ERROR%', [
+			$logError('Unable to connect FTP: %ERROR%', [
 				'ERROR' => $error_message
 			]);
 			
 			return false;
 		}
 		
-		$this->deployment->deployEvent('Connected ...');
+		$logEvent('Connected ...');
 
+		foreach( $files as $file ) {
+			$local_path = $local_base_dir.$file;
+			$remote_path = $this->deployment->getProject()->getConnectionBasePath().'/'.$file;
+
+			$logEvent('Uploading file: %LOCAL_PATH% -> %REMOTE_PATH%', [
+				'LOCAL_PATH' => $local_path,
+				'REMOTE_PATH' => $remote_path
+			]);
+
+			$dirs = array();
+
+			$dir_name = $file;
+
+			while( ($dir_name = dirname($dir_name)) ) {
+				if($dir_name=='.') {
+					break;
+				}
+
+				$dirs[] = $dir_name;
+			}
+
+			if($dirs) {
+				foreach( $dirs as $dir ) {
+					$created = Debug_ErrorHandler::doItSilent(function() use ($dir) {
+						$dir_path = $this->deployment->getProject()->getConnectionBasePath().'/'.$dir;
+						
+						if( !ftp_nlist($this->connection, $dir_path) ) {
+							return ftp_mkdir($this->connection,$dir_path  );
+						} else {
+							return true;
+						}
+					});
+					
+					if(!$created) {
+						$logError('Unable to create target directory %DIR%, Error: %ERROR%', [
+							'DIR' => $dir,
+							'ERROR' => Debug_ErrorHandler::getLastError()->getMessage()
+						]);
+						
+						return false;
+					}
+				}
+			}
+			
+			$addUploadedFile( $file );
+			
+			$res = Debug_ErrorHandler::doItSilent(function() use ($remote_path, $local_path) {
+				return ftp_put( $this->connection, $remote_path, $local_path, FTP_BINARY );
+			});
+			
+			if(!$res) {
+				$logError('File uploading failed! File: %REMOTE_PATH%', [
+					'REMOTE_PATH' => $remote_path
+				]);
+				
+				return false;
+			}
+			
+			
+			$logEvent('OK');
+		}
 		
-		return $this->uploadFiles(
-			$this->deployment->getProject()->getSourceDir(),
-			$this->deployment->getSelectedFiles()
+		return true;
+	}
+	
+	public function deploy() : bool
+	{
+		return $this->_upload(
+			local_base_dir: $this->deployment->getProject()->getSourceDir(),
+			files: $this->deployment->getSelectedFiles(),
+			logEvent: function( string $event, array $event_data=[] ) {
+				$this->deployment->deployEvent( $event, $event_data );
+			},
+			logError: function( string $message, array $error_data=[] ) {
+				$this->deployment->deployError( $message, $error_data );
+			},
+			addUploadedFile: function($file) : void {
+				$this->deployment->addDeployedFile( $file );
+			}
 		);
 	}
 	
+	
+	public function rollback(): bool
+	{
+		return $this->_upload(
+			local_base_dir: $this->deployment->getBackupDirPath(),
+			files: $this->deployment->getRollbackFiles(),
+			logEvent: function( string $event, array $event_data=[] ) {
+				$this->deployment->rollbackEvent( $event, $event_data );
+			},
+			logError: function( string $message, array $error_data=[] ) {
+				$this->deployment->rollbackError( $message, $error_data );
+			},
+			addUploadedFile: function($file) : void {
+				$this->deployment->addRollbackedFile( $file );
+			}
+		);
+	}
 }

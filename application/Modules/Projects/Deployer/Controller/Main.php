@@ -11,6 +11,7 @@ namespace JetApplicationModule\Projects\Deployer;
 use Jet\Application;
 use Jet\Http_Headers;
 use Jet\Http_Request;
+use Jet\Logger;
 use Jet\MVC;
 use Jet\MVC_Controller_Default;
 use Jet\Navigation_Breadcrumb;
@@ -66,9 +67,10 @@ class Controller_Main extends MVC_Controller_Default
 		}
 		
 		
-		
-		if($action=='start_new_deployment') {
-			return 'start_new_deployment';
+		if($this->current_project->deploymentPrepareAllowed()) {
+			if($action=='start_new_deployment') {
+				return 'start_new_deployment';
+			}
 		}
 		
 		if($this->current_deployment) {
@@ -80,25 +82,6 @@ class Controller_Main extends MVC_Controller_Default
 				] )
 			);
 			
-			if($action=='prepare_show') {
-				return 'deployment_prepare_show';
-			}
-			
-			if($action=='prepare') {
-				return 'deployment_prepare';
-			}
-			
-			if($action=='prepare_again') {
-				return 'deployment_prepare_again';
-			}
-			
-			if(
-				$action=='deploy_again' &&
-				$this->current_deployment->getState()==Deployment::STATE_DEPLOYMENT_ERROR
-			) {
-				return $action;
-			}
-			
 			if(
 				$action=='compare_file' &&
 				($file = $GET->getString('file')) &&
@@ -107,23 +90,76 @@ class Controller_Main extends MVC_Controller_Default
 				return 'compare_file';
 			}
 			
-			if( $this->current_deployment->getState()==Deployment::STATE_PREPARATION_DONE ) {
+			
+			if($this->current_project->deploymentPrepareAllowed()) {
+				if($action=='prepare_show') {
+					return 'deployment_prepare_show';
+				}
+				
+				if($action=='prepare') {
+					return 'deployment_prepare';
+				}
+				
+				if($action=='prepare_again') {
+					return 'deployment_prepare_again';
+				}
+			}
+			
+			if($this->current_deployment->doDeploymentAllowed()) {
 				if(
-					$action=='unselect_file' ||
-					$action=='select_file'
+					$action=='deploy_again' &&
+					$this->current_deployment->getState()==Deployment::STATE_DEPLOYMENT_ERROR
+				) {
+					return $action;
+				}
+				
+				
+				if( $this->current_deployment->getState()==Deployment::STATE_PREPARATION_DONE ) {
+					if(
+						$action=='unselect_file' ||
+						$action=='select_file'
+					) {
+						return $action;
+					}
+					
+					if(
+						$this->current_deployment->getSelectedFiles() &&
+						(
+							$action=='deployment_start_show' ||
+							$action=='deploy'
+						)
+					) {
+						return $action;
+					}
+				}
+			}
+			
+			if(
+				$action=='delete_deployment' &&
+				$this->current_deployment->deleteDeploymentAllowed()
+			) {
+				return $action;
+			}
+			
+			if($this->current_deployment->rollbackDeploymentAllowed()) {
+				if(
+					(
+						$action=='rollback' ||
+						$action=='rollback_start_show'
+					)
+					&&
+					count($this->current_deployment->getRollbackFiles())
 				) {
 					return $action;
 				}
 				
 				if(
-					$this->current_deployment->getSelectedFiles() &&
-					(
-						$action=='deployment_start_show' ||
-						$action=='deploy'
-					)
+					$action=='unselect_rollback_file' ||
+					$action=='select_rollback_file'
 				) {
 					return $action;
 				}
+				
 			}
 			
 		} else {
@@ -188,7 +224,6 @@ class Controller_Main extends MVC_Controller_Default
 		$deployment = Deployment::initPreparation( $this->current_project );
 		$this->current_deployment = $deployment;
 		
-
 		Http_Headers::movedTemporary(
 			MVC::getPage()->getURL(GET_params: [
 				'project' => $this->current_project->getCode(),
@@ -211,6 +246,14 @@ class Controller_Main extends MVC_Controller_Default
 	
 	public function deployment_prepare_Action() : void
 	{
+		Logger::success(
+			'deployment_prepare',
+			'Deployment preparation started',
+			$this->current_deployment->getId(),
+			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
+			$this->current_deployment
+		);
+
 		$this->current_deployment->prepare();
 		
 		Http_Headers::movedTemporary(
@@ -223,6 +266,14 @@ class Controller_Main extends MVC_Controller_Default
 	
 	public function deployment_prepare_again_Action() : void
 	{
+		Logger::success(
+			'deployment_prepare_again',
+			'Deployment preparation started again',
+			$this->current_deployment->getId(),
+			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
+			$this->current_deployment
+		);
+		
 		if(!$this->current_deployment->prepareAgain()) {
 			Http_Headers::movedTemporary(
 				MVC::getPage()->getURL(GET_params: [
@@ -243,6 +294,7 @@ class Controller_Main extends MVC_Controller_Default
 	
 	public function compare_file_Action() : void
 	{
+		
 		Navigation_Breadcrumb::addURL(Tr::_('File change'));
 		
 		require SysConf_Path::getLibrary().'Diff/Diff.php';
@@ -259,6 +311,17 @@ class Controller_Main extends MVC_Controller_Default
 		
 		]);
 		
+		Logger::success(
+			'file_compared',
+			'File compared',
+			$this->current_deployment->getId(),
+			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
+			[
+				'deployment' => $this->current_deployment,
+				'file' => $file
+			]
+		);
+		
 		$renderer = new Diff_Renderer_Html_SideBySide();
 		
 		
@@ -274,6 +337,17 @@ class Controller_Main extends MVC_Controller_Default
 	{
 		$file = Http_Request::GET()->getString('file');
 		
+		Logger::success(
+			'file_selected',
+			'File selected',
+			$this->current_deployment->getId(),
+			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
+			[
+				'deployment' => $this->current_deployment,
+				'file' => $file
+			]
+		);
+		
 		$this->current_deployment->unselectFile( $file );
 		
 		echo $this->view->render('deployment/selected_files');
@@ -283,6 +357,18 @@ class Controller_Main extends MVC_Controller_Default
 	public function select_file_Action() : void
 	{
 		$file = Http_Request::GET()->getString('file');
+		
+		
+		Logger::success(
+			'file_unselected',
+			'File unselected',
+			$this->current_deployment->getId(),
+			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
+			[
+				'deployment' => $this->current_deployment,
+				'file' => $file
+			]
+		);
 		
 		$this->current_deployment->selectFile( $file );
 		
@@ -303,6 +389,14 @@ class Controller_Main extends MVC_Controller_Default
 	
 	public function deploy_Action() : void
 	{
+		Logger::success(
+			'deployment_started',
+			'Deployment started',
+			$this->current_deployment->getId(),
+			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
+			$this->current_deployment
+		);
+		
 		$this->current_deployment->deploy();
 		
 		Http_Headers::movedTemporary(
@@ -315,6 +409,14 @@ class Controller_Main extends MVC_Controller_Default
 	
 	public function deploy_again_Action() : void
 	{
+		Logger::success(
+			'deployment_started_again',
+			'Deployment started again',
+			$this->current_deployment->getId(),
+			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
+			$this->current_deployment
+		);
+
 		$this->current_deployment->retryDeploy();
 		
 		Http_Headers::movedTemporary(
@@ -322,6 +424,101 @@ class Controller_Main extends MVC_Controller_Default
 				'project' => $this->current_project->getCode(),
 				'deployment' => $this->current_deployment->getId(),
 				'action' => 'deployment_start_show',
+			])
+		);
+		
+	}
+	
+	public function delete_deployment_Action() : void
+	{
+		Logger::success(
+			'deployment_deleted',
+			'Deployment deleted',
+			$this->current_deployment->getId(),
+			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
+			$this->current_deployment
+		);
+		
+		$this->current_deployment->deleteDeployment();
+		
+		Http_Headers::movedTemporary(
+			MVC::getPage()->getURL(GET_params: [
+				'project' => $this->current_project->getCode(),
+				'deployment' => $this->current_deployment->getId()
+			])
+		);
+		
+	}
+	
+	public function unselect_rollback_file_Action() : void
+	{
+		$file = Http_Request::GET()->getString('file');
+		
+		Logger::success(
+			'rollback file_unselected',
+			'Rollback file unselected',
+			$this->current_deployment->getId(),
+			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
+			[
+				'deployment' => $this->current_deployment,
+				'file' => $file
+			]
+		);
+		
+		$this->current_deployment->unselectRollbackFile( $file );
+		
+		echo $this->view->render('deployment/deployment_rollback/selected_files');
+		Application::end();
+	}
+	
+	public function select_rollback_file_Action() : void
+	{
+		$file = Http_Request::GET()->getString('file');
+		
+		Logger::success(
+			'rollback file_selected',
+			'Rollback file selected',
+			$this->current_deployment->getId(),
+			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
+			[
+				'deployment' => $this->current_deployment,
+				'file' => $file
+			]
+		);
+		
+		$this->current_deployment->selectRollbackFile( $file );
+		
+		echo $this->view->render('deployment/deployment_rollback/selected_files');
+		Application::end();
+	}
+	
+	public function rollback_start_show_Action() : void
+	{
+		$this->view->setVar( 'rollback_URL', MVC::getPage()->getURL(GET_params: [
+			'project' => $this->current_project->getCode(),
+			'deployment' => $this->current_deployment->getId(),
+			'action' => 'rollback'
+		]) );
+		
+		$this->output('deployment/rollback_in_progress');
+	}
+	
+	public function rollback_Action() : void
+	{
+		Logger::success(
+			'rollback',
+			'Rollback',
+			$this->current_deployment->getId(),
+			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
+			$this->current_deployment
+		);
+		
+		$this->current_deployment->rollback();
+		
+		Http_Headers::movedTemporary(
+			MVC::getPage()->getURL(GET_params: [
+				'project' => $this->current_project->getCode(),
+				'deployment' => $this->current_deployment->getId()
 			])
 		);
 		

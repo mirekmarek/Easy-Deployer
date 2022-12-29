@@ -12,7 +12,7 @@ use Jet\IO_Dir;
 use Jet\SysConf_Path;
 
 use JetApplication\Application_Admin;
-use JetApplication\Application_Web;
+use JetApplication\Application_Deployer;
 
 /**
  *
@@ -59,17 +59,17 @@ class Installer_Step_DirsCheck_Controller extends Installer_Step_Controller
 			SysConf_Path::getJs()     => [
 				'is_required'  => true,
 			],
-
+			
 			SysConf_Path::getBases() . Application_Admin::getBaseId() . '/' => [
 				'is_required'  => true,
 			],
-			SysConf_Path::getBases() . Application_Web::getBaseId() . '/'   => [
+			SysConf_Path::getBases() . Application_Deployer::getBaseId() . '/' => [
 				'is_required'  => true,
 			],
 			SysConf_Path::getConfig()                                       => [
 				'is_required'  => true,
 			],
-			Application_Web::getDeploymentsRootDir() => [
+			Application_Deployer::getDeploymentsRootDir()                      => [
 				'is_required'  => true,
 			]
 		];

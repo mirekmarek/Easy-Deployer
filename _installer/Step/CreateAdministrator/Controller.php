@@ -8,8 +8,9 @@
 
 namespace JetApplication\Installer;
 
+use Jet\Application_Modules;
 use Jet\Locale;
-use JetApplication\Application_Web;
+use JetApplication\Application_Deployer;
 use JetApplication\Auth_Administrator_User;
 use JetApplication\Auth_Developer_Role;
 
@@ -72,7 +73,7 @@ class Installer_Step_CreateAdministrator_Controller extends Installer_Step_Contr
 			$role->setName($name);
 			
 			$locale = Locale::getCurrentLocale();
-			$base = Application_Web::getBase();
+			$base = Application_Deployer::getBase();
 			
 			$homepage = $base->getHomepage( $locale );
 			
@@ -85,6 +86,13 @@ class Installer_Step_CreateAdministrator_Controller extends Installer_Step_Contr
 			$role->setPrivilege(
 				Auth_Developer_Role::PRIVILEGE_VISIT_PAGE,
 				$pages
+			);
+			
+			$module_manifest = Application_Modules::moduleManifest('Projects.Deployer');
+			
+			$role->setPrivilege(
+				Auth_Developer_Role::PRIVILEGE_ACTION,
+				array_keys( $module_manifest->getACLActions( false ) )
 			);
 			
 			$role->save();

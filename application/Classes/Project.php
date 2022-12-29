@@ -575,16 +575,16 @@ tmp';
 	{
 		if($value) {
 			
-			$key = Application_Web_Config::get()->getEncKey();
+			$key = Application_Deployer_Config::get()->getEncKey();
 			
 			$iv = openssl_random_pseudo_bytes(
-				openssl_cipher_iv_length(Application_Web_Config::CIPHER_ALGO)
+				openssl_cipher_iv_length(Application_Deployer_Config::CIPHER_ALGO)
 			
 			);
 			$tag = '';
 			$encrypted = openssl_encrypt(
 				data: $value,
-				cipher_algo: Application_Web_Config::CIPHER_ALGO,
+				cipher_algo: Application_Deployer_Config::CIPHER_ALGO,
 				passphrase: $key,
 				iv: $iv,
 				tag: $tag
@@ -596,13 +596,13 @@ tmp';
 
 	public function getConnectionPassword() : string
 	{
-		$key = Application_Web_Config::get()->getEncKey();
+		$key = Application_Deployer_Config::get()->getEncKey();
 		
 		[$encrypted, $iv, $tag] = explode('|', base64_decode($this->connection_password));
 		
 		return openssl_decrypt(
 			data: $encrypted,
-			cipher_algo: Application_Web_Config::CIPHER_ALGO,
+			cipher_algo: Application_Deployer_Config::CIPHER_ALGO,
 			passphrase: $key,
 			iv:  $iv,
 			tag: $tag
@@ -734,7 +734,7 @@ tmp';
 	{
 		$code = Data_Text::removeAccents($name);
 		$code = str_replace( ' ', '-', $code );
-		$code = preg_replace( '~([-]{2,})~', '-', $code );
+		$code = preg_replace( '~(-{2,})~', '-', $code );
 		$code = strtolower($code);
 		
 		$replace = [
@@ -806,5 +806,16 @@ tmp';
 	public function getNotes() : string
 	{
 		return $this->notes;
+	}
+	
+	public function deploymentPrepareAllowed() : bool
+	{
+		return (
+			$this->accessAllowed() &&
+			Auth::getCurrentUserHasPrivilege(
+				Auth_Developer_Role::PRIVILEGE_ACTION,
+				Deployment::ACTION_PREPARE_DEPLOYMENT
+			)
+		);
 	}
 }

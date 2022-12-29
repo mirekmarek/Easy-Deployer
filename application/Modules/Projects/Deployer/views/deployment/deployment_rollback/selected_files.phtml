@@ -1,0 +1,60 @@
+<?php
+namespace JetApplicationModule\Projects\Deployer;
+
+use Jet\MVC;
+use Jet\MVC_View;
+use Jet\Tr;
+use Jet\UI;
+use Jet\UI_button;
+use JetApplication\Deployment;
+
+/**
+ * @var MVC_View   $this
+ * @var Controller_Main $controller;
+ */
+
+$controller = $this->controller;
+
+$current_project = $controller->getCurrentProject();
+$current_deployment = $controller->getCurrentDeployment();
+
+$selected_files = $current_deployment->getRollbackFiles();
+
+$active_mode = $current_deployment->rollbackDeploymentAllowed();
+
+
+if(!$selected_files) {
+	return;
+}
+
+asort($selected_files);
+?>
+<h2><?=Tr::_('Selected rollback files')?></h2>
+
+<table class="table table-striped">
+	<?php foreach($selected_files as $file): ?>
+		<tr>
+			<td>
+				<?php if($active_mode): ?>
+					<?=UI::icon('trash')->addJsAction('onclick',"unselectFile('$file')" )?>
+				<?php endif; ?>
+			</td>
+			<td><?=$file?></td>
+		</tr>
+	<?php endforeach; ?>
+</table>
+
+<br><br><br>
+<?php if($active_mode): ?>
+	<?=UI::button(Tr::_('Start rollback'))
+		->setClass(UI_button::CLASS_DANGER)
+		->setIcon('')
+		->setUrl(MVC::getPage()->getURL(GET_params: [
+			'project'=> $current_project->getCode(),
+			'deployment' => $current_deployment->getId(),
+			'action' => 'rollback_start_show'
+		]))
+		->addJsAction('onclick', "return confirm('".addslashes(Tr::_('Do you really want to start rollback?'))."');")
+	?>
+	<br><br><br>
+<?php endif; ?>

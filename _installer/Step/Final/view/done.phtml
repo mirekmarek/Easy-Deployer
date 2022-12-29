@@ -4,7 +4,7 @@ namespace JetApplication\Installer;
 use Jet\Locale;
 use Jet\MVC;
 use Jet\Tr;
-use JetApplication\Application_Admin;use JetApplication\Application_Web;
+use JetApplication\Application_Admin;use JetApplication\Application_Deployer;
 
 $getPageURL = function( string $id ) : string
 {
@@ -24,6 +24,6 @@ $getPageURL = function( string $id ) : string
 	'URL_DEVELOPERS' => $getPageURL('developers-users'),
 	'URL_ROLES' => $getPageURL('developers-roles'),
 	'URL_PROJECTS' => $getPageURL('projects'),
-	'URL_DEPLOYER' => Application_Web::getBase()->getHomepage(Locale::getCurrentLocale())->getURL(),
+	'URL_DEPLOYER' => Application_Deployer::getBase()->getHomepage(Locale::getCurrentLocale())->getURL(),
 	'INSTALL_DIR' => dirname(__DIR__, 3)
 ] ); ?>

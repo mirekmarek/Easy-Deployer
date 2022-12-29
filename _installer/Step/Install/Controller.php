@@ -18,8 +18,8 @@ use Jet\Tr;
 use Jet\Translator;
 use Jet\UI_messages;
 use JetApplication\Application_Admin;
-use JetApplication\Application_Web;
-use JetApplication\Application_Web_Config;
+use JetApplication\Application_Deployer;
+use JetApplication\Application_Deployer_Config;
 use JetApplication\Auth_Administrator_Role;
 use JetApplication\Auth_Administrator_Role_Privilege;
 use JetApplication\Auth_Administrator_User;
@@ -30,7 +30,7 @@ use JetApplication\Auth_Developer_User;
 use JetApplication\Auth_Developer_User_Roles;
 use JetApplication\Deployment;
 use JetApplication\Logger_Admin_Event;
-use JetApplication\Logger_Web_Event;
+use JetApplication\Logger_Deployer_Event;
 use JetApplication\Project;
 
 
@@ -61,7 +61,7 @@ class Installer_Step_Install_Controller extends Installer_Step_Controller
 	
 	public function keys() : bool
 	{
-		$app_conf = new Application_Web_Config();
+		$app_conf = new Application_Deployer_Config();
 		
 		if(!$app_conf->getDeploymentsDir()) {
 			$app_conf->setDeploymentsDir( uniqid().uniqid() );
@@ -160,7 +160,7 @@ class Installer_Step_Install_Controller extends Installer_Step_Controller
 			Auth_Developer_User_Roles::class,
 			
 			Logger_Admin_Event::class,
-			Logger_Web_Event::class,
+			Logger_Deployer_Event::class,
 			
 			Project::class,
 			Deployment::class,
@@ -207,13 +207,13 @@ class Installer_Step_Install_Controller extends Installer_Step_Controller
 		
 		$URL = $_SERVER['HTTP_HOST'] . SysConf_URI::getBase();
 		$web = Factory_MVC::getBaseInstance();
-		$web->setName( 'Web' );
-		$web->setId( Application_Web::getBaseId() );
+		$web->setName( 'Deployer' );
+		$web->setId( Application_Deployer::getBaseId() );
 		$web->setIsSecret( true );
 		$web->setIsActive( true );
 		$web->setIsDefault( true );
 		$web->setInitializer([
-			Application_Web::class,
+			Application_Deployer::class,
 			'init'
 		]);
 		

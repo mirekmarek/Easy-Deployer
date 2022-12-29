@@ -24,11 +24,13 @@ require __DIR__.'/../lj/head.phtml';
 	<?=UI_messages::createDanger(Tr::_('Error during deployment preparation. Details below.'))->setCloseable(false)?>
 	<br>
 	
+	<?php if($current_deployment->deploymentPrepareAllowed()): ?>
 	<?=UI::button(Tr::_('Try again'))->setUrl(MVC::getPage()->getURL(GET_params: [
 		'project' => $current_project->getCode(),
 		'deployment' => $current_deployment->getId(),
 		'action' => 'prepare_again'
 	]))->setClass(UI_button::CLASS_PRIMARY)?>
+	<?php endif; ?>
 	<br>
 	<hr>
 

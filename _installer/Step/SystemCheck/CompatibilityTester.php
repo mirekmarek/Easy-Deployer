@@ -9,7 +9,7 @@
 namespace JetApplication\Installer;
 
 use Jet\Tr;
-use JetApplication\Application_Web_Config;
+use JetApplication\Application_Deployer_Config;
 
 require_once 'CompatibilityTester/TestResult.php';
 
@@ -238,7 +238,7 @@ class Installer_CompatibilityTester
 			function( Installer_CompatibilityTester_TestResult $test_result ) {
 				return
 					function_exists('openssl_get_cipher_methods') &&
-					in_array(Application_Web_Config::CIPHER_ALGO, openssl_get_cipher_methods()) &&
+					in_array(Application_Deployer_Config::CIPHER_ALGO, openssl_get_cipher_methods()) &&
 					function_exists('openssl_random_pseudo_bytes') &&
 					function_exists('openssl_cipher_iv_length') &&
 					function_exists('openssl_encrypt')

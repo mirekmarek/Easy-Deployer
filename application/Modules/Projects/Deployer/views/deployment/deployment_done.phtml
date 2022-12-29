@@ -18,19 +18,32 @@ $current_deployment = $controller->getCurrentDeployment();
 
 require __DIR__.'/../lj/head.phtml';
 ?>
-	<br>
-	<?=UI_messages::createSuccess(Tr::_('Deployment is successfully done!'))->setCloseable(false)?>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-7">
+			<br>
+			<?=UI_messages::createSuccess(Tr::_('Deployment is successfully done!'))->setCloseable(false)?>
+			
+			<?=Tr::_('Data and time: %DT%', ['DT'=>Locale::dateAndTime( $current_deployment->getDoneDateTime() )])?>
+			
+			<h3><?=Tr::_('Deployed files')?></h3>
+			
+			<table class="table table-striped">
+				<?php foreach($current_deployment->getDeployedFiles() as $file): ?>
+				<tr>
+					<td><?=$file?></td>
+				</tr>
+				<?php endforeach; ?>
+			</table>
+			
+			<?php require 'deployment_rollback.phtml'; ?>
+		</div>
 
-	<?=Tr::_('Data and time: %DT%', ['DT'=>Locale::dateAndTime( $current_deployment->getDoneDateTime() )])?>
-
-	<h3><?=Tr::_('Deployed files')?></h3>
-
-	<table class="table table-striped">
-		<?php foreach($current_deployment->getDeployedFiles() as $file): ?>
-		<tr>
-			<td><?=$file?></td>
-		</tr>
-		<?php endforeach; ?>
-	</table>
+		<div class="col-md-5 bg-light" id="selected-files-area">
+			<?php require 'deployment_rollback/selected_files.phtml'; ?>
+		</div>
+		
+	</div>
+</div>
 <?php
 require __DIR__.'/../lj/foot.phtml';

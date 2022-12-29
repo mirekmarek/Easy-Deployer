@@ -20,7 +20,7 @@ $current_deployment = $controller->getCurrentDeployment();
 
 $selected_files = $current_deployment->getSelectedFiles();
 
-$active_mode = $current_deployment->getState()==Deployment::STATE_PREPARATION_DONE;
+$active_mode = $current_deployment->getState()==Deployment::STATE_PREPARATION_DONE && $current_deployment->doDeploymentAllowed();
 
 $diff = $active_mode ? $current_deployment->getDiff() : null;
 

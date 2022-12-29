@@ -42,9 +42,9 @@ class Installer_Step_SystemCheck_Controller extends Installer_Step_Controller
 			[
 				'test_PHPVersion',
 				'test_PDOExtension',
-				'test_FTPExtension',
 				'test_MBStringExtension',
 				'test_INTLExtension',
+				'test_FTPExtension',
 				'test_SSL',
 			]
 		);

@@ -987,7 +987,7 @@ class Auth_Developer_User extends DataModel implements Auth_User_Interface
 	{
 		$locales = [];
 
-		foreach( Application_Web::getBase()->getLocales() as $locale_str => $locale ) {
+		foreach( Application_Deployer::getBase()->getLocales() as $locale_str => $locale ) {
 			$locales[$locale_str] = $locale->getName();
 		}
 

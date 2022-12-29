@@ -1,0 +1,32 @@
+<?php
+namespace JetApplicationModule\Projects\Deployer;
+
+use Jet\Locale;
+use Jet\MVC_View;
+use Jet\Tr;
+use Jet\UI_messages;
+
+/**
+ * @var MVC_View   $this
+ * @var Controller_Main $controller;
+ */
+
+$controller = $this->controller;
+
+$current_deployment = $controller->getCurrentDeployment();
+
+?>
+<br>
+<?=UI_messages::createSuccess(Tr::_('Rollback is successfully done!'))->setCloseable(false)?>
+
+<?=Tr::_('Data and time: %DT%', ['DT'=>Locale::dateAndTime( $current_deployment->getRollbackDateTime() )])?>
+
+<h3><?=Tr::_('Rollbacked files')?></h3>
+
+<table class="table table-striped">
+	<?php foreach($current_deployment->getRollbackedFiles() as $file): ?>
+	<tr>
+		<td><?=$file?></td>
+	</tr>
+	<?php endforeach; ?>
+</table>

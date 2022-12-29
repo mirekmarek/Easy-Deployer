@@ -1,0 +1,101 @@
+<?php
+namespace JetApplicationModule\Projects\Deployer;
+
+use Jet\MVC;
+use Jet\MVC_View;
+use Jet\Tr;
+use JetApplication\Deployment;
+
+/**
+ * @var MVC_View   $this
+ * @var Controller_Main $controller;
+ */
+
+$controller = $this->controller;
+
+$current_project = $controller->getCurrentProject();
+$current_deployment = $controller->getCurrentDeployment();
+
+if(
+	!$current_deployment->getDeployedFiles() ||
+	!$current_deployment->rollbackDeploymentAllowed()
+) {
+	return;
+}
+
+$select_file_url = MVC::getPage()->getURL(GET_params: [
+	'project' => $current_project->getCode(),
+	'deployment' => $current_deployment->getId(),
+	'action' => 'select_rollback_file',
+	'file' => ''
+]);
+
+$unselect_file_url = MVC::getPage()->getURL(GET_params: [
+	'project' => $current_project->getCode(),
+	'deployment' => $current_deployment->getId(),
+	'action' => 'unselect_rollback_file',
+	'file' => ''
+]);
+
+?>
+<?php
+switch($current_deployment->getRollbackState()) {
+	case Deployment::STATE_ROLLBACK_STARTED:
+		require 'deployment_rollback/started.phtml';
+		break;
+	case Deployment::STATE_ROLLBACK_ERROR:
+		require 'deployment_rollback/error.phtml';
+		break;
+	case Deployment::STATE_ROLLBACK_DONE:
+		require 'deployment_rollback/done.phtml';
+		break;
+}
+?>
+
+<hr>
+<h3><?=Tr::_('Do rollback')?></h3>
+
+<p><?=Tr::_('Select files to rollback')?></p>
+
+<table class="table table-striped">
+	<?php foreach($current_deployment->getDeployedFiles() as $file): ?>
+		<tr>
+			<td style="width: 50px;">
+				<input class="file-selection" type="checkbox" value="<?=$file?>" onchange="toggleFile(this);" <?php if($current_deployment->rollbackFileIsSelected($file)): ?> checked<?php endif;?> >
+			</td>
+			<td><?=$file?></td>
+		</tr>
+	<?php endforeach; ?>
+</table>
+
+
+<script>
+	function toggleFile( checkbox ) {
+		setTimeout(function () {
+			if(checkbox.checked) {
+				selectFile(checkbox.value);
+			} else {
+				unselectFile(checkbox.value);
+			}
+		}, 10);
+	}
+
+	function selectFile( file ) {
+		$('#selected-files-area').load('<?=$select_file_url?>'+encodeURIComponent(file));
+	}
+
+	function unselectFile( file ) {
+
+		$('.file-selection').each(function (i, item) {
+			if(
+				item.value==file &&
+				item.checked
+			) {
+				item.checked = false;
+			}
+		});
+
+		$('#selected-files-area').load('<?=$unselect_file_url?>'+encodeURIComponent(file));
+
+	}
+</script>

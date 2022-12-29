@@ -8,6 +8,8 @@
 
 namespace JetApplication;
 
+use Jet\Application_Module;
+use Jet\Application_Modules;
 use Jet\DataModel;
 use Jet\DataModel_Definition;
 use Jet\DataModel_IDController_Passive;
@@ -33,6 +35,7 @@ class Auth_Developer_Role extends DataModel implements Auth_Role_Interface
 {
 	const PRIVILEGE_VISIT_PAGE = 'visit_page';
 	const PRIVILEGE_USE_PROJECT = 'use_project';
+	const PRIVILEGE_ACTION = 'action';
 
 
 	/**
@@ -334,6 +337,11 @@ class Auth_Developer_Role extends DataModel implements Auth_Role_Interface
 				'label' => 'Secret area access',
 				'options_getter' => 'getAclActionValuesList_Pages'
 			],
+			static::PRIVILEGE_ACTION => [
+				'label' => 'Actions',
+				'options_getter' => 'getAclActionValuesList_Actions'
+			],
+			
 		];
 	}
 
@@ -433,7 +441,7 @@ class Auth_Developer_Role extends DataModel implements Auth_Role_Interface
 		$forest = new Data_Forest();
 
 
-		$base = Application_Web::getBase();
+		$base = Application_Deployer::getBase();
 		foreach( $base->getLocales() as $locale ) {
 
 			$homepage = $base->getHomepage( $locale );
@@ -494,7 +502,22 @@ class Auth_Developer_Role extends DataModel implements Auth_Role_Interface
 			static::_getPagesTree( $page, $data );
 		}
 	}
-
+	
+	/**
+	 *
+	 * @return array
+	 */
+	public static function getAclActionValuesList_Actions() : array
+	{
+		$module_manifest = Application_Modules::moduleManifest('Projects.Deployer');
+		
+		$res = [];
+		foreach( $module_manifest->getACLActions() as $action=>$action_label ) {
+			$res[$action] = $action_label;
+		}
+		
+		return $res;
+	}
 
 	/**
 	 * @return Form

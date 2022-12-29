@@ -45,4 +45,6 @@ abstract class Deployment_Backend
 	abstract public function prepare() : bool;
 	
 	abstract public function deploy() : bool;
+	
+	abstract public function rollback() : bool;
 }
