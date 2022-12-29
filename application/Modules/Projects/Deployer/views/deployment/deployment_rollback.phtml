@@ -17,8 +17,7 @@ $current_project = $controller->getCurrentProject();
 $current_deployment = $controller->getCurrentDeployment();
 
 if(
-	!$current_deployment->getDeployedFiles() ||
-	!$current_deployment->rollbackDeploymentAllowed()
+	!$current_deployment->getDeployedFiles()
 ) {
 	return;
 }
@@ -52,6 +51,7 @@ switch($current_deployment->getRollbackState()) {
 }
 ?>
 
+<?php if($current_deployment->rollbackDeploymentAllowed()): ?>
 <hr>
 <h3><?=Tr::_('Do rollback')?></h3>
 
@@ -99,3 +99,4 @@ switch($current_deployment->getRollbackState()) {
 
 	}
 </script>
+<?php endif; ?>

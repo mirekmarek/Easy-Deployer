@@ -22,6 +22,9 @@ $current_deployment = $controller->getCurrentDeployment();
 
 
 $deleteBtn = function( Deployment $deployment ) use ($current_project) {
+	if(!$deployment->deleteDeploymentAllowed()) {
+		return;
+	}
 	?><a
 		href="<?=MVC::getPage()->getURL(
 		GET_params: [
