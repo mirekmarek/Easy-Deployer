@@ -233,8 +233,8 @@ class Installer_CompatibilityTester
 	public function test_SSL(): void
 	{
 		$this->test(
-			Tr::_( 'SSL' ),
-			Tr::_( 'PHP SSL support must be available' ),
+			Tr::_( 'OpenSSL' ),
+			Tr::_( 'PHP OpenSSL support must be available' ),
 			function( Installer_CompatibilityTester_TestResult $test_result ) {
 				return
 					function_exists('openssl_get_cipher_methods') &&

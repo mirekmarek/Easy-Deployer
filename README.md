@@ -25,7 +25,7 @@ This application is based on [PHP Jet framework](https://github.com/mirekmarek/p
 * PHP INTL (mostly standard PHP module)
 * PHP PDO (mostly standard PHP module)
 * PHP mbstring (mostly standard PHP module)
-* PHP SSL (mostly standard PHP module)
+* PHP OpenSSL (mostly standard PHP module)
 * PHP FTP extension (easy to install extension)
 
 ## Installation
