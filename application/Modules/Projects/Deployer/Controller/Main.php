@@ -311,13 +311,12 @@ class Controller_Main extends MVC_Controller_Default
 		
 		]);
 		
-		Logger::success(
+		Logger::info(
 			'file_compared',
 			'File compared',
 			$this->current_deployment->getId(),
 			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
 			[
-				'deployment' => $this->current_deployment,
 				'file' => $file
 			]
 		);
@@ -337,13 +336,12 @@ class Controller_Main extends MVC_Controller_Default
 	{
 		$file = Http_Request::GET()->getString('file');
 		
-		Logger::success(
-			'file_selected',
-			'File selected',
+		Logger::info(
+			'file_unselected',
+			'File unselected',
 			$this->current_deployment->getId(),
 			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
 			[
-				'deployment' => $this->current_deployment,
 				'file' => $file
 			]
 		);
@@ -359,13 +357,12 @@ class Controller_Main extends MVC_Controller_Default
 		$file = Http_Request::GET()->getString('file');
 		
 		
-		Logger::success(
-			'file_unselected',
-			'File unselected',
+		Logger::info(
+			'file_selected',
+			'File selected',
 			$this->current_deployment->getId(),
 			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
 			[
-				'deployment' => $this->current_deployment,
 				'file' => $file
 			]
 		);
@@ -454,13 +451,12 @@ class Controller_Main extends MVC_Controller_Default
 	{
 		$file = Http_Request::GET()->getString('file');
 		
-		Logger::success(
+		Logger::info(
 			'rollback file_unselected',
 			'Rollback file unselected',
 			$this->current_deployment->getId(),
 			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
 			[
-				'deployment' => $this->current_deployment,
 				'file' => $file
 			]
 		);
@@ -475,13 +471,12 @@ class Controller_Main extends MVC_Controller_Default
 	{
 		$file = Http_Request::GET()->getString('file');
 		
-		Logger::success(
+		Logger::info(
 			'rollback file_selected',
 			'Rollback file selected',
 			$this->current_deployment->getId(),
 			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
 			[
-				'deployment' => $this->current_deployment,
 				'file' => $file
 			]
 		);
