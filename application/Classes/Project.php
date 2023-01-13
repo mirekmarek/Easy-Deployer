@@ -17,6 +17,7 @@ use Jet\Form_Definition;
 use Jet\Form_Field_Input;
 use Jet\Form_Field_MultiSelect;
 use Jet\IO_Dir;
+use Jet\IO_File;
 
 /**
  *
@@ -170,7 +171,7 @@ tmp';
 	)]
 	#[Form_Definition(
 		type: Form_Field::TYPE_INPUT,
-		label: 'Connection host:',
+		label: 'Host:',
 		is_required: true,
 		error_messages: [
 			Form_Field::ERROR_CODE_EMPTY => 'Please enter connection host',
@@ -178,6 +179,21 @@ tmp';
 		]
 	)]
 	protected string $connection_host = '';
+	
+	/**
+	 * @var int
+	 */
+	#[DataModel_Definition(
+		type: DataModel::TYPE_INT
+	)]
+	#[Form_Definition(
+		type: Form_Field::TYPE_INT,
+		label: 'Port:',
+		is_required: false,
+		error_messages: [
+		]
+	)]
+	protected int $connection_port = 0;
 
 	/**
 	 * @var string
@@ -188,7 +204,7 @@ tmp';
 	)]
 	#[Form_Definition(
 		type: Form_Field::TYPE_INPUT,
-		label: 'Connection username:',
+		label: 'Username:',
 		is_required: true,
 		error_messages: [
 			Form_Field::ERROR_CODE_EMPTY => 'Please enter connection username',
@@ -207,7 +223,7 @@ tmp';
 	)]
 	#[Form_Definition(
 		type: Form_Field::TYPE_PASSWORD,
-		label: 'Connection password:',
+		label: 'Password:',
 		is_required: true,
 		error_messages: [
 			Form_Field::ERROR_CODE_EMPTY => 'Please enter connection password',
@@ -215,6 +231,58 @@ tmp';
 		]
 	)]
 	protected string $connection_password = '';
+	
+	/**
+	 * @var string
+	 */
+	#[DataModel_Definition(
+		type: DataModel::TYPE_STRING,
+		max_len: 255
+	)]
+	#[Form_Definition(
+		type: Form_Field::TYPE_INPUT,
+		label: 'Public key file path:',
+		is_required: false,
+		error_messages: [
+			Form_Field::ERROR_CODE_EMPTY => 'Please enter public key file path',
+			'is_not_readable' => 'Key file does not exist or is not readable',
+		]
+	)]
+	protected string $connection_public_key_file_path = '';
+	
+	/**
+	 * @var string
+	 */
+	#[DataModel_Definition(
+		type: DataModel::TYPE_STRING,
+		max_len: 255
+	)]
+	#[Form_Definition(
+		type: Form_Field::TYPE_INPUT,
+		label: 'Private key file path:',
+		is_required: false,
+		error_messages: [
+			Form_Field::ERROR_CODE_EMPTY => 'Please enter private key file path',
+			'is_not_readable' => 'Key file does not exist or is not readable',
+		]
+	)]
+	protected string $connection_private_key_file_path = '';
+	
+	/**
+	 * @var string
+	 */
+	#[DataModel_Definition(
+		type: DataModel::TYPE_STRING,
+		max_len: 255
+	)]
+	#[Form_Definition(
+		type: Form_Field::TYPE_INPUT,
+		label: 'Local username:',
+		is_required: false,
+		error_messages: [
+		]
+	)]
+	protected string $connection_local_username = '';
 
 	/**
 	 * @var string
@@ -232,23 +300,7 @@ tmp';
 		]
 	)]
 	protected string $connection_base_path = '/www';
-
-	#[Form_Definition(
-		type: Form_Field::TYPE_MULTI_SELECT,
-		label: 'Access of developer roles:',
-		is_required: false,
-		default_value_getter_name: 'getProjectRoleAccess',
-		setter_name: 'setProjectRoleAccess',
-		select_options_creator: [
-			self::class,
-			'getRoles'
-		],
-		error_messages: [
-			Form_Field::ERROR_CODE_EMPTY => 'Please select role',
-			Form_Field::ERROR_CODE_INVALID_VALUE => 'Please select role'
-		]
-	)]
-	protected array $project_role_access = [];
+	
 
 	/**
 	 * @var string
@@ -265,6 +317,25 @@ tmp';
 		]
 	)]
 	protected string $notes = '';
+	
+	
+	#[Form_Definition(
+		type: Form_Field::TYPE_MULTI_SELECT,
+		label: 'Access of developer roles:',
+		is_required: false,
+		default_value_getter_name: 'getProjectRoleAccess',
+		setter_name: 'setProjectRoleAccess',
+		select_options_creator: [
+			self::class,
+			'getRoles'
+		],
+		error_messages: [
+			Form_Field::ERROR_CODE_EMPTY => 'Please select role',
+			Form_Field::ERROR_CODE_INVALID_VALUE => 'Please select role'
+		]
+	)]
+	protected array $project_role_access = [];
+	
 	
 	public static function getRoles() : array
 	{
@@ -336,6 +407,14 @@ tmp';
 			return true;
 		} );
 		
+		$form->field('connection_port')->setHelpText(
+			'Custom TCP port - optional'
+		);
+		
+		$form->field('connection_local_username')->setHelpText(
+			'Optional'
+		);
+		
 		$form->field('source_dir')->setHelpText(
 			"Full path of project directory located on yours localhost or development server."
 		);
@@ -357,6 +436,56 @@ tmp';
 		$form->field('connection_base_path')->setHelpText(
 			"Root directory of project on the production server"
 		);
+		
+		$hasField = function( string $fied_name ) use ($form) : bool {
+			$type = $form->getField('connection_type')->getValue();
+			$fields = Deployment_Backend::getBackendConnectionEditFormFieldNames( $type );
+			
+			return in_array( $fied_name, $fields );
+		};
+		
+		$form->field( 'connection_public_key_file_path' )->setValidator(function( Form_Field_Input $field ) use ($hasField) : bool {
+			if(!$hasField('connection_public_key_file_path')) {
+				return true;
+			}
+			
+			$path = $field->getValue();
+			if(!$path) {
+				$field->setError( Form_Field::ERROR_CODE_EMPTY );
+				return false;
+			}
+			
+			if(
+				!IO_File::exists($path) ||
+				!IO_File::isReadable($path)
+			) {
+				$field->setError('is_not_readable');
+				return false;
+			}
+			
+			return true;
+		});
+		$form->field( 'connection_private_key_file_path' )->setValidator(function( Form_Field_Input $field ) use ($hasField) : bool {
+			if(!$hasField('connection_private_key_file_path')) {
+				return true;
+			}
+			
+			$path = $field->getValue();
+			if(!$path) {
+				$field->setError( Form_Field::ERROR_CODE_EMPTY );
+				return false;
+			}
+			
+			if(
+				!IO_File::exists($path) ||
+				!IO_File::isReadable($path)
+			) {
+				$field->setError('is_not_readable');
+				return false;
+			}
+
+			return true;
+		});
 		
 	}
 	
@@ -560,6 +689,20 @@ tmp';
 	{
 		return $this->connection_host;
 	}
+	
+	public function setConnectionPort( int $value ) : void
+	{
+		$this->connection_port = $value;
+	}
+	
+	public function getConnectionPort( int $default_value ) : int
+	{
+		if(!$this->connection_port) {
+			return $default_value;
+		}
+		return $this->connection_port;
+	}
+	
 
 	public function setConnectionUsername( string $value ) : void
 	{
@@ -817,5 +960,53 @@ tmp';
 				Deployment::ACTION_PREPARE_DEPLOYMENT
 			)
 		);
+	}
+
+	/**
+	 * @param string $value
+	 */
+	public function setConnectionPublicKeyFilePath( string $value ) : void
+	{
+		$this->connection_public_key_file_path = $value;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getConnectionPublicKeyFilePath() : string
+	{
+		return $this->connection_public_key_file_path;
+	}
+
+	/**
+	 * @param string $value
+	 */
+	public function setConnectionPrivateKeyFilePath( string $value ) : void
+	{
+		$this->connection_private_key_file_path = $value;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getConnectionPrivateKeyFilePath() : string
+	{
+		return $this->connection_private_key_file_path;
+	}
+
+	/**
+	 * @param string $value
+	 */
+	public function setConnectionLocalUsername( string $value ) : void
+	{
+		$this->connection_local_username = $value;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getConnectionLocalUsername() : string
+	{
+		return $this->connection_local_username;
 	}
 }

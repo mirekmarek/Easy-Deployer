@@ -17,4 +17,7 @@ return [
 	'System' => '',
 	'Easy Deployer' => '',
 	'Logout' => '',
+	'FTP' => '',
+	'SFTP - key authentication' => '',
+	'SFTP - password authentication' => '',
 ];

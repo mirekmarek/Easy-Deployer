@@ -6,6 +6,7 @@ use Jet\Form;
 use Jet\Form_Renderer;
 use Jet\Tr;
 use Jet\UI;
+use JetApplication\Deployment_Backend;
 
 /**
 * @var MVC_View $this
@@ -42,8 +43,40 @@ $form->field('code')->label()->addCustomCssStyle('opacity: 0.3');
 
 $form->field('notes')->input()->addCustomCssStyle('height: 300px;');
 
-?>
+foreach($form->getFields() as $field) {
+	if(
+		!str_starts_with( $field->getName() , 'connection' ) ||
+		$field->getName()=='connection_type'
+	) {
+		continue;
+	}
+	
+	$field->row()->addCustomCssClass('connection_edit_field');
+	$field->row()->setDataAttribute('field', $field->getName());
+}
 
+$form->field('connection_type')->input()->addJsAction('onchange', 'changeType(this.options[this.selectedIndex].value)');
+
+$visible_fields = [];
+
+foreach(Deployment_Backend::getAvailableBackends() as $type=>$type_label) {
+	$visible_fields[$type] = Deployment_Backend::getBackendConnectionEditFormFieldNames( $type );
+}
+
+$current_visible_fields = $visible_fields[$form->field('connection_type')->getValue()];
+
+$all_connection_fields = [
+	'connection_host',
+	'connection_port',
+	'connection_username',
+	'connection_password',
+	'connection_public_key_file_path',
+	'connection_private_key_file_path',
+	'connection_local_username',
+	'connection_base_path',
+];
+
+?>
 
 <?= $form->start(); ?>
 
@@ -90,16 +123,39 @@ $form->field('notes')->input()->addCustomCssStyle('height: 300px;');
 		</div>
 		
 		<?= $form->field( 'connection_type' ) ?>
-		<?= $form->field( 'connection_host' ) ?>
-		<?= $form->field( 'connection_username' ) ?>
-		<?= $form->field( 'connection_password' ) ?>
-		<?= $form->field( 'connection_base_path' ) ?>
+		
+		<?php foreach($all_connection_fields as $field_name):
+			$field = $form->field($field_name);
+		
+			if(!in_array($field_name, $current_visible_fields)) {
+				$field->row()->addCustomCssStyle('display:none');
+			}
+			
+			echo $field;
+		endforeach; ?>
 	</div>
 </div>
 <?= $form->end(); ?>
 
-<script type="text/javascript">
-	function generateCode( name ) {
+<br><br><br><br><br><br><br><br>
+
+<script>
+	const visible_fields = <?=json_encode($visible_fields)?>;
+
+	const changeType = function ( type ) {
+
+		const v_f = visible_fields[type];
+
+		$('.connection_edit_field').each( function ( index, row ) {
+			if(v_f.includes(row.dataset['field'])) {
+				$(row).show();
+			} else {
+				$(row).hide();
+			}
+		} );
+	};
+
+	const generateCode = function ( name ) {
 		$.ajax({
 			url: '?generate_code='+encodeURIComponent(name),
 			dataType: 'json'

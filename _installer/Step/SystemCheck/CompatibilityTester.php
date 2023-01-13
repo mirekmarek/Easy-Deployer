@@ -10,6 +10,8 @@ namespace JetApplication\Installer;
 
 use Jet\Tr;
 use JetApplication\Application_Deployer_Config;
+use JetApplication\Deployment_Backend_FTP;
+use JetApplication\Deployment_Backend_SFTP;
 
 require_once 'CompatibilityTester/TestResult.php';
 
@@ -178,7 +180,7 @@ class Installer_CompatibilityTester
 	{
 		$this->test(
 			Tr::_( 'PDO extension' ),
-			Tr::_( 'PHP PDO extension must be activated' ),
+			Tr::_( 'PHP <a href="https://www.php.net/manual/en/book.pdo.php" target="_blank">PDO extension</a> must be activated' ),
 			function() {
 				return extension_loaded( 'PDO' );
 			}
@@ -192,7 +194,7 @@ class Installer_CompatibilityTester
 	{
 		$this->test(
 			Tr::_( 'Multibyte String extension' ),
-			Tr::_( 'PHP Multibyte String extension must be activated' ),
+			Tr::_( 'PHP <a href="https://www.php.net/manual/en/book.mbstring.php" target="_blank">Multibyte String</a> extension must be activated' ),
 			function() {
 				return extension_loaded( 'mbstring' );
 			}
@@ -206,7 +208,7 @@ class Installer_CompatibilityTester
 	{
 		$this->test(
 			Tr::_( 'INTL extension' ),
-			Tr::_( 'PHP Internationalization Functions extension must be activated' ),
+			Tr::_( 'PHP <a href="https://www.php.net/manual/en/book.intl.php" target="_blank">Internationalization Functions extension</a> must be activated' ),
 			function( Installer_CompatibilityTester_TestResult $test_result ) {
 				return extension_loaded( 'intl' );
 			}
@@ -219,10 +221,42 @@ class Installer_CompatibilityTester
 	public function test_FTPExtension(): void
 	{
 		$this->test(
-			Tr::_( 'FTP extension' ),
-			Tr::_( 'PHP FTP must be activated' ),
+			Tr::_( 'FTP and/or SSH2 extension' ),
+			Tr::_( 'PHP <a href="https://www.php.net/manual/en/book.ftp.php" target="_blank">FTP extension</a> and/or <a href="https://www.php.net/manual/en/book.ssh2.php" target="_blank">SSH2 extension</a> must be activated' ),
 			function( Installer_CompatibilityTester_TestResult $test_result ) {
-				return extension_loaded( 'ftp' );
+				$ftp_avl = Deployment_Backend_FTP::isAvailable();
+				$sftp_avl = Deployment_Backend_SFTP::isAvailable();
+				
+				
+				if(!$ftp_avl && !$sftp_avl) {
+					$test_result->setResultMessage(
+						Tr::_(
+							'PHP <a href="https://www.php.net/manual/en/book.ftp.php" target="_blank">FTP extension</a> is not available.<br>'
+							.'PHP <a href="https://www.php.net/manual/en/book.ssh2.php" target="_blank">SSH2 extension</a> is not available.<br><br>'
+							.'<b>At least one of those extension must be available.</b>'
+						)
+					);
+					
+					return false;
+				}
+				
+				if(!$ftp_avl) {
+					$test_result->setResultMessage(
+						Tr::_(
+							'PHP <a href="https://www.php.net/manual/en/book.ftp.php" target="_blank">FTP extension</a> is not available.<br><b>FTP support is disabled.</b>'
+						)
+					);
+				}
+				
+				if(!$sftp_avl) {
+					$test_result->setResultMessage(
+						Tr::_(
+							'PHP <a href="https://www.php.net/manual/en/book.ssh2.php" target="_blank">SSH2 extension</a> is not available.<br><b>SFTP support is disabled.</b>'
+						)
+					);
+				}
+				
+				return true;
 			}
 		);
 	}
@@ -234,7 +268,7 @@ class Installer_CompatibilityTester
 	{
 		$this->test(
 			Tr::_( 'OpenSSL' ),
-			Tr::_( 'PHP OpenSSL support must be available' ),
+			Tr::_( 'PHP <a href="https://www.php.net/manual/en/book.openssl.php" target="_blank">OpenSSL support</a> must be available' ),
 			function( Installer_CompatibilityTester_TestResult $test_result ) {
 				return
 					function_exists('openssl_get_cipher_methods') &&

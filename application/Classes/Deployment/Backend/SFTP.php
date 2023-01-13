@@ -1,7 +1,6 @@
 <?php
 namespace JetApplication;
 
-use FTP\Connection as FTP_Connection;
 use Jet\Debug_ErrorHandler;
 use Jet\IO_Dir;
 use Jet\IO_Dir_Exception;
@@ -9,59 +8,44 @@ use Jet\IO_File;
 use Jet\IO_File_Exception;
 use Jet\Locale;
 
-class Deployment_Backend_FTP extends Deployment_Backend
+abstract class Deployment_Backend_SFTP extends Deployment_Backend
 {
 
 	/**
-	 * @var resource|FTP_Connection
+	 * @var resource
 	 */
 	protected $connection;
 	
+	/**
+	 * @var resource
+	 */
+	protected $sftp;
+	
 	public static function isAvailable(): bool
 	{
-		return extension_loaded( 'ftp' );
+		return extension_loaded( 'ssh2' )
+			&& function_exists('ssh2_connect')
+			&& function_exists('ssh2_sftp');
 	}
 	
-	public static function getLabel() : string
-	{
-		return 'FTP';
-	}
-	
-	protected static function getConnectionEditFormFieldNames() : array
-	{
-		return [
-			'connection_host',
-			'connection_port',
-			'connection_username',
-			'connection_password',
-			'connection_base_path',
-		];
-	}
+	abstract public static function getLabel() : string;
 	
 	public function connect( ?string &$error_message ): bool
 	{
 
 		$connected = Debug_ErrorHandler::doItSilent(function() : bool {
 			
+			
 			$hostname = $this->project->getConnectionHost();
-			$port = $this->project->getConnectionPort( 21 );
+			$port = $this->project->getConnectionPort( 22 );
+
 			
-			if( str_contains( $hostname, ':' ) ) {
-				[$hostname, $port] = explode(':', $hostname);
-			}
-			
-			$this->connection = ftp_connect( $hostname, $port );
+			$this->connection = ssh2_connect( $hostname, $port );
 			
 			if($this->connection) {
-				if( ftp_login(
-					$this->connection,
-					$this->project->getConnectionUsername(),
-					$this->project->getConnectionPassword()
-				) ) {
-					if(ftp_pasv( $this->connection, true )) {
-						if(ftp_chdir( $this->connection, $this->project->getConnectionBasePath() )) {
-							return true;
-						}
+				if( $this->connect_auth() ) {
+					if($this->sftp = ssh2_sftp($this->connection)) {
+						return true;
 					}
 				}
 			}
@@ -80,94 +64,98 @@ class Deployment_Backend_FTP extends Deployment_Backend
 
 		return true;
 	}
+	
+	abstract protected function connect_auth() : bool;
+	
+	protected function connect_auth_password() : bool
+	{
+		return ssh2_auth_password(
+			session: $this->connection,
+			username: $this->project->getConnectionLocalUsername(),
+			password: $this->project->getConnectionPassword()
+		
+		);
+	}
+	
+	protected function connect_auth_key() : bool
+	{
+		return ssh2_auth_pubkey_file(
+			session: $this->connection,
+			username: $this->project->getConnectionUsername(),
+			pubkeyfile: $this->project->getConnectionPublicKeyFilePath(),
+			privkeyfile: $this->project->getConnectionPrivateKeyFilePath(),
+			passphrase: $this->project->getConnectionPassword()
+		);
+	}
 
 	public function getList( $dir='.' ): array
 	{
-		$raw= ftp_rawlist( $this->connection, $dir, false );
-
-
-		$list = array();
-		foreach( $raw as $l ) {
-
-			if(!preg_match_all('/^([drwxs+-]{10})\s+(\d+)\s+(\w+)\s+(\w+)\s+(\d+)\s+(.{12}) (.*)$/m', $l, $matches, PREG_SET_ORDER)) {
-				//var_dump( $l );
+		$dir = 'ssh2.sftp://'.$this->sftp.'/'.$dir.'/';
+		
+		$dh   = opendir($dir);
+		
+		$list = [];
+		while( ($name = readdir($dh)) !== false) {
+			if ( str_starts_with( $name, '.' ) ){
 				continue;
 			}
-
-			$params = $matches[0][1];
-			$size = $matches[0][5];
-			$name = $matches[0][7];
-
-			if($name=='.' || $name=='..') {
-				continue;
-			}
-
-			$is_dir = $params[0]=='d';
-
+			
+			$is_dir = is_dir( $dir.$name );
+			
 			if(!$is_dir) {
 				$pi = pathinfo($name);
-
+				
 				if(!isset($pi['extension'])) {
 					$pi['extension'] = '';
 				}
-
+				
 				$extension = strtolower($pi['extension']);
-
+				
 				if(!in_array($extension, $this->project->getAllowedExtensions( true ) )) {
 					continue;
 				}
-
+				
 			}
-
+			
+			
 			$list[] = [
 				'name' => $name,
 				'is_dir' => $is_dir,
-				'size' => $size
+				'size' => $is_dir ? 0 : filesize( $dir.$name )
 			];
 		}
-
-
+		
+		closedir($dh);
+		
 		return $list;
 	}
 
-	public function downloadFilesFromDir( string $ftp_dir, string $local_dir ) : bool
+	public function downloadFilesFromDir( string $server_dir, string $local_dir ) : bool
 	{
 		
-		if($this->project->dirIsBlacklisted($ftp_dir)) {
+		if($this->project->dirIsBlacklisted($server_dir)) {
 			return true;
 		}
 		
-		$_ftp_dir = $this->project->getConnectionBasePath().'/'.$ftp_dir;
+		$_server_dir = $this->project->getConnectionBasePath().'/'.$server_dir;
 
-		$this->deployment->prepareEvent('Downloading files from dir %DIR%', ['DIR'=>$_ftp_dir]);
+		$this->deployment->prepareEvent('Downloading files from dir %DIR%', ['DIR'=>$_server_dir]);
 
 		if($local_dir!='.') {
 			try {
 				IO_Dir::create( $local_dir );
 			} catch( IO_Dir_Exception $e ) {
 				$this->deployment->prepareError('Unable to create directory: %DIR%, %ERROR%', [
-					'DIR' => $_ftp_dir,
+					'DIR' => $_server_dir,
 					'ERROR' => $e->getMessage()
 				]);
 				
 				return false;
 			}
 		}
-
-		if(!Debug_ErrorHandler::doItSilent( function() use ($_ftp_dir) {
-			return ftp_chdir( $this->connection, $_ftp_dir );
-		} )) {
-			$this->deployment->prepareError('Unable to change FTP directory: %DIR%, %ERROR%', [
-				'DIR' => $_ftp_dir,
-				'ERROR' => Debug_ErrorHandler::getLastError()->getMessage()
-			]);
-			
-			return false;
-		}
-		
 		
 
-		$files = $this->getList();
+		$files = $this->getList( $_server_dir );
 
 		$dirs = array();
 
@@ -180,7 +168,7 @@ class Deployment_Backend_FTP extends Deployment_Backend
 				$dirs[] = $name;
 			} else {
 				
-				if($this->project->fileIsBlacklisted($ftp_dir.'/'.$name)) {
+				if($this->project->fileIsBlacklisted($server_dir.'/'.$name)) {
 					return true;
 				}
 				
@@ -190,13 +178,19 @@ class Deployment_Backend_FTP extends Deployment_Backend
 				]);
 
 				$local_path = $local_dir.$name;
+				$remote_path = $_server_dir.$name;
 				
 				
-				if(!Debug_ErrorHandler::doItSilent(function() use ($local_path, $name) {
-					return ftp_get( $this->connection, $local_path, $name, FTP_BINARY );
+				if(!Debug_ErrorHandler::doItSilent(function() use ($local_path, $remote_path) {
+					return ssh2_scp_recv(
+						session: $this->connection,
+						remote_file: $remote_path,
+						local_file: $local_path
+					);
+					
 				})) {
 					$this->deployment->prepareError('File downloading failed. File: %FILE%, Error: %ERROR%', [
-						'FILE' => $this->project->getConnectionBasePath().'/'.$ftp_dir.'/'.$name,
+						'FILE' => $remote_path,
 						'ERROR' => Debug_ErrorHandler::getLastError()->getMessage()
 					]);
 
@@ -221,7 +215,7 @@ class Deployment_Backend_FTP extends Deployment_Backend
 		foreach( $dirs as $name ) {
 			$next_local_dir = $local_dir.$name.'/';
 			
-			if(!$this->downloadFilesFromDir( $ftp_dir.$name.'/', $next_local_dir )) {
+			if(!$this->downloadFilesFromDir( $server_dir.$name.'/', $next_local_dir )) {
 				return false;
 			}
 
@@ -233,11 +227,11 @@ class Deployment_Backend_FTP extends Deployment_Backend
 	
 	public function prepare() : bool
 	{
-		$this->deployment->prepareEvent('Connecting to a FTP');
+		$this->deployment->prepareEvent('Connecting to a server');
 		
 		
 		if(!$this->connect( $error_message )) {
-			$this->deployment->prepareError('Unable to connect FTP: %ERROR%', [
+			$this->deployment->prepareError('Unable to connect server: %ERROR%', [
 				'ERROR' => $error_message
 			]);
 			
@@ -254,7 +248,7 @@ class Deployment_Backend_FTP extends Deployment_Backend
 		}
 		
 		if(!$this->downloadFilesFromDir(
-			ftp_dir: '',
+			server_dir: '',
 			local_dir: $backup_dir
 		)) {
 			return false;
@@ -268,11 +262,11 @@ class Deployment_Backend_FTP extends Deployment_Backend
 	
 	protected function _upload( string $local_base_dir, array $files, callable $logEvent, callable $logError, callable $addUploadedFile ) : bool
 	{
-		$logEvent('Connecting to a FTP');
+		$logEvent('Connecting to a server');
 		
 		
 		if(!$this->connect( $error_message )) {
-			$logError('Unable to connect FTP: %ERROR%', [
+			$logError('Unable to connect server: %ERROR%', [
 				'ERROR' => $error_message
 			]);
 			
@@ -307,8 +301,9 @@ class Deployment_Backend_FTP extends Deployment_Backend
 					$created = Debug_ErrorHandler::doItSilent(function() use ($dir) {
 						$dir_path = $this->project->getConnectionBasePath().'/'.$dir;
 						
-						if( !ftp_nlist($this->connection, $dir_path) ) {
-							return ftp_mkdir($this->connection,$dir_path  );
+						
+						if( !file_exists('ssh2.sftp://'.$this->sftp.'/'.$dir_path) ) {
+							return ssh2_sftp_mkdir( $this->sftp, $dir_path );
 						} else {
 							return true;
 						}
@@ -328,7 +323,11 @@ class Deployment_Backend_FTP extends Deployment_Backend
 			$addUploadedFile( $file );
 			
 			$res = Debug_ErrorHandler::doItSilent(function() use ($remote_path, $local_path) {
-				return ftp_put( $this->connection, $remote_path, $local_path, FTP_BINARY );
+				return ssh2_scp_send(
+					session: $this->connection,
+					local_file: $local_path,
+					remote_file: $remote_path
+				);
 			});
 			
 			if(!$res) {

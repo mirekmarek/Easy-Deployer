@@ -17,4 +17,7 @@ return [
 	'System' => 'Systém',
 	'Easy Deployer' => '',
 	'Logout' => 'Odhlásit se',
+	'FTP' => 'FTP',
+	'SFTP - key authentication' => 'SFTP - přihlášení pomocí klíče',
+	'SFTP - password authentication' => 'SFTP - přihlášení pomocí hesla',
 ];
