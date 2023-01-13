@@ -47,6 +47,18 @@ $grid->getColumn( 'code' )->setRenderer(
 	}
 );
 
+$grid->getColumn( 'connection_type' )->setRenderer(
+	function( Project $item ) use ( $router ) {
+		echo $item->getConnectionTypeTitle();
+	}
+);
+
+$grid->getColumn( 'connection_host' )->setRenderer(
+	function( Project $item ) use ( $router ) {
+		echo $item->getConnectionHost();
+	}
+);
+
 
 $grid->getColumn( 'name' )->setRenderer(
 	function( Project $item ) use ( $router ) {

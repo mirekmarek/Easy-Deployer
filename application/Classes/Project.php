@@ -679,6 +679,11 @@ tmp';
 	{
 		return $this->connection_type;
 	}
+	
+	public function getConnectionTypeTitle() : string
+	{
+		return Deployment_Backend::getAvailableBackends()[$this->getConnectionType()];
+	}
 
 	public function setConnectionHost( string $value ) : void
 	{

@@ -52,4 +52,6 @@ return [
 	'Please enter public key file path' => 'Prosím zadejte cestu k souboru veřejného klíče',
 	'Please enter private key file path' => 'Prosím zadejte cestu k souboru soukromého klíče',
 	'Key file does not exist or is not readable' => 'Soubor klíče neexistuje, nebo není čitelný',
+	'Connection type' => 'Typ spojení',
+	'Server' => 'Server',
 ];
