@@ -71,7 +71,7 @@ abstract class Deployment_Backend_SFTP extends Deployment_Backend
 	{
 		return ssh2_auth_password(
 			session: $this->connection,
-			username: $this->project->getConnectionLocalUsername(),
+			username: $this->project->getConnectionUsername(),
 			password: $this->project->getConnectionPassword()
 		
 		);
@@ -79,6 +79,7 @@ abstract class Deployment_Backend_SFTP extends Deployment_Backend
 	
 	protected function connect_auth_key() : bool
 	{
+		
 		return ssh2_auth_pubkey_file(
 			session: $this->connection,
 			username: $this->project->getConnectionUsername(),
@@ -259,6 +260,16 @@ abstract class Deployment_Backend_SFTP extends Deployment_Backend
 		return true;
 	}
 	
+	protected function getCreateDirMode() : int
+	{
+		return 0744;
+	}
+	
+	protected function getCreateFileMode() : int
+	{
+		return 0644;
+	}
+	
 	
 	protected function _upload( string $local_base_dir, array $files, callable $logEvent, callable $logError, callable $addUploadedFile ) : bool
 	{
@@ -303,7 +314,12 @@ abstract class Deployment_Backend_SFTP extends Deployment_Backend
 						
 						
 						if( !file_exists('ssh2.sftp://'.$this->sftp.'/'.$dir_path) ) {
-							return ssh2_sftp_mkdir( $this->sftp, $dir_path );
+							return ssh2_sftp_mkdir(
+								sftp: $this->sftp,
+								dirname: $dir_path,
+								mode: $this->getCreateDirMode(),
+								recursive: true
+							);
 						} else {
 							return true;
 						}
@@ -312,7 +328,7 @@ abstract class Deployment_Backend_SFTP extends Deployment_Backend
 					if(!$created) {
 						$logError('Unable to create target directory %DIR%, Error: %ERROR%', [
 							'DIR' => $dir,
-							'ERROR' => Debug_ErrorHandler::getLastError()->getMessage()
+							'ERROR' => Debug_ErrorHandler::getLastError()?->getMessage()
 						]);
 						
 						return false;
@@ -326,7 +342,8 @@ abstract class Deployment_Backend_SFTP extends Deployment_Backend
 				return ssh2_scp_send(
 					session: $this->connection,
 					local_file: $local_path,
-					remote_file: $remote_path
+					remote_file: $remote_path,
+					create_mode: $this->getCreateFileMode()
 				);
 			});
 			

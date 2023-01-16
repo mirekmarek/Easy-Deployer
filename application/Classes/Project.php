@@ -411,9 +411,11 @@ tmp';
 			'Custom TCP port - optional'
 		);
 		
+		/*
 		$form->field('connection_local_username')->setHelpText(
 			'Optional'
 		);
+		*/
 		
 		$form->field('source_dir')->setHelpText(
 			"Full path of project directory located on yours localhost or development server."

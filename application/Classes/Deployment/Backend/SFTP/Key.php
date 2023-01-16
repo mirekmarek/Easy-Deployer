@@ -20,7 +20,7 @@ class Deployment_Backend_SFTP_Key extends Deployment_Backend_SFTP
 			
 			'connection_public_key_file_path',
 			'connection_private_key_file_path',
-			'connection_local_username',
+			//'connection_local_username',
 			
 			'connection_base_path',
 		];

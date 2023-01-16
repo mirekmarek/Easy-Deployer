@@ -69,4 +69,8 @@ return [
 	'Log of rollback' => 'Protokol navrácení',
 	'Log of deployment' => 'Protokol nasazení',
 	'Log of deployment preparation' => 'Protokol přípravy nasazení',
+	'Connecting to a server' => 'Spojuji se se serverem',
+	'Unable to connect server: %ERROR%' => 'Nemohu se spojit se serverem: %ERROR%',
+	'Error during deployment preparation. Details below.' => 'Chyba během nasazovací operace. Detaily níže.',
+	'Try again' => 'Zkusit znovu',
 ];
