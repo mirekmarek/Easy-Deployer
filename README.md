@@ -16,6 +16,8 @@ Main features:
 * Simple web based user interface
 * Easy installation
 
+![Promo image](promo.png "Easy Deployer")
+
 This application is based on [PHP Jet framework](https://github.com/mirekmarek/php-jet) and lightly modified [PHP Diff library](https://github.com/chrisboulton/php-diff).
 
 ## Requirements
@@ -27,6 +29,7 @@ This application is based on [PHP Jet framework](https://github.com/mirekmarek/p
 * PHP mbstring (mostly standard PHP module)
 * PHP OpenSSL (mostly standard PHP module)
 * PHP FTP extension (easy to install extension)
+* PHP SSH2 extension (easy to install extension)
 
 ## Installation
 * Download package
