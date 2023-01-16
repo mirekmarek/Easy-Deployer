@@ -42,6 +42,10 @@
 
 class Diff_SequenceMatcher
 {
+	public $matchingBlocks = null;
+	public $opCodes = null;
+	public $fullBCount = null;
+	
 	/**
 	 * @var string|array Either a string or an array containing a callback function to determine if a line is "junk" or not.
 	 */
@@ -643,12 +647,7 @@ class Diff_SequenceMatcher
 		$aLength = count ($this->a);
 		for($i = 0; $i < $aLength; ++$i) {
 			$char = $this->a[$i];
-			if(isset($avail[$char])) {
-				$numb = $avail[$char];
-			}
-			else {
-				$numb = $this->arrayGetDefault($this->fullBCount, $char, 0);
-			}
+			$numb = $avail[$char] ?? $this->arrayGetDefault( $this->fullBCount, $char, 0 );
 			$avail[$char] = $numb - 1;
 			if($numb > 0) {
 				++$matches;
@@ -702,12 +701,7 @@ class Diff_SequenceMatcher
 	 */
 	private function arrayGetDefault($array, $key, $default)
 	{
-		if(isset($array[$key])) {
-			return $array[$key];
-		}
-		else {
-			return $default;
-		}
+		return $array[$key] ?? $default;
 	}
 
 	/**
