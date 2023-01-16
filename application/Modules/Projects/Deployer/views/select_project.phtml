@@ -20,13 +20,14 @@ use JetApplication\Project;
 		<?php foreach(Project::getListOfCurrentUser() as $project ):
 			?>
 			<li class="list-group-item">
-				<a href="<?=MVC::getPage()->getURL(GET_params: ['project'=>$project->getCode()])?>"><?=$project->getName()?></a>
+				<a href="<?=MVC::getPage()->getURL(GET_params: ['project'=>$project->getCode()])?>" style="font-weight: bolder;font-size: 1.5rem"><?=$project->getName()?></a>
 				<br>
-				<span class="badge badge-secondary"><?=$project->getConnectionTypeTitle()?></span>
 				<span class="badge badge-primary"><?=$project->getConnectionHost()?></span>
+				<span class="badge badge-secondary"><?=$project->getConnectionTypeTitle()?></span>
 				<br>
 				<?=nl2br($project->getNotes())?>
 			</li>
+		<br>
 		<?php
 		endforeach; ?>
 	</ul>
