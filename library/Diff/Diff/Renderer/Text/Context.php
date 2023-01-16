@@ -47,19 +47,19 @@ class Diff_Renderer_Text_Context extends Diff_Renderer_Abstract
 	/**
 	 * @var array Array of the different opcode tags and how they map to the context diff equivalent.
 	 */
-	private $tagMap = array(
+	private array $tagMap = [
 		'insert' => '+',
 		'delete' => '-',
 		'replace' => '!',
 		'equal' => ' '
-	);
+	];
 
 	/**
 	 * Render and return a context formatted (old school!) diff file.
 	 *
-	 * @return string The generated context diff.
+	 * The generated context diff.
 	 */
-	public function render()
+	public function render() : string|array
 	{
 		$diff = '';
 		$opCodes = $this->diff->getGroupedOpcodes();

@@ -47,9 +47,9 @@ class Diff_Renderer_Text_Unified extends Diff_Renderer_Abstract
 	/**
 	 * Render and return a unified diff.
 	 *
-	 * @return string The unified diff.
+	 * The unified diff.
 	 */
-	public function render()
+	public function render() : string|array
 	{
 		$diff = '';
 		$opCodes = $this->diff->getGroupedOpcodes();

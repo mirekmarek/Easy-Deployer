@@ -47,18 +47,18 @@ class Diff_Renderer_Html_Array extends Diff_Renderer_Abstract
 	/**
 	 * @var array Array of the default options that apply to this renderer.
 	 */
-	protected $defaultOptions = array(
+	protected array $defaultOptions = [
 		'tabSize' => 4
-	);
+	];
 
 	/**
 	 * Render and return an array structure suitable for generating HTML
 	 * based differences. Generally called by subclasses that generate a
 	 * HTML based diff and return an array of the changes to show in the diff.
 	 *
-	 * @return array An array of the generated chances, suitable for presentation in HTML.
+	 * An array of the generated chances, suitable for presentation in HTML.
 	 */
-	public function render()
+	public function render() : array|string
 	{
 		// As we'll be modifying a & b to include our change markers,
 		// we need to get the contents and store them here. That way
@@ -146,7 +146,7 @@ class Diff_Renderer_Html_Array extends Diff_Renderer_Abstract
 	 * @param string $toLine The second string.
 	 * @return array Array containing the starting position (0 by default) and the ending position (-1 by default)
 	 */
-	private function getChangeExtent($fromLine, $toLine)
+	private function getChangeExtent(string $fromLine, string $toLine) : array
 	{
 		$start = 0;
 		$limit = min(strlen($fromLine), strlen($toLine));
@@ -172,7 +172,7 @@ class Diff_Renderer_Html_Array extends Diff_Renderer_Abstract
 	 * @param array $lines Array of lines to format.
 	 * @return array Array of the formatted lines.
 	 */
-	protected function formatLines($lines)
+	protected function formatLines(array $lines) : array
 	{
 		$lines = array_map(array($this, 'ExpandTabs'), $lines);
 		$lines = array_map(array($this, 'HtmlSafe'), $lines);
@@ -188,7 +188,7 @@ class Diff_Renderer_Html_Array extends Diff_Renderer_Abstract
 	 * @param string[] $matches Array with preg matches.
 	 * @return string The HTML representation of the string.
 	 */
-	private function fixSpaces(array $matches)
+	private function fixSpaces(array $matches) : string
 	{
 		if(!isset($matches[1])) {
 			return '';
@@ -211,7 +211,7 @@ class Diff_Renderer_Html_Array extends Diff_Renderer_Abstract
 	 * @param string $line The containing tabs to convert.
 	 * @return string The line with the tabs converted to spaces.
 	 */
-	private function expandTabs($line)
+	private function expandTabs(string $line) : string
 	{
 		return str_replace("\t", str_repeat(' ', $this->options['tabSize']), $line);
 	}
@@ -222,7 +222,7 @@ class Diff_Renderer_Html_Array extends Diff_Renderer_Abstract
 	 * @param string $string The string.
 	 * @return string The string with the HTML characters replaced by entities.
 	 */
-	private function htmlSafe($string)
+	private function htmlSafe( string $string) : string
 	{
 		return htmlspecialchars($string, ENT_NOQUOTES, 'UTF-8');
 	}

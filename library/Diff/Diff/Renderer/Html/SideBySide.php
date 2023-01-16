@@ -50,9 +50,9 @@ class Diff_Renderer_Html_SideBySide extends Diff_Renderer_Html_Array
 	 * Render a and return diff with changes between the two sequences
 	 * displayed side by side.
 	 *
-	 * @return string The generated side by side diff.
+	 * The generated side by side diff.
 	 */
-	public function render()
+	public function render() : array|string
 	{
 		$changes = parent::render();
 

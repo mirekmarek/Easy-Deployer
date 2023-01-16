@@ -43,19 +43,19 @@
 abstract class Diff_Renderer_Abstract
 {
 	/**
-	 * @var object Instance of the diff class that this renderer is generating the rendered diff for.
+	 * Instance of the diff class that this renderer is generating the rendered diff for.
 	 */
-	public $diff;
+	public object|null $diff = null;
 
 	/**
-	 * @var array Array of the default options that apply to this renderer.
+	 * Array of the default options that apply to this renderer.
 	 */
-	protected $defaultOptions = array();
+	protected array $defaultOptions = [];
 
 	/**
-	 * @var array Array containing the user applied and merged default options for the renderer.
+	 * Array containing the user applied and merged default options for the renderer.
 	 */
-	protected $options = array();
+	protected array$options = [];
 
 	/**
 	 * The constructor. Instantiates the rendering engine and if options are passed,
@@ -63,7 +63,7 @@ abstract class Diff_Renderer_Abstract
 	 *
 	 * @param array $options Optionally, an array of the options for the renderer.
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		$this->setOptions($options);
 	}
@@ -75,8 +75,10 @@ abstract class Diff_Renderer_Abstract
 	 *
 	 * @param array $options Array of options to set.
 	 */
-	public function setOptions(array $options)
+	public function setOptions(array $options) : void
 	{
 		$this->options = array_merge($this->defaultOptions, $options);
 	}
+	
+	abstract public function render() : string|array;
 }

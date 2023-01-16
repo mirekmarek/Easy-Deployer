@@ -3,9 +3,9 @@
  * Diff
  *
  * A comprehensive library for generating differences between two strings
- * in multiple formats (unified, side by side HTML etc)
+ * in multiple formats (unified, side by side HTML etc.)
  *
- * PHP version 5
+ * PHP version 8
  *
  * Copyright (c) 2009 Chris Boulton <chris.boulton@interspire.com>
  * 
@@ -46,24 +46,24 @@
 class Diff
 {
 	/**
-	 * @var array The "old" sequence to use as the basis for the comparison.
+	 * The "old" sequence to use as the basis for the comparison.
 	 */
-	private $a = null;
+	private array $a;
 
 	/**
-	 * @var array The "new" sequence to generate the changes for.
+	 * The "new" sequence to generate the changes for.
 	 */
-	private $b = null;
+	private array $b;
 
 	/**
-	 * @var array Array containing the generated opcodes for the differences between the two items.
+	 * Array containing the generated opcodes for the differences between the two items.
 	 */
-	private $groupedCodes = null;
+	private array|null $groupedCodes = null;
 
 	/**
 	 * @var array Associative array of the default options available for the diff class and their default value.
 	 */
-	private $defaultOptions = array(
+	private array $defaultOptions = array(
 		'context' => 3,
 		'ignoreNewLines' => false,
 		'ignoreWhitespace' => false,
@@ -73,7 +73,7 @@ class Diff
 	/**
 	 * @var array Array of the options that have been applied for generating the diff.
 	 */
-	private $options = array();
+	private array $options;
 
 	/**
 	 * The constructor.
@@ -81,12 +81,12 @@ class Diff
 	 * @param array $a Array containing the lines of the first string to compare.
 	 * @param array $b Array containing the lines for the second string to compare.
 	 */
-	public function __construct($a, $b, $options=array())
+	public function __construct(array $a, array $b, array $options=array())
 	{
 		$this->a = $a;
 		$this->b = $b;
 
-		if (is_array($options))
+		if ( $options )
 			$this->options = array_merge($this->defaultOptions, $options);
 		else
 			$this->options = $this->defaultOptions;
@@ -95,10 +95,11 @@ class Diff
 	/**
 	 * Render a diff using the supplied rendering class and return it.
 	 *
-	 * @param object $renderer An instance of the rendering object to use for generating the diff.
-	 * @return mixed The generated diff. Exact return value depends on the rendered.
+	 * @param Diff_Renderer_Abstract $renderer An instance of the rendering object to use for generating the diff.
+	 *
+	 * The generated diff. Exact return value depends on the rendered.
 	 */
-	public function render(Diff_Renderer_Abstract $renderer)
+	public function render(Diff_Renderer_Abstract $renderer) : array|string
 	{
 		$renderer->diff = $this;
 		return $renderer->render();
@@ -111,10 +112,10 @@ class Diff
 	 * that line.
 	 *
 	 * @param int $start The starting number.
-	 * @param int $end The ending number. If not supplied, only the item in $start will be returned.
-	 * @return array Array of all of the lines between the specified range.
+	 * @param int|null $end The ending number. If not supplied, only the item in $start will be returned.
+	 * @return array Array of all the lines between the specified range.
 	 */
-	public function getA($start=0, $end=null)
+	public function getA( int $start=0, int|null $end=null) : array
 	{
 		if($start == 0 && $end === null) {
 			return $this->a;
@@ -138,10 +139,10 @@ class Diff
 	 * that line.
 	 *
 	 * @param int $start The starting number.
-	 * @param int $end The ending number. If not supplied, only the item in $start will be returned.
-	 * @return array Array of all of the lines between the specified range.
+	 * @param int|null $end The ending number. If not supplied, only the item in $start will be returned.
+	 * @return array Array of all the lines between the specified range.
 	 */
-	public function getB($start=0, $end=null)
+	public function getB( int $start=0, int|null $end=null) : array
 	{
 		if($start == 0 && $end === null) {
 			return $this->b;
@@ -165,7 +166,7 @@ class Diff
 	 *
 	 * @return array Array of the grouped opcodes for the generated diff.
 	 */
-	public function getGroupedOpcodes()
+	public function getGroupedOpcodes() : array
 	{
 		if(!is_null($this->groupedCodes)) {
 			return $this->groupedCodes;

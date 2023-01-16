@@ -48,9 +48,9 @@ class Diff_Renderer_Html_Inline extends Diff_Renderer_Html_Array
 	 * Render a and return diff with changes between the two sequences
 	 * displayed inline (under each other)
 	 *
-	 * @return string The generated inline diff.
+	 * The generated inline diff.
 	 */
-	public function render()
+	public function render() : array|string
 	{
 		$changes = parent::render();
 		$html = '';
