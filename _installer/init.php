@@ -40,6 +40,8 @@ Installer::setSteps(
 		'Install',
 		
 		'CreateAdministrator',
+		'CreateDeveloper',
+		
 		'Final',
 	]
 );

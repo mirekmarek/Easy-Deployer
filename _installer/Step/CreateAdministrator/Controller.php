@@ -8,11 +8,7 @@
 
 namespace JetApplication\Installer;
 
-use Jet\Application_Modules;
-use Jet\Locale;
-use JetApplication\Application_Deployer;
 use JetApplication\Auth_Administrator_User;
-use JetApplication\Auth_Developer_Role;
 
 /**
  *
@@ -51,8 +47,6 @@ class Installer_Step_CreateAdministrator_Controller extends Installer_Step_Contr
 			if( $form->catch() ) {
 				$administrator->setIsSuperuser( true );
 				$administrator->save();
-				
-				$this->createMainDeveloperRole();
 
 				Installer::goToNext();
 			}
@@ -60,46 +54,6 @@ class Installer_Step_CreateAdministrator_Controller extends Installer_Step_Contr
 			$this->render( 'default' );
 		}
 
-	}
-	
-	public function createMainDeveloperRole() : bool
-	{
-		$id = 'main';
-		$name = 'Main';
-		
-		if(!Auth_Developer_Role::idExists('main')) {
-			$role = new Auth_Developer_Role();
-			$role->setId( $id );
-			$role->setName($name);
-			
-			$locale = Locale::getCurrentLocale();
-			$base = Application_Deployer::getBase();
-			
-			$homepage = $base->getHomepage( $locale );
-			
-			$pages = [];
-			$pages[] = $homepage->getKey();
-			foreach($homepage->getChildren() as $ch) {
-				$pages[] = $ch->getKey();
-			}
-			
-			$role->setPrivilege(
-				Auth_Developer_Role::PRIVILEGE_VISIT_PAGE,
-				$pages
-			);
-			
-			$module_manifest = Application_Modules::moduleManifest('Projects.Deployer');
-			
-			$role->setPrivilege(
-				Auth_Developer_Role::PRIVILEGE_ACTION,
-				array_keys( $module_manifest->getACLActions( false ) )
-			);
-			
-			$role->save();
-		}
-		
-		
-		return true;
 	}
 	
 }
