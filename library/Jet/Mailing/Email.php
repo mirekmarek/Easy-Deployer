@@ -319,7 +319,7 @@ class Mailing_Email extends BaseObject
 		} else {
 			$headers['From'] = mb_encode_mimeheader($this->getSenderEmail());
 		}
-		//$headers['Subject'] = mb_encode_mimeheader($subject);
+		$headers['Subject'] = mb_encode_mimeheader($subject);
 		$headers['Reply-To'] = mb_encode_mimeheader($this->getSenderEmail());
 		$headers['MIME-Version'] = '1.0';
 		$headers['Content-Type'] = 'multipart/mixed; boundary=' . $boundary_1 . ';';
@@ -410,7 +410,6 @@ class Mailing_Email extends BaseObject
 		
 		
 		$message .= "--$boundary_1--" . $eol;
-		
 	}
 	
 

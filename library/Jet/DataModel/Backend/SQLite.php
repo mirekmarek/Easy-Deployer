@@ -8,8 +8,6 @@
 
 namespace Jet;
 
-use SQLite3;
-
 /**
  *
  */
@@ -60,8 +58,7 @@ class DataModel_Backend_SQLite extends DataModel_Backend
 		return in_array(
 			Db::DRIVER_SQLITE,
 			Db_Backend_PDO_Config::getDrivers()
-		) &&
-			class_exists( SQLite3::class, false );
+		);
 	}
 	
 	
@@ -501,8 +498,8 @@ class DataModel_Backend_SQLite extends DataModel_Backend
 		if( is_object( $value ) ) {
 			$value = (string)$value;
 		}
-
-		return "'" . SQLite3::escapeString( $value ) . "'";
+		
+		return $this->getDb()->quoteString( $value );
 	}
 
 	/**
@@ -1171,12 +1168,7 @@ class DataModel_Backend_SQLite extends DataModel_Backend
 		$data = $this->getDb()->fetchCol(
 			$this->createSelectQuery( $query )
 		);
-
-		if( !is_array( $data ) ) {
-			return $data;
-		}
-
-
+		
 		foreach( $data as $i => $d ) {
 			foreach( $query->getSelect() as $item ) {
 				/**

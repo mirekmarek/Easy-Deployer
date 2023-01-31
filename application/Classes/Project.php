@@ -160,7 +160,7 @@ tmp';
 			Form_Field::ERROR_CODE_INVALID_VALUE => 'Please select connection type'
 		]
 	)]
-	protected string $connection_type = '';
+	protected string $connection_type = 'FTP';
 
 	/**
 	 * @var string
