@@ -301,17 +301,33 @@ class Deployment_Backend_FTP extends Deployment_Backend
 
 				$dirs[] = $dir_name;
 			}
-
 			if($dirs) {
+				
 				foreach( $dirs as $dir ) {
 					$created = Debug_ErrorHandler::doItSilent(function() use ($dir) {
 						$dir_path = $this->project->getConnectionBasePath().'/'.$dir;
 						
-						if( !ftp_nlist($this->connection, $dir_path) ) {
-							return ftp_mkdir($this->connection,$dir_path  );
-						} else {
-							return true;
+						
+						if(!ftp_chdir( $this->connection, $this->project->getConnectionBasePath() )) {
+							return false;
 						}
+						
+						$sub_dirs = explode('/',$dir);
+						
+						foreach($sub_dirs as $sub_dir){
+							if(!ftp_chdir($this->connection, $sub_dir)){
+								if(!ftp_mkdir($this->connection, $sub_dir)) {
+									return false;
+								}
+								ftp_chdir($this->connection, $sub_dir);
+							}
+						}
+						
+						if(!ftp_chdir($this->connection, $this->project->getConnectionBasePath())) {
+							return false;
+						}
+						
+						return true;
 					});
 					
 					if(!$created) {
