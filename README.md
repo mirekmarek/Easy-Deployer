@@ -1,6 +1,6 @@
 # Easy Deployer
 
-Easy Deployer is easy to use, but very powerful online projects deployment tool. It uses FTP for file transfer and SCP and SFTP support will be available soon.
+Easy Deployer is easy to use, but very powerful online projects deployment tool. It uses FTP or SCP/SFTP for file transfer.
 
 Main features:
 
