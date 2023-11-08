@@ -8,6 +8,7 @@
 
 namespace JetApplication;
 
+use Jet\Auth_User_Interface;
 use Jet\BaseObject;
 use Jet\Auth_Controller_Interface;
 
@@ -27,7 +28,7 @@ use Jet\Data_DateTime;
  */
 class Auth_Controller_Deployer extends BaseObject implements Auth_Controller_Interface
 {
-	const LOGIN_FORM_MODULE_NAME = 'Login.Deployer';
+	const LOGIN_FORM_MODULE_NAME = 'Deployer.Login';
 
 
 	const EVENT_LOGIN_FAILED = 'login_failed';
@@ -169,6 +170,15 @@ class Auth_Controller_Deployer extends BaseObject implements Auth_Controller_Int
 
 		Session::destroy();
 		$this->current_user = null;
+	}
+	
+	/**
+	 * @param Auth_User_Interface $user
+	 * @return bool
+	 */
+	public function loginUser( Auth_User_Interface $user ) : bool
+	{
+		return false;
 	}
 
 	/**

@@ -6,35 +6,37 @@
  * @author Miroslav Marek <mirek.marek@web-jet.cz>
  */
 
-namespace JetApplication;
-
 use Jet\Autoloader_Loader;
 use Jet\SysConf_Path;
 
 /**
  *
  */
-class Autoloader_ApplicationClasses extends Autoloader_Loader
+return new class extends Autoloader_Loader
 {
+	public const ROOT_NAMESPACE = 'JetApplication\\';
+	
+	/**
+	 * @return string
+	 */
+	public function getAutoloaderName() : string
+	{
+		return 'application/Classes';
+	}
 
 	/**
 	 *
-	 * @param string $root_namespace
-	 * @param string $namespace
 	 * @param string $class_name
 	 *
 	 * @return bool|string
 	 */
-	public function getScriptPath( string $root_namespace, string $namespace, string $class_name ): bool|string
+	public function getScriptPath( string $class_name ): bool|string
 	{
-
-		if( $root_namespace != 'JetApplication' ) {
+		if( !str_starts_with($class_name, static::ROOT_NAMESPACE ) ) {
 			return false;
 		}
-
-		$class_name = str_replace( '_', DIRECTORY_SEPARATOR, $class_name );
-
-		return SysConf_Path::getApplication() . 'Classes/' . $class_name . '.php';
+		
+		return SysConf_Path::getApplication() . 'Classes/' . $this->classNameToPath( substr($class_name, strlen(static::ROOT_NAMESPACE)) );
 
 	}
-}
+};

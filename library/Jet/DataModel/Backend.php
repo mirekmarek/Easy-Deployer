@@ -13,14 +13,18 @@ namespace Jet;
  */
 abstract class DataModel_Backend extends BaseObject
 {
-	const TYPE_MYSQL = 'MySQL';
-	const TYPE_SQLITE = 'SQLite';
+	public const TYPE_MYSQL = 'MySQL';
+	public const TYPE_PGSQL = 'PgSQL';
+	public const TYPE_MSSQL = 'MSSQL';
+	public const TYPE_SQLITE = 'SQLite';
 	
 	/**
 	 * @var array[]
 	 */
 	protected static array $backend_types = [
 		self::TYPE_MYSQL,
+		self::TYPE_PGSQL,
+		self::TYPE_MSSQL,
 		self::TYPE_SQLITE,
 	];
 

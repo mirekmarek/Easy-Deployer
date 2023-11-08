@@ -13,6 +13,9 @@ require_once 'Autoloader/Exception.php';
 require_once 'Autoloader/Loader.php';
 require_once 'Autoloader/Cache.php';
 require_once 'Autoloader/Cache/Backend.php';
+require_once 'SysConf/Jet/Autoloader.php';
+require_once 'IO/Dir.php';
+require_once 'IO/File.php';
 
 /**
  *
@@ -42,8 +45,8 @@ class Autoloader
 	 * @var bool
 	 */
 	protected static bool $save_class_map = false;
-
-
+	
+	
 	/**
 	 *
 	 */
@@ -62,7 +65,57 @@ class Autoloader
 		], true, true );
 
 	}
-
+	
+	/**
+	 * @param string|null $dir
+	 * @return void
+	 */
+	public static function registerLibraryAutoloaders( ?string $dir=null ) : void
+	{
+		if(!$dir) {
+			$dir = SysConf_Path::getLibrary();
+		}
+		
+		$dirs = IO_Dir::getSubdirectoriesList( $dir );
+		foreach($dirs as $path=>$name) {
+			$path .= SysConf_Jet_Autoloader::getLibraryAutoloaderFileName();
+			if(!IO_File::exists($path)) {
+				continue;
+			}
+			
+			$loader = require $path;
+			static::register( $loader );
+		}
+	}
+	
+	/**
+	 * @param string|null $dir
+	 * @return void
+	 */
+	public static function  registerApplicationAutoloaders( ?string $dir=null ) : void
+	{
+		if(!$dir) {
+			$dir = SysConf_Path::getApplication().SysConf_Jet_Autoloader::getApplicationAutoloadersDirName();
+		}
+		
+		$files = IO_Dir::getFilesList( $dir, '*.php' );
+		foreach($files as $path=>$name) {
+			$loader = require $path;
+			static::register( $loader );
+		}
+	}
+	
+	/**
+	 * @return void
+	 */
+	public static function initComposerAutoloader() : void
+	{
+		$composer_autoloader = SysConf_Path::getLibrary().'Composer/autoload.php';
+		if( file_exists( $composer_autoloader) ) {
+			include_once $composer_autoloader;
+		}
+	}
+	
 	/**
 	 * @param string $class_name
 	 * @param ?string $loader_name
@@ -72,13 +125,9 @@ class Autoloader
 	public static function getScriptPath( string $class_name, ?string &$loader_name='' ) : string|bool
 	{
 		$path = false;
-		$root_namespace = strstr( $class_name, '\\', true );
-		$namespace = substr( $class_name, 0, strrpos( $class_name, '\\' ) );
-		$_class_name = substr( $class_name, strlen( $namespace ) + 1 );
-		$loader_name = '';
 
 		foreach( static::$loaders as $loader_name => $loader ) {
-			$path = $loader->getScriptPath( $root_namespace, $namespace, $_class_name );
+			$path = $loader->getScriptPath( $class_name );
 			if( $path ) {
 				break;
 			}
@@ -171,6 +220,6 @@ class Autoloader
 	 */
 	public static function register( Autoloader_Loader $loader ): void
 	{
-		static::$loaders[get_class( $loader )] = $loader;
+		static::$loaders[$loader->getAutoloaderName()] = $loader;
 	}
 }

@@ -485,7 +485,7 @@ class Auth_Developer_Role extends DataModel implements Auth_Role_Interface
 	 * @param MVC_Page_Interface $page
 	 * @param                    $data
 	 */
-	protected static function _getPagesTree( MVC_Page_Interface $page, &$data )
+	protected static function _getPagesTree( MVC_Page_Interface $page, &$data ) : void
 	{
 
 		if( $page->getIsSecret() ) {
@@ -508,7 +508,7 @@ class Auth_Developer_Role extends DataModel implements Auth_Role_Interface
 	 */
 	public static function getAclActionValuesList_Actions() : array
 	{
-		$module_manifest = Application_Modules::moduleManifest('Projects.Deployer');
+		$module_manifest = Application_Modules::moduleManifest('Deployer.Projects');
 		
 		$res = [];
 		foreach( $module_manifest->getACLActions() as $action=>$action_label ) {

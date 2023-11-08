@@ -1,0 +1,140 @@
+<?php
+namespace JetApplicationModule\Deployer\Projects;
+
+use Jet\MVC;
+use Jet\MVC_View;
+use Jet\Tr;
+use Jet\UI;
+use Jet\UI_button;
+use Jet\UI_messages;
+
+/**
+ * @var MVC_View   $this
+ * @var Controller_Main $controller;
+ */
+
+$controller = $this->controller;
+
+$current_project = $controller->getCurrentProject();
+$current_deployment = $controller->getCurrentDeployment();
+
+$diff = $current_deployment->getDiff();
+
+$new_files = $diff->getNewFiles();
+$changed_files = $diff->getChangedFiles();
+
+$select_file_url = MVC::getPage()->getURL(GET_params: [
+	'project' => $current_project->getCode(),
+	'deployment' => $current_deployment->getId(),
+	'action' => 'select_file',
+	'file' => ''
+]);
+
+$unselect_file_url = MVC::getPage()->getURL(GET_params: [
+	'project' => $current_project->getCode(),
+	'deployment' => $current_deployment->getId(),
+	'action' => 'unselect_file',
+	'file' => ''
+]);
+
+require __DIR__.'/../lj/head.phtml';
+?>
+<br>
+<h2><?=Tr::_('Deployment has been prepared')?></h2>
+<br>
+<?php if($current_deployment->deploymentPrepareAllowed()): ?>
+<?=UI::button(Tr::_('Prepare again'))->setUrl(MVC::getPage()->getURL(GET_params: [
+	'project' => $current_project->getCode(),
+	'deployment' => $current_deployment->getId(),
+	'action' => 'prepare_again'
+]))->setClass(UI_button::CLASS_PRIMARY)?>
+<?php endif; ?>
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-7">
+			<?php if(!$new_files && !$changed_files): ?>
+				<br><br>
+				<?=UI_messages::createInfo(Tr::_('Nothing to deploy. Project is fully up to date.'))->setCloseable(false);?>
+			<?php endif; ?>
+			
+			<?php if($new_files): ?>
+				<br><br>
+				<h3><?=Tr::_('New files')?></h3>
+				<table class="table table-striped">
+					<?php foreach($new_files as $file): ?>
+						<tr>
+							<?php if($current_deployment->doDeploymentAllowed()): ?>
+							<td style="width: 50px;">
+								<input class="file-selection" type="checkbox" value="<?=$file?>" onchange="toggleFile(this);" <?php if($current_deployment->fileIsSelected($file)): ?> checked<?php endif;?> >
+							</td>
+							<?php endif; ?>
+							<td><?=$file?></td>
+						</tr>
+					<?php endforeach; ?>
+				</table>
+			<?php endif; ?>
+			
+			<?php if($changed_files): ?>
+				<br><br>
+				<h3><?=Tr::_('Changed files')?></h3>
+				<table class="table table-striped">
+					<?php foreach($changed_files as $file): ?>
+						<tr>
+							<td style="width: 100px;"><a href="<?=MVC::getPage()->getURL(GET_params: [
+									'project' => $current_project->getCode(),
+									'deployment' => $current_deployment->getId(),
+									'action' => 'compare_file',
+									'file' => $file
+								])?>" target="_blank"><?=Tr::_('Compare')?></a></td>
+							<?php if($current_deployment->doDeploymentAllowed()): ?>
+							<td style="width: 50px;">
+								<input class="file-selection" type="checkbox" value="<?=$file?>" onchange="toggleFile(this);" <?php if($current_deployment->fileIsSelected($file)): ?> checked<?php endif;?> >
+							</td>
+							<?php endif; ?>
+							<td><?=$file?></td>
+						</tr>
+					<?php endforeach; ?>
+				</table>
+			<?php endif; ?>
+			
+		</div>
+		<div class="col-md-5 bg-light" id="selected-files-area">
+			<?php require 'selected_files.phtml'; ?>
+		</div>
+	</div>
+</div>
+
+<script>
+	function toggleFile( checkbox ) {
+		setTimeout(function () {
+			if(checkbox.checked) {
+				selectFile(checkbox.value);
+			} else {
+				unselectFile(checkbox.value);
+			}
+		}, 10);
+	}
+	
+	function selectFile( file ) {
+		$('#selected-files-area').load('<?=$select_file_url?>'+encodeURIComponent(file));
+	}
+	
+	function unselectFile( file ) {
+
+		$('.file-selection').each(function (i, item) {
+			if(
+				item.value==file &&
+				item.checked
+			) {
+				item.checked = false;
+			}
+		});
+		
+		$('#selected-files-area').load('<?=$unselect_file_url?>'+encodeURIComponent(file));
+		
+	}
+</script>
+
+<?php
+require __DIR__.'/../lj/foot.phtml';

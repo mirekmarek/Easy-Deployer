@@ -1,0 +1,34 @@
+<?php
+namespace JetApplicationModule\Deployer\Projects;
+
+use Jet\MVC_View;
+use Jet\Tr;
+use Jet\UI_messages;
+
+/**
+ * @var MVC_View   $this
+ * @var Controller_Main $controller;
+ */
+
+$controller = $this->controller;
+
+$current_deployment = $controller->getCurrentDeployment();
+
+?>
+<br>
+<?=UI_messages::createDanger(Tr::_('Error during rollback. Details below.'))->setCloseable(false)?>
+<?php if(count($current_deployment->getRollbackedFiles())): ?>
+<hr>
+<h3><?=Tr::_('Rollbacked files')?></h3>
+
+<table class="table table-striped">
+	<?php foreach($current_deployment->getRollbackedFiles() as $file): ?>
+		<tr>
+			<td><?=$file?></td>
+		</tr>
+	<?php endforeach; ?>
+</table>
+<?php endif; ?>
+<hr>
+<h3><?=Tr::_('Log of rollback')?></h3>
+<?=$current_deployment->getRollbackLog();?>

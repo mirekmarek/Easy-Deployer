@@ -91,7 +91,7 @@ class Installer_Step_CreateDeveloper_Controller extends Installer_Step_Controlle
 			$pages
 		);
 		
-		$module_manifest = Application_Modules::moduleManifest('Projects.Deployer');
+		$module_manifest = Application_Modules::moduleManifest('Deployer.Projects');
 		
 		$role->setPrivilege(
 			Auth_Developer_Role::PRIVILEGE_ACTION,

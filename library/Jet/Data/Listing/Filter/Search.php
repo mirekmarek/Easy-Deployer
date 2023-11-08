@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUnusedAliasInspection */
+<?php /** @noinspection PhpDeprecationInspection */
 
 /**
  *
@@ -9,12 +9,12 @@
 
 namespace Jet;
 
-use Jet\Form;
-use Jet\Form_Field_Search;
-use Jet\Http_Request;
 
 /**
  *
+ * @deprecated
+ * Use DataListing which is better and more powerful.
+ * This one will be removed in v2024.05
  */
 abstract class Data_Listing_Filter_Search extends Data_Listing_Filter
 {

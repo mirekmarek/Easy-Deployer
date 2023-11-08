@@ -1,0 +1,19 @@
+<?php
+namespace JetApplicationModule\Admin\Projects;
+
+use JetApplication\Project as Project;
+
+
+use Jet\MVC_View;
+
+/**
+ * @var MVC_View $this
+ * @var Project $item
+ */
+
+$item = $this->getRaw('item');
+$router = $this->getController()->getControllerRouter();
+
+
+$edit_uri = $router->action('edit')->URI( $item->getCode() );
+?><a href="<?=$edit_uri;?>"><?=$item->getCode();?></a><?php

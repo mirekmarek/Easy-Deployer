@@ -1,0 +1,18 @@
+<?php
+namespace JetApplicationModule\Deployer\Projects;
+
+use Jet\MVC_View;
+
+/**
+ * @var MVC_View   $this
+ * @var Controller_Main $controller;
+ */
+
+$controller = $this->controller;
+
+$current_project = $controller->getCurrentProject();
+$current_deployment = $controller->getCurrentDeployment();
+
+require 'lj/head.phtml';
+
+require 'lj/foot.phtml';

@@ -1,0 +1,121 @@
+<?php
+namespace JetApplicationModule\Deployer\Projects;
+
+use Jet\MVC_View;
+
+use Diff;
+use Diff_Renderer_Html_SideBySide;
+
+/**
+ * @var MVC_View   $this
+ * @var Controller_Main $controller;
+ * @var Diff $diff
+ * @var Diff_Renderer_Html_SideBySide $renderer
+ */
+
+$controller = $this->controller;
+
+$current_project = $controller->getCurrentProject();
+$current_deployment = $controller->getCurrentDeployment();
+
+$file = $this->getString('file');
+
+$diff = $this->getRaw('diff');
+$renderer = $this->getRaw('renderer');
+
+require 'lj/head.phtml';
+
+?>
+	<style>
+		.Differences {
+			width: 100%;
+			border-collapse: collapse;
+			border-spacing: 0;
+			empty-cells: show;
+		}
+
+		.Differences thead th {
+			text-align: left;
+			border-bottom: 1px solid #000;
+			background: #aaa;
+			color: #000;
+			padding: 4px;
+		}
+		.Differences tbody th {
+			text-align: right;
+			background: #ccc;
+			width: 4em;
+			padding: 1px 2px;
+			border-right: 1px solid #000;
+			vertical-align: top;
+			font-size: 13px;
+		}
+
+		.Differences td {
+			padding: 1px 2px;
+			font-family: Consolas, monospace;
+			font-size: 13px;
+		}
+
+		.DifferencesSideBySide .ChangeInsert td.Left {
+			background: #dfd;
+		}
+
+		.DifferencesSideBySide .ChangeInsert td.Right {
+			background: #cfc;
+		}
+
+		.DifferencesSideBySide .ChangeDelete td.Left {
+			background: #f88;
+		}
+
+		.DifferencesSideBySide .ChangeDelete td.Right {
+			background: #faa;
+		}
+
+		.DifferencesSideBySide .ChangeReplace .Left {
+			background: #fe9;
+		}
+
+		.DifferencesSideBySide .ChangeReplace .Right {
+			background: #fd8;
+		}
+
+		.Differences ins, .Differences del {
+			text-decoration: none;
+		}
+
+		.DifferencesSideBySide .ChangeReplace ins, .DifferencesSideBySide .ChangeReplace del {
+			background: #fc0;
+		}
+
+		.Differences .Skipped {
+			background: #f7f7f7;
+		}
+
+		.DifferencesInline .ChangeReplace .Left,
+		.DifferencesInline .ChangeDelete .Left {
+			background: #fdd;
+		}
+
+		.DifferencesInline .ChangeReplace .Right,
+		.DifferencesInline .ChangeInsert .Right {
+			background: #dfd;
+		}
+
+		.DifferencesInline .ChangeReplace ins {
+			background: #9e9;
+		}
+
+		.DifferencesInline .ChangeReplace del {
+			background: #e99;
+		}
+		
+	</style>
+
+	<br>
+	<h3><?=$file; ?></h3>
+	<?=$diff->Render($renderer);?>
+
+<?php
+require 'lj/foot.phtml';

@@ -11,7 +11,7 @@ return [
 	],
 	'contents' => [
 		[
-			'module_name' => 'Projects.Deployer',
+			'module_name' => 'Deployer.Projects',
 			'controller_name' => 'Main',
 			'controller_action' => 'default',
 			'parameters' => [

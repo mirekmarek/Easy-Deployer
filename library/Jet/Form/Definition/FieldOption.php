@@ -16,13 +16,13 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 class Form_Definition_FieldOption extends BaseObject
 {
-	const TYPE_STRING = 'string';
-	const TYPE_INT = 'int';
-	const TYPE_FLOAT = 'float';
-	const TYPE_BOOL = 'bool';
-	const TYPE_CALLABLE = 'callable';
-	const TYPE_ARRAY = 'array';
-	const TYPE_ASSOC_ARRAY = 'assoc_array';
+	public const TYPE_STRING = 'string';
+	public const TYPE_INT = 'int';
+	public const TYPE_FLOAT = 'float';
+	public const TYPE_BOOL = 'bool';
+	public const TYPE_CALLABLE = 'callable';
+	public const TYPE_ARRAY = 'array';
+	public const TYPE_ASSOC_ARRAY = 'assoc_array';
 
 	protected string $name = '';
 	protected string $type = '';
@@ -43,7 +43,8 @@ class Form_Definition_FieldOption extends BaseObject
 	 * @param string $name
 	 * @param array $definition
 	 */
-	public function setup( string $field_class, string $name, array $definition ) {
+	public function setup( string $field_class, string $name, array $definition ) : void
+	{
 		$this->name = $name;
 		
 		foreach($definition as $key=>$val) {

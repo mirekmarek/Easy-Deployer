@@ -1,0 +1,15 @@
+<?php
+namespace JetApplicationModule\Admin\Projects;
+
+use JetApplication\Project as Project;
+
+use Jet\MVC_View;
+
+/**
+ * @var MVC_View $this
+ * @var Project $item
+ */
+
+$item = $this->getRaw('item');
+
+echo $item->getConnectionTypeTitle();
