@@ -253,6 +253,15 @@ class Deployment extends DataModel
 	protected string $rollbacked_files = '';
 
 	/**
+	 * @var string
+	 */ 
+	#[DataModel_Definition(
+		type: DataModel::TYPE_STRING,
+		max_len: 999999
+	)]
+	protected string $web_hooks_call_result = '';
+
+	/**
 	 * @param int|string $id
 	 * @return static|null
 	 */
@@ -749,6 +758,9 @@ class Deployment extends DataModel
 		
 		$this->save();
 		
+		$this->callWebHooks();
+		$this->save();
+		
 		return true;
 	}
 	
@@ -1212,5 +1224,50 @@ class Deployment extends DataModel
 			default => '',
 		};
 		
+	}
+
+	/**
+	 * @param string $value
+	 */
+	public function setWebHooksCallResult( string $value ) : void
+	{
+		$this->web_hooks_call_result = $value;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getWebHooksCallResult() : string
+	{
+		return $this->web_hooks_call_result;
+	}
+	
+	public function callWebHooks() : void
+	{
+		$web_hooks = $this->project->getWebHooks();
+		$context_options = [
+			"ssl" => [
+				"verify_peer"      => false,
+				"verify_peer_name" => false,
+			],
+		];
+		
+		$this->web_hooks_call_result = '';
+		
+		foreach($web_hooks as $URL) {
+			
+			
+			$response = file_get_contents(
+				filename: $URL,
+				context: stream_context_create($context_options)
+			);
+			
+			if( isset( $http_response_header ) ) {
+				$response = implode("\n", $http_response_header)."\n\n".$response;
+			}
+			
+			$this->web_hooks_call_result .= $URL."\n-------------------------------\n".$response."\n\n";
+			
+		}
 	}
 }

@@ -31,6 +31,7 @@ $form->renderer()->setDefaultFieldWidth( [
 
 $form->field( 'allowed_extensions' )->input()->addCustomCssStyle('height: 200px;');
 $form->field( 'blacklist' )->input()->addCustomCssStyle('height: 400px;');
+$form->field( 'web_hooks' )->input()->addCustomCssStyle('height: 400px;');
 
 if(!$form->field( 'code' )->getIsReadonly()) {
 	$form->field('name')->input()->addJsAction('onkeyup', 'generateCode(this.value)');
@@ -113,7 +114,14 @@ $all_connection_fields = [
 		<?= $form->field( 'source_dir' ) ?>
 		<?= $form->field( 'allowed_extensions' ) ?>
 		<?= $form->field( 'blacklist' ) ?>
-
+		
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div class="col-md-10">
+				<h3><?= Tr::_('Web hooks')?></h3>
+			</div>
+		</div>
+		<?= $form->field( 'web_hooks' ) ?>
 
 		<div class="row">
 			<div class="col-md-2"></div>

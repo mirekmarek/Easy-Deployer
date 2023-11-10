@@ -54,4 +54,13 @@ return [
 	'Key file does not exist or is not readable' => '',
 	'Connection type' => '',
 	'Server' => '',
+	'Get project data' => '',
+	'Add new project' => '',
+	'Update project' => '',
+	'Delete project' => '',
+	'Admin.Projects' => '',
+	'Web hooks:' => '',
+	'Web hooks' => '',
+	'A list of <b>URLs of Web services</b> that will be called to perform the deployment.<br>Each URL on new line' => '',
+	
 ];

@@ -54,9 +54,13 @@ return [
 	'Key file does not exist or is not readable' => 'Soubor klíče neexistuje, nebo není čitelný',
 	'Connection type' => 'Typ spojení',
 	'Server' => 'Server',
-	'Get project data' => '',
-	'Add new project' => '',
-	'Update project' => '',
-	'Delete project' => '',
+	'Get project data' => 'Získat informace o projektu',
+	'Add new project' => 'Založit nový projekt',
+	'Update project' => 'Upravit projekt',
+	'Delete project' => 'Smazat projekt',
 	'Admin.Projects' => '',
+	'Web hooks:' => '',
+	'Web hooks' => '',
+	'A list of <b>URLs of Web services</b> that will be called to perform the deployment.<br>Each URL on new line' =>
+		'Seznam <b>URL adres webových služeb</b>, které budou volány po provedení nasazení.<br>Každá URL na nový řádek',
 ];

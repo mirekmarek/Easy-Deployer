@@ -36,6 +36,12 @@ require __DIR__.'/../lj/head.phtml';
 				<?php endforeach; ?>
 			</table>
 			
+			<?php if($current_deployment->getWebHooksCallResult()): ?>
+			<h3><?=Tr::_('Web hooks')?></h3>
+			<pre><?=$current_deployment->getWebHooksCallResult()?></pre>
+			<?php endif; ?>
+			
+			
 			<?php require 'deployment_rollback.phtml'; ?>
 		</div>
 

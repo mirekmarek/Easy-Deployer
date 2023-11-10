@@ -74,4 +74,5 @@ return [
 	'Error during deployment preparation. Details below.' => 'Chyba během nasazovací operace. Detaily níže.',
 	'Try again' => 'Zkusit znovu',
 	'Deployer.Projects' => '',
+	'Web hooks' => '',
 ];

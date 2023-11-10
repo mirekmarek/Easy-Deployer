@@ -335,6 +335,24 @@ tmp';
 		]
 	)]
 	protected array $project_role_access = [];
+
+	/**
+	 * @var string
+	 */ 
+	#[DataModel_Definition(
+		type: DataModel::TYPE_STRING,
+		max_len: 65536
+	)]
+	#[Form_Definition(
+		type: Form_Field::TYPE_TEXTAREA,
+		label: 'Web hooks:',
+		is_required: false,
+		error_messages: [
+		]
+	)]
+	protected string $web_hooks = '';
+	
+	protected ?array $_web_hooks = null;
 	
 	
 	public static function getRoles() : array
@@ -434,16 +452,23 @@ tmp';
 			."<br>"
 			."Each relative path on new line"
 		);
-
+		
+		$form->field('web_hooks')->setHelpText(
+			"A list of <b>URLs of Web services</b> that will be called to perform the deployment."
+			."<br>"
+			."Each URL on new line"
+		);
+		
+		
 		$form->field('connection_base_path')->setHelpText(
 			"Root directory of project on the production server"
 		);
 		
-		$hasField = function( string $fied_name ) use ($form) : bool {
+		$hasField = function( string $field_name ) use ($form) : bool {
 			$type = $form->getField('connection_type')->getValue();
 			$fields = Deployment_Backend::getBackendConnectionEditFormFieldNames( $type );
 			
-			return in_array( $fied_name, $fields );
+			return in_array( $field_name, $fields );
 		};
 		
 		$form->field( 'connection_public_key_file_path' )->setValidator(function( Form_Field_Input $field ) use ($hasField) : bool {
@@ -1015,5 +1040,41 @@ tmp';
 	public function getConnectionLocalUsername() : string
 	{
 		return $this->connection_local_username;
+	}
+
+	/**
+	 * @param string $value
+	 */
+	public function setWebHooks( string $value ) : void
+	{
+		$this->web_hooks = $this->_cleanupValue($value);
+		
+		$this->_web_hooks = null;
+		
+		$this->web_hooks = implode("\n", $this->getWebHooks());
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getWebHooks() : array
+	{
+		if($this->_web_hooks===null) {
+			$this->_web_hooks = [];
+			
+			$web_hooks = explode("\n", $this->web_hooks);
+			foreach($web_hooks as $item) {
+				$item = trim($item);
+				
+				if(!$item) {
+					continue;
+				}
+				
+				$this->_web_hooks[] = $item;
+			}
+		}
+		
+		
+		return $this->_web_hooks;
 	}
 }
