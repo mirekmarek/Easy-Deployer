@@ -19,7 +19,7 @@ return [
 	],
 	'contents' => [
 		[
-			'module_name' => 'UserAccount',
+			'module_name' => 'Deployer.UserAccount',
 			'controller_name' => 'Main',
 			'controller_action' => 'default',
 			'parameters' => [
