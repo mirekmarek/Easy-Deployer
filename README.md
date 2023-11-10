@@ -23,11 +23,11 @@ This application is based on [PHP Jet framework](https://github.com/mirekmarek/p
 ## Requirements
 
 * Some web server (non-public!) running PHP 8.0 and newer (your development and testing server, or your localhost)
-* MariaDB / MySQL or SQLite support
-* PHP INTL (mostly standard PHP module)
-* PHP PDO (mostly standard PHP module)
-* PHP mbstring (mostly standard PHP module)
-* PHP OpenSSL (mostly standard PHP module)
+* MariaDB / MySQL, PostgreSQL, MS SQL or SQLite support
+* PHP INTL (standard PHP module)
+* PHP PDO (standard PHP module)
+* PHP mbstring (standard PHP module)
+* PHP OpenSSL (standard PHP module)
 * PHP FTP extension (easy to install extension)
 * PHP SSH2 extension (easy to install extension)
 
