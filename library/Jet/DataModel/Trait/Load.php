@@ -326,11 +326,21 @@ trait DataModel_Trait_Load
 
 		$main_select = DataModel_PropertyFilter::getQuerySelect( $this_definition, $load_filter );
 		$query->setSelect( $main_select );
-
+		
+		if( isset( $where_per_model[''] ) ) {
+			$where_per_model[$this_definition->getModelName()] = $where_per_model[''];
+		}
+		
+		if( isset( $where_per_model['this'] ) ) {
+			$where_per_model[$this_definition->getModelName()] = $where_per_model['this'];
+		}
+		
 
 		if( isset( $where_per_model[$this_definition->getModelName()] ) ) {
 			$query->setWhere( $where_per_model[$this_definition->getModelName()] );
 		}
+		
+		
 
 		if( $order_by ) {
 			$query->setOrderBy( $order_by );
@@ -441,6 +451,7 @@ trait DataModel_Trait_Load
 	
 	
 	/**
+	 * @param string $fetch_method
 	 * @param array $select
 	 * @param array $where
 	 * @param array|string|null $group_by
@@ -448,7 +459,7 @@ trait DataModel_Trait_Load
 	 * @param string|array|null $order_by
 	 * @param int|null $limit
 	 * @param int|null $offset
-	 * @param string $fetch_method
+	 * @param bool $raw_mode
 	 * @return mixed
 	 */
 	protected static function dataFetch(
@@ -460,6 +471,7 @@ trait DataModel_Trait_Load
 		null|string|array $order_by = null,
 		null|int          $limit = null,
 		null|int          $offset = null,
+		bool              $raw_mode = false
 	): mixed
 	{
 		$query = static::createQuery( $where );
@@ -481,6 +493,10 @@ trait DataModel_Trait_Load
 			$query->setLimit( $limit, $offset );
 		}
 		
+		if($raw_mode) {
+			$query->setRawMode( true );
+		}
+		
 		/**
 		 * @var DataModel_Backend $backend
 		 */
@@ -497,6 +513,7 @@ trait DataModel_Trait_Load
 	 * @param string|array|null $order_by
 	 * @param int|null $limit
 	 * @param int|null $offset
+	 * @param bool $raw_mode
 	 *
 	 * @return mixed
 	 */
@@ -506,7 +523,8 @@ trait DataModel_Trait_Load
 	                                     null|array $having = null,
 	                                     null|string|array $order_by = null,
 	                                     null|int $limit=null,
-	                                     null|int $offset=null
+	                                     null|int $offset=null,
+	                                     bool $raw_mode=false
 	): mixed
 	{
 		return static::dataFetch(
@@ -517,7 +535,8 @@ trait DataModel_Trait_Load
 			$having,
 			$order_by,
 			$limit,
-			$offset
+			$offset,
+			$raw_mode
 		);
 	}
 	
@@ -529,6 +548,8 @@ trait DataModel_Trait_Load
 	 * @param string|array|null $order_by
 	 * @param int|null $limit
 	 * @param int|null $offset
+	 * @param bool $raw_mode
+	 *
 	 * @return mixed
 	 */
 	public static function dataFetchAssoc( array $select,
@@ -537,7 +558,8 @@ trait DataModel_Trait_Load
 	                                       null|array $having = null,
 	                                       null|string|array $order_by = null,
 	                                       null|int $limit=null,
-	                                       null|int $offset=null
+	                                       null|int $offset=null,
+	                                       bool $raw_mode=false
 	): mixed
 	{
 		return static::dataFetch(
@@ -548,7 +570,8 @@ trait DataModel_Trait_Load
 			$having,
 			$order_by,
 			$limit,
-			$offset
+			$offset,
+			$raw_mode
 		);
 	}
 	
@@ -561,6 +584,7 @@ trait DataModel_Trait_Load
 	 * @param string|array|null $order_by
 	 * @param int|null $limit
 	 * @param int|null $offset
+	 * @param bool $raw_mode
 	 * @return mixed
 	 */
 	public static function dataFetchCol( array $select,
@@ -569,7 +593,8 @@ trait DataModel_Trait_Load
 	                                       null|array $having = null,
 	                                       null|string|array $order_by = null,
 	                                       null|int $limit=null,
-	                                       null|int $offset=null
+	                                       null|int $offset=null,
+	                                       bool $raw_mode=false
 	): mixed
 	{
 		return static::dataFetch(
@@ -580,7 +605,8 @@ trait DataModel_Trait_Load
 			$having,
 			$order_by,
 			$limit,
-			$offset
+			$offset,
+			$raw_mode
 		);
 	}
 	
@@ -593,6 +619,7 @@ trait DataModel_Trait_Load
 	 * @param string|array|null $order_by
 	 * @param int|null $limit
 	 * @param int|null $offset
+	 * @param bool $raw_mode
 	 * @return mixed
 	 */
 	public static function dataFetchPairs( array $select,
@@ -601,7 +628,8 @@ trait DataModel_Trait_Load
 	                                     null|array $having = null,
 	                                     null|string|array $order_by = null,
 	                                     null|int $limit=null,
-	                                     null|int $offset=null
+	                                     null|int $offset=null,
+	                                     bool $raw_mode=false
 	): mixed
 	{
 		return static::dataFetch(
@@ -612,7 +640,8 @@ trait DataModel_Trait_Load
 			$having,
 			$order_by,
 			$limit,
-			$offset
+			$offset,
+			$raw_mode
 		);
 	}
 	
@@ -624,6 +653,7 @@ trait DataModel_Trait_Load
 	 * @param string|array|null $order_by
 	 * @param int|null $limit
 	 * @param int|null $offset
+	 * @param bool $raw_mode
 	 * @return mixed
 	 */
 	public static function dataFetchRow( array $select,
@@ -632,7 +662,8 @@ trait DataModel_Trait_Load
 	                                       null|array $having = null,
 	                                       null|string|array $order_by = null,
 	                                       null|int $limit=null,
-	                                       null|int $offset=null
+	                                       null|int $offset=null,
+	                                       bool $raw_mode=false
 	): mixed
 	{
 		return static::dataFetch(
@@ -643,7 +674,8 @@ trait DataModel_Trait_Load
 			$having,
 			$order_by,
 			$limit,
-			$offset
+			$offset,
+			$raw_mode
 		);
 	}
 	
@@ -655,6 +687,7 @@ trait DataModel_Trait_Load
 	 * @param string|array|null $order_by
 	 * @param int|null $limit
 	 * @param int|null $offset
+	 * @param bool $raw_mode
 	 * @return mixed
 	 */
 	public static function dataFetchOne( array $select,
@@ -663,7 +696,8 @@ trait DataModel_Trait_Load
 	                                     null|array $having = null,
 	                                     null|string|array $order_by = null,
 	                                     null|int $limit=null,
-	                                     null|int $offset=null
+	                                     null|int $offset=null,
+	                                     bool $raw_mode=false
 	): mixed
 	{
 		return static::dataFetch(
@@ -674,7 +708,8 @@ trait DataModel_Trait_Load
 			$having,
 			$order_by,
 			$limit,
-			$offset
+			$offset,
+			$raw_mode
 		);
 	}
 	/**

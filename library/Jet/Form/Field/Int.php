@@ -24,8 +24,8 @@ class Form_Field_Int extends Form_Field_Input implements Form_Field_Part_NumberR
 	 * @var array
 	 */
 	protected array $error_messages = [
-		Form_Field::ERROR_CODE_EMPTY        => '',
-		Form_Field::ERROR_CODE_OUT_OF_RANGE => '',
+		Form_Field::ERROR_CODE_EMPTY        => 'Please enter a value',
+		Form_Field::ERROR_CODE_OUT_OF_RANGE => 'Out of range',
 	];
 	
 	/**
@@ -36,7 +36,9 @@ class Form_Field_Int extends Form_Field_Input implements Form_Field_Part_NumberR
 		parent::catchInput( $data );
 		
 		if($this->_value!=='') {
-			$this->_value = (float)$this->_value_raw;
+			$this->_value = (int)$this->_value_raw;
+		} else {
+			$this->_value = null;
 		}
 	}
 }

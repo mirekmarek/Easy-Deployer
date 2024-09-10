@@ -26,7 +26,7 @@ class DataModel_Relations extends BaseObject
 	 */
 	public static function add( string $data_model_class_name,
 	                            DataModel_Definition_Relation $relation,
-	                            bool $ignore_if_exists = false ): void
+	                            bool $ignore_if_exists = true ): void
 	{
 		if( !isset( static::$relations[$data_model_class_name] ) ) {
 			static::$relations[$data_model_class_name] = [];
@@ -58,9 +58,31 @@ class DataModel_Relations extends BaseObject
 	{
 		if( !array_key_exists( $data_model_class_name, static::$relations ) ) {
 			static::$relations[$data_model_class_name] = [];
-
+			
 			DataModel_Definition::get( $data_model_class_name )->initRelations();
+			
+			$parents = array_keys( class_parents( $data_model_class_name ) );
+			
+			if(
+				isset($parents[0]) &&
+				!str_starts_with($parents[0], DataModel::class)
+			) {
+				
+				try {
+					$parent_relations = static::get( $parents[0] );
+					foreach($parent_relations as $model_name=>$relation) {
+						if(!isset(static::$relations[$data_model_class_name][$model_name])) {
+							static::$relations[$data_model_class_name][$model_name] = $relation;
+						}
+					}
+				} catch( DataModel_Exception $e ) {
+				
+				}
+				
+				
+			}
 		}
+		
 
 		return static::$relations[$data_model_class_name];
 	}

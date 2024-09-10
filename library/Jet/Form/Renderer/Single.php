@@ -8,6 +8,8 @@
 
 namespace Jet;
 
+use Closure;
+
 /**
  *
  */
@@ -17,6 +19,9 @@ abstract class Form_Renderer_Single extends Form_Renderer
 	 * @var ?string
 	 */
 	protected ?string $view_script = null;
+	
+
+	protected ?Closure $custom_renderer = null;
 
 
 	/**
@@ -55,11 +60,39 @@ abstract class Form_Renderer_Single extends Form_Renderer
 	{
 		return $this->render();
 	}
-
+	
+	/**
+	 * @return Closure|null
+	 */
+	public function getCustomRenderer(): ?Closure
+	{
+		return $this->custom_renderer;
+	}
+	
+	/**
+	 * @param Closure|null $custom_renderer
+	 * @return void
+	 */
+	public function setCustomRenderer( ?Closure $custom_renderer ): void
+	{
+		$this->custom_renderer = $custom_renderer;
+	}
+	
 	/**
 	 * @return string
 	 */
 	public function render(): string
+	{
+		if($this->custom_renderer) {
+			ob_start();
+			$this->custom_renderer->call( $this );
+			return ob_get_clean();
+		} else {
+			return $this->renderByView();
+		}
+	}
+	
+	public function renderByView() : string
 	{
 		try {
 			return $this->getView()->render( $this->getViewScript() );
@@ -67,7 +100,7 @@ abstract class Form_Renderer_Single extends Form_Renderer
 			Debug_ErrorHandler::handleException( $e );
 			die();
 		}
-
+		
 	}
 
 }

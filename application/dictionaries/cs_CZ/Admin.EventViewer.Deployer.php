@@ -31,4 +31,6 @@ return [
 	'Context object name:' => 'Kontextový objekt - název:',
 	'Context object:' => 'Kontextový objekt:',
 	'Export to CSV file' => '',
+	'Please enter a value' => '',
+	'Invalid value' => '',
 ];

@@ -27,4 +27,5 @@ return [
 	'Please enter ID' => 'Prosím zadejte ID',
 	'Sorry, but ID %ID% is used.' => 'Lituji, ale ID %ID% je již použito',
 	'Admin / Role management / Administrators' => '',
+	'Please enter a value' => '',
 ];

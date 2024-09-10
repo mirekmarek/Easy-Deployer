@@ -89,6 +89,26 @@ class Translator extends BaseObject
 	{
 		static::$current_dictionary = $current_dictionary;
 	}
+	
+	/**
+	 *
+	 * @param string $dictionary
+	 * @param callable $action
+	 *
+	 * @return mixed
+	 */
+	public static function setCurrentDictionaryTemporary( string $dictionary, callable $action ): mixed
+	{
+		$current_dictionary = static::$current_dictionary;
+		static::$current_dictionary = $dictionary;
+		
+		$res = $action();
+		
+		static::$current_dictionary  =$current_dictionary;
+		
+		return $res;
+	}
+	
 
 	/**
 	 *
@@ -121,6 +141,15 @@ class Translator extends BaseObject
 			}
 		}
 	}
+	
+	/**
+	 *
+	 */
+	public static function saveDictionary( Translator_Dictionary $dictionary ): void
+	{
+		static::getBackend()->saveDictionary( $dictionary );
+	}
+	
 
 	/**
 	 * Gets translation of given text
@@ -206,5 +235,34 @@ class Translator extends BaseObject
 		return static::$dictionaries[$dictionary_key];
 	}
 
-
+	public static function installApplicationModuleDictionaries( Application_Module_Manifest $module ) : void
+	{
+		static::getBackend()->installApplicationModuleDictionaries( $module );
+	}
+	
+	
+	public static function collectApplicationModuleDictionaries( Application_Module_Manifest $module ) : void
+	{
+		static::getBackend()->collectApplicationModuleDictionaries( $module );
+	}
+	
+	public static function uninstallApplicationModuleDictionaries( Application_Module_Manifest $module ) : void
+	{
+		static::getBackend()->uninstallApplicationModuleDictionaries( $module );
+	}
+	
+	/**
+	 * @return Locale[]
+	 */
+	public static function getKnownLocales() : array
+	{
+		return static::getBackend()->getKnownLocales();
+	}
+	
+	public static function getKnownDictionaries( Locale $locale ) : array
+	{
+		return static::getBackend()->getKnownDictionaries( $locale );
+	}
+	
+	
 }

@@ -390,7 +390,10 @@ class DataModel_Backend_MSSQL extends DataModel_Backend
 		}
 		
 		if( $value instanceof Data_DateTime ) {
-			$value = $value->format( 'Y-m-d H:i:s' );
+			$value = $value->isOnlyDate() ?
+				$value->format( 'Y-m-d' )
+				:
+				$value->format( 'Y-m-d H:i:s' );
 		}
 		
 		if(
@@ -1159,6 +1162,11 @@ class DataModel_Backend_MSSQL extends DataModel_Backend
 		if( !is_array( $data ) ) {
 			return $data;
 		}
+		
+		if($query->getRawMode()) {
+			return $data;
+		}
+		
 		
 		return $this->validateResultData( $query, $fetch_method, $data );
 	}

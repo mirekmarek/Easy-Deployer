@@ -61,6 +61,8 @@ return [
 	'Admin.Projects' => '',
 	'Web hooks:' => '',
 	'Web hooks' => '',
-	'A list of <b>URLs of Web services</b> that will be called to perform the deployment.<br>Each URL on new line' =>
-		'Seznam <b>URL adres webových služeb</b>, které budou volány po provedení nasazení.<br>Každá URL na nový řádek',
+	'A list of <b>URLs of Web services</b> that will be called to perform the deployment.<br>Each URL on new line' => 'Seznam <b>URL adres webových služeb</b>, které budou volány po provedení nasazení.<br>Každá URL na nový řádek',
+	'Please enter a value' => '',
+	'Invalid value' => '',
+	'Out of range' => '',
 ];
