@@ -37,6 +37,29 @@ $unselect_file_url = MVC::getPage()->getURL(GET_params: [
 	'file' => ''
 ]);
 
+
+$select_all_new_files_url = MVC::getPage()->getURL(GET_params: [
+	'project' => $current_project->getCode(),
+	'deployment' => $current_deployment->getId(),
+	'action' => 'select_all_new_files',
+]);
+$unselect_all_new_files_url = MVC::getPage()->getURL(GET_params: [
+	'project' => $current_project->getCode(),
+	'deployment' => $current_deployment->getId(),
+	'action' => 'unselect_all_new_files',
+]);
+$select_all_changed_files_url = MVC::getPage()->getURL(GET_params: [
+	'project' => $current_project->getCode(),
+	'deployment' => $current_deployment->getId(),
+	'action' => 'select_all_changed_files',
+]);
+$unselect_all_changed_files_url = MVC::getPage()->getURL(GET_params: [
+	'project' => $current_project->getCode(),
+	'deployment' => $current_deployment->getId(),
+	'action' => 'unselect_all_changed_files',
+]);
+
+
 require __DIR__.'/../lj/head.phtml';
 ?>
 <br>
@@ -62,16 +85,29 @@ require __DIR__.'/../lj/head.phtml';
 				<br><br>
 				<h3><?=Tr::_('New files')?></h3>
 				<table class="table table-striped">
-					<?php foreach($new_files as $file): ?>
+					<?php
+					$i = 0;
+					foreach($new_files as $file):
+						$i++;
+						?>
 						<tr>
 							<?php if($current_deployment->doDeploymentAllowed()): ?>
 							<td style="width: 50px;">
-								<input class="file-selection" type="checkbox" value="<?=$file?>" onchange="toggleFile(this);" <?php if($current_deployment->fileIsSelected($file)): ?> checked<?php endif;?> >
+								<input id="nf_<?=$i?>" class="file-selection new-file" type="checkbox" value="<?=$file?>" onchange="toggleFile(this);" <?php if($current_deployment->fileIsSelected($file)): ?> checked<?php endif;?> >
 							</td>
 							<?php endif; ?>
-							<td><?=$file?></td>
+							<td onclick="toggleFileById('nf_<?=$i?>')" style="cursor: pointer"><?=$file?></td>
 						</tr>
 					<?php endforeach; ?>
+					<tfoot>
+					<tr>
+						<td></td>
+						<td>
+							<?=UI::button(Tr::_('Select all'))->setOnClick("selectAllNewFiles();")->setClass(UI_button::CLASS_INFO);?>
+							<?=UI::button(Tr::_('Unselect all'))->setOnClick("unselectAllNewFiles();")->setClass(UI_button::CLASS_LIGHT);?>
+						</td>
+					</tr>
+					</tfoot>
 				</table>
 			<?php endif; ?>
 			
@@ -79,7 +115,11 @@ require __DIR__.'/../lj/head.phtml';
 				<br><br>
 				<h3><?=Tr::_('Changed files')?></h3>
 				<table class="table table-striped">
-					<?php foreach($changed_files as $file): ?>
+					<?php
+					$i = 0;
+					foreach($changed_files as $file):
+						$i++;
+						?>
 						<tr>
 							<td style="width: 100px;"><a href="<?=MVC::getPage()->getURL(GET_params: [
 									'project' => $current_project->getCode(),
@@ -89,12 +129,22 @@ require __DIR__.'/../lj/head.phtml';
 								])?>" target="_blank"><?=Tr::_('Compare')?></a></td>
 							<?php if($current_deployment->doDeploymentAllowed()): ?>
 							<td style="width: 50px;">
-								<input class="file-selection" type="checkbox" value="<?=$file?>" onchange="toggleFile(this);" <?php if($current_deployment->fileIsSelected($file)): ?> checked<?php endif;?> >
+								<input class="file-selection changed-file" type="checkbox" value="<?=$file?>" onchange="toggleFile(this);" <?php if($current_deployment->fileIsSelected($file)): ?> checked<?php endif;?> >
 							</td>
 							<?php endif; ?>
-							<td><?=$file?></td>
+							<td onclick="toggleFileById('nf_<?=$i?>')" style="cursor: pointer"><?=$file?></td>
 						</tr>
 					<?php endforeach; ?>
+					<tfoot>
+					<tr>
+						<td></td>
+						<td></td>
+						<td>
+							<?=UI::button(Tr::_('Select all'))->setOnClick("selectAllChangedFiles();")->setClass(UI_button::CLASS_INFO);?>
+							<?=UI::button(Tr::_('Unselect all'))->setOnClick("unselectAllChangedFiles();")->setClass(UI_button::CLASS_LIGHT);?>
+						</td>
+					</tr>
+					</tfoot>
 				</table>
 			<?php endif; ?>
 			
@@ -106,6 +156,14 @@ require __DIR__.'/../lj/head.phtml';
 </div>
 
 <script>
+	
+	function toggleFileById( id ) {
+		const checkbox = document.getElementById(id);
+		checkbox.checked = !checkbox.checked;
+
+		toggleFile(checkbox);
+	}
+	
 	function toggleFile( checkbox ) {
 		setTimeout(function () {
 			if(checkbox.checked) {
@@ -115,6 +173,44 @@ require __DIR__.'/../lj/head.phtml';
 			}
 		}, 10);
 	}
+
+	function selectAllNewFiles() {
+		const chb = document.getElementsByClassName('new-file');
+
+		for (let i = 0; i < chb.length; i++) {
+			chb[i].checked = true;
+		}
+
+		$('#selected-files-area').load('<?=$select_all_new_files_url?>');
+	}
+
+	function unselectAllNewFiles() {
+		const chb = document.getElementsByClassName('new-file');
+
+		for (let i = 0; i < chb.length; i++) {
+			chb[i].checked = false;
+		}
+		$('#selected-files-area').load('<?=$unselect_all_new_files_url?>');
+	}
+	
+	function selectAllChangedFiles() {
+		const chb = document.getElementsByClassName('changed-file');
+
+		for (let i = 0; i < chb.length; i++) {
+			chb[i].checked = true;
+		}
+		$('#selected-files-area').load('<?=$select_all_changed_files_url?>');
+	}
+
+	function unselectAllChangedFiles() {
+		const chb = document.getElementsByClassName('changed-file');
+
+		for (let i = 0; i < chb.length; i++) {
+			chb[i].checked = false;
+		}
+		$('#selected-files-area').load('<?=$unselect_all_changed_files_url?>');
+	}
+	
 	
 	function selectFile( file ) {
 		$('#selected-files-area').load('<?=$select_file_url?>'+encodeURIComponent(file));

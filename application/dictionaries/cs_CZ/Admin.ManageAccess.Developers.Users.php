@@ -52,4 +52,6 @@ return [
 	'Is blocked:' => 'Je zablokován:',
 	'User is not blocked' => 'Uživatel není zablokován',
 	'User is blocked till %till_date%' => 'Uživatel není zablokován do %till_date%',
+	'Please enter a value' => '',
+	'Invalid value' => '',
 ];

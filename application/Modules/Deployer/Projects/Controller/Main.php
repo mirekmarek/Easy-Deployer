@@ -8,6 +8,7 @@
  */
 namespace JetApplicationModule\Deployer\Projects;
 
+use Jet\AJAX;
 use Jet\Application;
 use Jet\Http_Headers;
 use Jet\Http_Request;
@@ -116,8 +117,14 @@ class Controller_Main extends MVC_Controller_Default
 				
 				if( $this->current_deployment->getState()==Deployment::STATE_PREPARATION_DONE ) {
 					if(
-						$action=='unselect_file' ||
-						$action=='select_file'
+						in_array($action, [
+							'unselect_file',
+							'select_file',
+							'select_all_new_files',
+							'unselect_all_new_files',
+							'select_all_changed_files',
+							'unselect_all_changed_files'
+						])
 					) {
 						return $action;
 					}
@@ -332,10 +339,36 @@ class Controller_Main extends MVC_Controller_Default
 
 	}
 	
+	public function select_all_new_files_Action() : void
+	{
+		$this->current_deployment->selectAllNewFiles();
+		AJAX::snippetResponse( $this->view->render('deployment/selected_files') );
+	}
+	
+	public function unselect_all_new_files_Action() : void
+	{
+		$this->current_deployment->unselectAllNewFiles();
+		AJAX::snippetResponse( $this->view->render('deployment/selected_files') );
+	}
+	
+	public function select_all_changed_files_Action() : void
+	{
+		$this->current_deployment->selectAllChangedFiles();
+		AJAX::snippetResponse( $this->view->render('deployment/selected_files') );
+	}
+	
+	public function unselect_all_changed_files_Action() : void
+	{
+		$this->current_deployment->unselectAllChangedFiles();
+		AJAX::snippetResponse( $this->view->render('deployment/selected_files') );
+	}
+	
+	
 	public function unselect_file_Action() : void
 	{
 		$file = Http_Request::GET()->getString('file');
 		
+		/*
 		Logger::info(
 			'file_unselected',
 			'File unselected',
@@ -345,18 +378,18 @@ class Controller_Main extends MVC_Controller_Default
 				'file' => $file
 			]
 		);
+		*/
 		
 		$this->current_deployment->unselectFile( $file );
 		
-		echo $this->view->render('deployment/selected_files');
-		Application::end();
+		AJAX::snippetResponse( $this->view->render('deployment/selected_files') );
 	}
 	
 	public function select_file_Action() : void
 	{
 		$file = Http_Request::GET()->getString('file');
 		
-		
+		/*
 		Logger::info(
 			'file_selected',
 			'File selected',
@@ -366,11 +399,11 @@ class Controller_Main extends MVC_Controller_Default
 				'file' => $file
 			]
 		);
+		*/
 		
 		$this->current_deployment->selectFile( $file );
 		
-		echo $this->view->render('deployment/selected_files');
-		Application::end();
+		AJAX::snippetResponse( $this->view->render('deployment/selected_files') );
 	}
 	
 	public function deployment_start_show_Action() : void

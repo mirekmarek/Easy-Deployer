@@ -75,4 +75,6 @@ return [
 	'Try again' => 'Zkusit znovu',
 	'Deployer.Projects' => '',
 	'Web hooks' => '',
+	'Select all' => '',
+	'Unselect all' => '',
 ];

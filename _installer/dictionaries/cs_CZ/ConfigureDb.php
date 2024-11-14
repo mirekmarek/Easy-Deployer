@@ -24,4 +24,6 @@ return [
 	'Data path:' => 'Cesta k datovému souboru:',
 	'Charset:' => 'Znaková sada:',
 	'Path:' => 'Cesta:',
+	'Please enter a value' => '',
+	'Invalid value' => '',
 ];

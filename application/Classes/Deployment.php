@@ -828,6 +828,38 @@ class Deployment extends DataModel
 		return in_array($file, $this->getSelectedFiles());
 	}
 	
+	public function selectAllNewFiles() : void
+	{
+		foreach($this->getDiff()->getNewFiles() as $file) {
+			$this->addSelectedFile( $file );
+		}
+		$this->save();
+	}
+	
+	public function unselectAllNewFiles() : void
+	{
+		foreach($this->getDiff()->getNewFiles() as $file) {
+			$this->removeSelectedFile( $file );
+		}
+		$this->save();
+	}
+	
+	public function selectAllChangedFiles() : void
+	{
+		foreach($this->getDiff()->getChangedFiles() as $file) {
+			$this->addSelectedFile( $file );
+		}
+		$this->save();
+	}
+	
+	public function unselectAllChangedFiles() : void
+	{
+		foreach($this->getDiff()->getChangedFiles() as $file) {
+			$this->removeSelectedFile( $file );
+		}
+		$this->save();
+	}
+	
 	public function unselectFile( string $file ) : void
 	{
 		if($this->state!=static::STATE_PREPARATION_DONE) {
