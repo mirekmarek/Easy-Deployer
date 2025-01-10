@@ -73,8 +73,10 @@ return [
 	'Unable to connect server: %ERROR%' => 'Nemohu se spojit se serverem: %ERROR%',
 	'Error during deployment preparation. Details below.' => 'Chyba během nasazovací operace. Detaily níže.',
 	'Try again' => 'Zkusit znovu',
-	'Deployer.Projects' => '',
+	'Deployer.Projects' => 'Projekty',
 	'Web hooks' => '',
-	'Select all' => '',
-	'Unselect all' => '',
+	'Select all' => 'Vybrat vše',
+	'Unselect all' => 'Odvybrat vše',
+	'Show all diffs' => 'Ukázat všechny změny',
+	'All diffs' => 'Všechny změny',
 ];

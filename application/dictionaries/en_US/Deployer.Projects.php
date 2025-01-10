@@ -73,4 +73,10 @@ return [
 	'Unable to connect server: %ERROR%' => '',
 	'Error during deployment preparation. Details below.' => '',
 	'Try again' => '',
+	'Deployer.Projects' => 'Projects',
+	'Web hooks' => '',
+	'Select all' => '',
+	'Unselect all' => '',
+	'Show all diffs' => '',
+	'All diffs' => '',
 ];

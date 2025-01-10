@@ -142,6 +142,12 @@ require __DIR__.'/../lj/head.phtml';
 						<td>
 							<?=UI::button(Tr::_('Select all'))->setOnClick("selectAllChangedFiles();")->setClass(UI_button::CLASS_INFO);?>
 							<?=UI::button(Tr::_('Unselect all'))->setOnClick("unselectAllChangedFiles();")->setClass(UI_button::CLASS_LIGHT);?>
+							&nbsp;&nbsp;&nbsp;&nbsp;
+							<?=UI::button(Tr::_('Show all diffs'))->setUrl(MVC::getPage()->getURL(GET_params: [
+								'project' => $current_project->getCode(),
+								'deployment' => $current_deployment->getId(),
+								'action' => 'show_all_diffs',
+							]))->setClass(UI_button::CLASS_SECONDARY)->setCustomTagAttribute('target', '_blank');?>
 						</td>
 					</tr>
 					</tfoot>

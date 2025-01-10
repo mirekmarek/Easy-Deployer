@@ -91,6 +91,12 @@ class Controller_Main extends MVC_Controller_Default
 				return 'compare_file';
 			}
 			
+			if(
+				$action=='show_all_diffs'
+			) {
+				return 'show_all_diffs';
+			}
+			
 			
 			if($this->current_project->deploymentPrepareAllowed()) {
 				if($action=='prepare_show') {
@@ -337,6 +343,45 @@ class Controller_Main extends MVC_Controller_Default
 		
 		$this->output('file_diff');
 
+	}
+	
+	public function show_all_diffs_Action() : void
+	{
+		Navigation_Breadcrumb::addURL(Tr::_('All diffs'));
+		
+		require SysConf_Path::getLibrary().'Diff/Diff.php';
+		require SysConf_Path::getLibrary().'Diff/Diff/Renderer/Html/SideBySide.php';
+		
+		Logger::info(
+			'show_all_diffs',
+			'All diffs displayed',
+			$this->current_deployment->getId(),
+			$this->current_deployment->getProject()->getCode().':'.$this->current_deployment->getId(),
+			[]
+		);
+		
+		
+		$renderer = new Diff_Renderer_Html_SideBySide();
+		$this->view->setVar( 'renderer', $renderer );
+		
+		$diffs = [];
+		foreach($this->current_deployment->getDiff()->getChangedFiles() as $file) {
+			
+			$new = explode("\n", $this->current_deployment->readSourceFile( $file ) );
+			$old = explode("\n", $this->current_deployment->readBackupFile( $file ) );
+			
+			$diff = new Diff( $old, $new, [
+				//'ignoreWhitespace' => true,
+				//'ignoreCase' => true,
+			
+			]);
+			
+			$diffs[$file] = $diff;
+		}
+		
+		$this->view->setVar( 'diffs', $diffs );
+		$this->output('all_diffs');
+		
 	}
 	
 	public function select_all_new_files_Action() : void
