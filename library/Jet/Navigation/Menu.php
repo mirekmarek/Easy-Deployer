@@ -261,19 +261,15 @@ class Navigation_Menu extends BaseObject
 				 * @var Navigation_Menu|Navigation_Menu_Item $a
 				 * @var Navigation_Menu|Navigation_Menu_Item $b
 				 */
-
-				if( $a->getIndex() == $b->getIndex() ) {
-					return 0;
-				}
-
-				return ($a->getIndex() < $b->getIndex()) ? -1 : 1;
+				
+				return $a->getIndex() <=> $b->getIndex();
 			}
 		);
 
 	}
 
 	/**
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function toArray(): array
 	{
@@ -288,6 +284,10 @@ class Navigation_Menu extends BaseObject
 			$menu['items'] = [];
 
 			foreach( $this->items as $item ) {
+				if($item->getSourceModuleName()) {
+					continue;
+				}
+				
 				$item_id = $item->getId();
 
 				$menu_item = $item->toArray();

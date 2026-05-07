@@ -8,9 +8,7 @@
 
 namespace Jet;
 
-/**
- *
- */
+/** @phpstan-consistent-constructor */
 class Navigation_MenuSet extends BaseObject
 {
 
@@ -25,9 +23,9 @@ class Navigation_MenuSet extends BaseObject
 	protected string $config_file_path = '';
 
 	/**
-	 * @var string|null
+	 * @var string|null|false
 	 */
-	protected string|null $translator_dictionary = '';
+	protected string|null|false $translator_dictionary = '';
 
 	/**
 	 * @var Navigation_Menu[]
@@ -59,11 +57,11 @@ class Navigation_MenuSet extends BaseObject
 
 	/**
 	 * @param string $name
-	 * @param string|null|bool $translator_dictionary
+	 * @param string|null|false $translator_dictionary
 	 *
 	 * @return Navigation_MenuSet
 	 */
-	public static function get( string $name, string|null|bool $translator_dictionary = null ): Navigation_MenuSet
+	public static function get( string $name, string|null|false $translator_dictionary = null ): Navigation_MenuSet
 	{
 		if( !isset( static::$_sets[$name] ) ) {
 			static::$_sets[$name] = new static( $name, $translator_dictionary );
@@ -90,9 +88,9 @@ class Navigation_MenuSet extends BaseObject
 
 	/**
 	 * @param string $name
-	 * @param string|null|bool $translator_dictionary
+	 * @param string|null|false $translator_dictionary
 	 */
-	public function __construct( string $name, string|null|bool $translator_dictionary = null )
+	public function __construct( string $name, string|null|false $translator_dictionary = null )
 	{
 		$this->setName( $name );
 		$this->translator_dictionary = $translator_dictionary;
@@ -160,49 +158,58 @@ class Navigation_MenuSet extends BaseObject
 
 		}
 
-		$this->initModuleMenuItems();
+		$this->initModulesMenuItems();
 	}
 
 
 	/**
 	 *
 	 */
-	protected function initModuleMenuItems(): void
+	protected function initModulesMenuItems(): void
 	{
 		foreach( Application_Modules::activatedModulesList() as $manifest ) {
-
-			$items_file_path = $manifest->getModuleDir().SysConf_Jet_Modules::getMenuItemsDir().'/'.$this->name.'.php';
-			if(!IO_File::isReadable($items_file_path)) {
-				continue;
-			}
-
+			$this->initModuleMenuItems(  $manifest);
+		}
+	}
+	
+	public function initModuleMenuItems( Application_Module_Manifest $module_manifest ) : void
+	{
+		$items_file_path = $module_manifest->getModuleDir().SysConf_Jet_Modules::getMenuItemsDir().'/'.$this->name.'.php';
+		if(!IO_File::isReadable($items_file_path)) {
+			return;
+		}
+		
+		
+		$translator_dictionary = $module_manifest->getName();
+		
+		Translator::setCurrentDictionaryTemporary( $translator_dictionary, function() use ($items_file_path, $module_manifest) {
 			$menu_data = require $items_file_path;
-
-			$translator_dictionary = $manifest->getName();
-
+			
 			foreach($menu_data as $menu_id=>$menu_items_data) {
 				$menu = $this->getMenu( $menu_id );
 				if( !$menu ) {
 					continue;
 				}
-
+				
 				foreach( $menu_items_data as $item_id => $menu_item_data ) {
 					$label = '';
-
+					
 					if( !empty( $menu_item_data['label'] ) ) {
-						$label = Tr::_( $menu_item_data['label'], [], $translator_dictionary );
+						$label = Tr::_( $menu_item_data['label'] );
 					}
-
+					
 					$menu_item = new Navigation_Menu_Item( $item_id, $label );
 					$menu_item->setMenuId( $menu_id );
 					$menu_item->setData( $menu_item_data );
-
+					$menu_item->setSourceModuleName( $module_manifest->getName() );
+					
 					$menu->addItem( $menu_item );
 				}
 			}
-		}
+			
+		} );
+		
 	}
-
 
 	/**
 	 * @param string $id
@@ -262,15 +269,42 @@ class Navigation_MenuSet extends BaseObject
 	public function saveDataFile(): void
 	{
 		$res = [];
+		
+		$per_module = [];
 
 		foreach( $this->menus as $menu ) {
 			$menu_id = $menu->getId();
 
 			$res[$menu_id] = $menu->toArray();
-
+			
+			foreach($menu->getItems() as $item) {
+				if(!$item->getSourceModuleName()) {
+					continue;
+				}
+				
+				$module = $item->getSourceModuleName();
+				
+				if(!isset($per_module[$module])) {
+					$per_module[$module] = [];
+				}
+				
+				if(!isset($per_module[$module][$menu_id])) {
+					$per_module[$module][$menu_id] = [];
+				}
+				
+				$per_module[$module][$menu_id][$item->getId(false)] = $item->toArray();
+			}
 		}
 
 		IO_File::writeDataAsPhp( $this->config_file_path, $res );
+		
+		foreach($per_module as $module_name=>$menus) {
+			$module_manifest = Application_Modules::moduleManifest( $module_name );
+			
+			$items_file_path = $module_manifest->getModuleDir().SysConf_Jet_Modules::getMenuItemsDir().'/'.$this->name.'.php';
+			
+			IO_File::writeDataAsPhp( $items_file_path, $menus );
+		}
 	}
 
 }

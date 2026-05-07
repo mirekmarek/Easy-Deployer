@@ -315,8 +315,23 @@ class Controller_Main extends MVC_Controller_Default
 		
 		$file = Http_Request::GET()->getString('file');
 		
-		$new = explode("\n", $this->current_deployment->readSourceFile( $file ) );
-		$old = explode("\n", $this->current_deployment->readBackupFile( $file ) );
+		$new = $this->current_deployment->readSourceFile( $file );
+		$old = $this->current_deployment->readBackupFile( $file );
+		
+		$custom_charset = $this->current_project->getCustomCharset();
+		
+		if(
+			$custom_charset &&
+			$custom_charset!='utf8'
+		) {
+			$new = iconv($custom_charset, 'utf8', $new);
+			$old = iconv($custom_charset, 'utf8', $old);
+		}
+		
+		
+		$new = explode("\n", $new );
+		$old = explode("\n", $old );
+		
 		
 		$diff = new Diff( $old, $new, [
 			//'ignoreWhitespace' => true,

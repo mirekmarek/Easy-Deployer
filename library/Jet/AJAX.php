@@ -16,7 +16,7 @@ class AJAX
 
 	/**
 	 * @param mixed $response_data (will be encoded by json_encode)
-	 * @param array $http_headers
+	 * @param array<string,string> $http_headers
 	 * @param int $http_code
 	 */
 	public static function commonResponse( mixed $response_data, array $http_headers = [], int $http_code = 200 ): void
@@ -36,8 +36,8 @@ class AJAX
 
 	/**
 	 * @param bool $success
-	 * @param array $snippets
-	 * @param array $data
+	 * @param array<string,string> $snippets
+	 * @param array<string,mixed> $data
 	 */
 	public static function operationResponse( bool $success, array $snippets = [], array $data = [] ): void
 	{

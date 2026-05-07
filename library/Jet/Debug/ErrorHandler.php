@@ -31,7 +31,7 @@ class Debug_ErrorHandler
 	protected static Debug_ErrorHandler_Error|null $last_error = null;
 
 	/**
-	 * @var array
+	 * @var array<string>
 	 */
 	protected static array $ignore_non_fatal_errors_paths = [
 		'/' . __NAMESPACE__ . '/IO/'
@@ -48,7 +48,7 @@ class Debug_ErrorHandler
 	}
 
 	/**
-	 * @return array
+	 * @return array<string>
 	 */
 	public static function getIgnoreNonFatalErrorsPaths(): array
 	{
@@ -60,8 +60,9 @@ class Debug_ErrorHandler
 	 */
 	public static function initialize(): void
 	{
-		Debug::setOutputIsHTML( php_sapi_name() != 'cli' );
+		Debug::setOutputIsHTML( (php_sapi_name() != 'cli') );
 
+		/** @phpstan-ignore argument.type  */
 		set_error_handler( [
 			static::class,
 			'handleError'
@@ -70,7 +71,23 @@ class Debug_ErrorHandler
 			static::class,
 			'handleException'
 		] );
-
+		
+		register_shutdown_function( function() {
+			$error = error_get_last();
+			if(
+				!$error ||
+				$error['type']!=E_ERROR
+			) {
+				return;
+			}
+			
+			static::handleError(
+				$error['type'],
+				$error['message'],
+				$error['file'],
+				$error['line']
+			);
+		} );
 	}
 
 
@@ -146,7 +163,7 @@ class Debug_ErrorHandler
 			foreach($backtrace as $bt) {
 				if(
 					($bt['class']??'')==static::class &&
-					($bt['function']??'')=='doItSilent'
+					$bt['function']=='doItSilent'
 				) {
 					$error->setIsSilenced(true);
 					break;

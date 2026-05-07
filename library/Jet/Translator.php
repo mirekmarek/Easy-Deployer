@@ -155,7 +155,7 @@ class Translator extends BaseObject
 	 * Gets translation of given text
 	 *
 	 * @param string $text
-	 * @param array $data (optional) - data that replace parts of text; input array('KEY1'=>'value1') replaces %KEY1% in text for value1
+	 * @param array<string,string|int|float> $data (optional) - data that replace parts of text; input array('KEY1'=>'value1') replaces %KEY1% in text for value1
 	 * @param string|null $dictionary (optional)
 	 * @param Locale|null $locale (optional) - target locale
 	 *
@@ -171,7 +171,7 @@ class Translator extends BaseObject
 	 *
 	 *
 	 * @param string $phrase
-	 * @param array $data (optional) - data that replace parts of text; input array('KEY1'=>'value1') replaces %KEY1% in text for value1
+	 * @param array<string,string|int|float> $data (optional) - data that replace parts of text; input array('KEY1'=>'value1') replaces %KEY1% in text for value1
 	 * @param string|null $dictionary (optional)
 	 * @param Locale|null $locale (optional) - target locale
 	 *
@@ -201,15 +201,15 @@ class Translator extends BaseObject
 			return Data_Text::replaceData( $phrase, $data );
 		}
 
-		if( is_string( $locale ) ) {
-			$locale = new Locale( $locale );
-		}
-
-		$translation = static::loadDictionary( $dictionary, $locale )->getTranslation( $phrase, SysConf_Jet_Translator::getAutoAppendUnknownPhrase() );
-
-
-		return static::getBackend()->updateTranslation( $translation, $data );
+		$translation = static::loadDictionary( $dictionary, $locale )->getTranslation(
+			$phrase,
+			SysConf_Jet_Translator::getAutoAppendUnknownPhrase()
+		);
+		
+		return Data_Text::replaceData( $translation, $data );
 	}
+	
+	
 
 	/**
 	 *
@@ -259,6 +259,10 @@ class Translator extends BaseObject
 		return static::getBackend()->getKnownLocales();
 	}
 	
+	/**
+	 * @param Locale $locale
+	 * @return array<string,string>
+	 */
 	public static function getKnownDictionaries( Locale $locale ) : array
 	{
 		return static::getBackend()->getKnownDictionaries( $locale );

@@ -29,14 +29,14 @@ abstract class DataModel_IDController extends BaseObject
 	 * array key: ID property name
 	 * array value: ID value
 	 *
-	 * @var array
+	 * @var array<string,string|int|null>
 	 */
 	protected array $values = [];
 
 
 	/**
 	 * @param DataModel_Definition_Model $data_model_definition
-	 * @param array $options
+	 * @param array<string,mixed> $options
 	 */
 	public function __construct( DataModel_Definition_Model $data_model_definition, array $options )
 	{
@@ -100,7 +100,7 @@ abstract class DataModel_IDController extends BaseObject
 
 
 	/**
-	 * @param array $options
+	 * @param array<string,mixed> $options
 	 */
 	public function setOptions( array $options ): void
 	{
@@ -140,6 +140,19 @@ abstract class DataModel_IDController extends BaseObject
 	public function toString(): string
 	{
 		return implode( ':', $this->values );
+	}
+	
+	public function fromString( string $id ) : static
+	{
+		$id = explode( ':', $id );
+		
+		$i = 0;
+		foreach($this->values as $property_name => $value ) {
+			$this->values[$property_name] = $id[$i];
+			$i++;
+		}
+		
+		return $this;
 	}
 
 	/**
@@ -181,7 +194,7 @@ abstract class DataModel_IDController extends BaseObject
 	}
 
 	/**
-	 * @return array
+	 * @return string[]
 	 */
 	public function getPropertyNames(): array
 	{

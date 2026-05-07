@@ -19,7 +19,7 @@ class IO_File
 {
 
 	/**
-	 * @var ?array
+	 * @var ?array<string>
 	 */
 	protected static ?array $http_response_header = null;
 
@@ -135,13 +135,15 @@ class IO_File
 	{
 		static::_write( $file_path, $data, false );
 	}
-
+	
 	/**
 	 * @param string $path
-	 * @param array $data
+	 * @param array<mixed> $data
 	 * @param bool $reset_cache
-	 *
+	 * @return void
 	 * @throws IO_File_Exception
+	 * @noinspection PhpRedundantDocCommentInspection
+	 * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
 	 */
 	public static function writeDataAsPhp( string $path, array $data, bool $reset_cache=true ) : void
 	{
@@ -249,6 +251,7 @@ class IO_File
 		static::$http_response_header = null;
 		$data = file_get_contents( $file_path );
 
+		/** @phpstan-ignore-next-line */
 		if( isset( $http_response_header ) ) {
 			static::$http_response_header = $http_response_header;
 
@@ -275,7 +278,7 @@ class IO_File
 	}
 
 	/**
-	 * @return array
+	 * @return array<string>
 	 */
 	public static function getHttpResponseHeader(): array
 	{
@@ -495,7 +498,7 @@ class IO_File
 		$fp = fopen( $file_path, 'r' );
 		fpassthru( $fp );
 		fclose( $fp );
-
+		Application::end();
 	}
 
 
@@ -510,7 +513,7 @@ class IO_File
 	}
 
 	/**
-	 * @return array|null
+	 * @return array<string,string|int>|null
 	 */
 	protected static function _getLastError(): array|null
 	{

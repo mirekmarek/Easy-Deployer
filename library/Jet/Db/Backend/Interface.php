@@ -39,7 +39,7 @@ interface Db_Backend_Interface
 	 * Executes command (INSERT, UPDATE, DELETE or CREATE, ...) and return affected rows
 	 *
 	 * @param string $query
-	 * @param array $query_data
+	 * @param array<string,mixed> $query_data
 	 *
 	 * @return int
 	 */
@@ -47,10 +47,11 @@ interface Db_Backend_Interface
 
 	/**
 	 * @param string $query
-	 * @param array $query_params
+	 * @param array<string,mixed> $query_params
 	 * @param ?callable $result_handler
 	 *
-	 * @return iterable
+	 * @return iterable<mixed>
+	 * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
 	 */
 	public function query( string $query, array $query_params = [], ?callable $result_handler=null ): iterable;
 
@@ -58,56 +59,57 @@ interface Db_Backend_Interface
 	/**
 	 *
 	 * @param string $query
-	 * @param array $query_data (optional)
+	 * @param array<string,mixed> $query_data (optional)
 	 *
-	 * @return array
+	 * @return array<int,array<string,mixed>>
 	 */
 	public function fetchAll( string $query, array $query_data = [] ): array;
 
 	/**
 	 *
 	 * @param string $query
-	 * @param array $query_data (optional)
+	 * @param array<string,mixed> $query_data (optional)
 	 *
-	 * @return array|bool
+	 * @return array<string,mixed>|false
 	 */
-	public function fetchRow( string $query, array $query_data = [] ): array|bool;
+	public function fetchRow( string $query, array $query_data = [] ): array|false;
 
 	/**
 	 *
 	 * @param string $query
-	 * @param array $query_data (optional)
+	 * @param array<string,mixed> $query_data (optional)
 	 * @param string|null $key_column (optional)
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public function fetchAssoc( string $query, array $query_data = [], ?string $key_column = null ): array;
 
 	/**
 	 *
 	 * @param string $query
-	 * @param array $query_data (optional)
+	 * @param array<string,mixed> $query_data (optional)
 	 * @param string|null $column (optional, default: 1st column)
 	 *
-	 * @return array
+	 * @return array<mixed>
+	 * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
 	 */
 	public function fetchCol( string $query, array $query_data = [], ?string $column = null ): array;
 
 	/**
 	 *
 	 * @param string $query
-	 * @param array $query_data (optional)
+	 * @param array<string,mixed> $query_data (optional)
 	 * @param string|null $key_column (optional, default: 1st column)
 	 * @param string|null $value_column (optional, default: 2nd column)
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function fetchPairs( string $query, array $query_data = [], ?string $key_column = null, ?string $value_column = null ): array;
 
 	/**
 	 *
 	 * @param string $query
-	 * @param array $query_data (optional)
+	 * @param array<string,mixed> $query_data (optional)
 	 * @param string|null $column (optional, default:1st column)
 	 *
 	 * @return mixed
@@ -137,9 +139,9 @@ interface Db_Backend_Interface
 	/**
 	 * @param string|null $name
 	 *
-	 * @return string
+	 * @return string|false
 	 */
-	public function lastInsertId( string $name = null ) : string;
+	public function lastInsertId( ?string $name = null ) : string|false;
 
 	
 	public function quoteString( string $string ) : string;

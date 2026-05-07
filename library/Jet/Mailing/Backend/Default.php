@@ -23,7 +23,8 @@ class Mailing_Backend_Default extends Mailing_Backend_Abstract
 	public function sendEmail( Mailing_Email $email ): bool
 	{
 
-		$subject = $email->getSubject();
+		
+		
 		
 		$this->prepareMessage( $email, $message, $header );
 
@@ -32,8 +33,16 @@ class Mailing_Backend_Default extends Mailing_Backend_Abstract
 		if(is_array($to)) {
 			$to = implode(', ', $to);
 		}
-
-		return mail( $to, $subject, $message, $header );
+		
+		$subject = $email->getSubject();
+		
+		$i_encoding = mb_internal_encoding();
+		mb_internal_encoding('UTF-8');
+		$encoded_subject = mb_encode_mimeheader("Subject: $subject", 'UTF-8');
+		$encoded_subject = substr($encoded_subject, strlen('Subject: '));
+		mb_internal_encoding($i_encoding);
+		
+		return mail( $to, $encoded_subject, $message, $header, '-f '.$email->getSenderEmail() );
 
 	}
 }

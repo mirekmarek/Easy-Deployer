@@ -24,7 +24,7 @@ class DataModel_Definition_Property_DataModel extends DataModel_Definition_Prope
 	protected ?string $data_model_class = null;
 
 	/**
-	 * @param array $definition_data
+	 * @param array<string,mixed> $definition_data
 	 *
 	 * @throws DataModel_Exception
 	 */
@@ -55,9 +55,9 @@ class DataModel_Definition_Property_DataModel extends DataModel_Definition_Prope
 
 	/**
 	 *
-	 * @return string
+	 * @return string|DataModel_Related
 	 */
-	public function getValueDataModelClass() : string
+	public function getValueDataModelClass() : string|DataModel_Related
 	{
 		return $this->data_model_class;
 	}
@@ -66,9 +66,9 @@ class DataModel_Definition_Property_DataModel extends DataModel_Definition_Prope
 	 *
 	 * @param mixed               &$property
 	 *
-	 * @return array|null
+	 * @return array<int,mixed>|null
 	 */
-	public function getJsonSerializeValue( mixed &$property ): ?array
+	public function getJsonSerializeValue( mixed $property ): ?array
 	{
 		if( !$property ) {
 			return null;
@@ -126,13 +126,14 @@ class DataModel_Definition_Property_DataModel extends DataModel_Definition_Prope
 	{
 		return false;
 	}
-
+	
 	/**
-	 * @param mixed &$property
-	 * @param array $data
-	 *
+	 * @param object $obj
+	 * @param string $property_name
+	 * @param array<string,mixed> $data
+	 * @return void
 	 */
-	public function loadPropertyValue( mixed &$property, array $data ): void
+	public function loadPropertyValue( object $obj, string $property_name, array $data ): void
 	{
 	}
 
@@ -150,7 +151,7 @@ class DataModel_Definition_Property_DataModel extends DataModel_Definition_Prope
 
 	/**
 	 *
-	 * @param array|DataModel_Definition_Property_DataModel[] &$related_definitions
+	 * @param array<DataModel_Definition_Property_DataModel> &$related_definitions
 	 *
 	 * @throws DataModel_Exception
 	 *
@@ -198,4 +199,34 @@ class DataModel_Definition_Property_DataModel extends DataModel_Definition_Prope
 
 		return $definition;
 	}
+	
+	/**
+	 *
+	 * @param mixed &$value
+	 * @return string|int|float|null|bool
+	 */
+	public function getCheckSumData( mixed &$value ): string|int|float|null|bool
+	{
+		if(
+			is_object($value) &&
+			$value instanceof DataModel
+		) {
+			return $value->getCheckSum();
+		}
+		
+		if(is_array($value)) {
+			$ch_s = '';
+			foreach( $value as $v ) {
+				if($v instanceof DataModel) {
+					$ch_s .= $v->getCheckSum();
+				}
+			}
+			
+			return md5( $ch_s );
+		}
+		
+		
+		return '';
+	}
+	
 }

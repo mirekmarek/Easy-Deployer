@@ -114,9 +114,9 @@ class UI_tree extends UI_Renderer_Single
 	}
 
 	/**
-	 * @return array|bool
+	 * @return array<string>
 	 */
-	protected function getSelectedPath(): array|bool
+	protected function getSelectedPath(): array
 	{
 
 		$selected_id = $this->getSelectedId();
@@ -200,26 +200,15 @@ class UI_tree extends UI_Renderer_Single
 	 * @param Data_Tree_Node $node
 	 *
 	 * @return callable
-	 *
-	 * @throws Exception
 	 */
 	public function getNodeRenderer( Data_Tree_Node $node ): callable
 	{
 		$renderer = $this->getRendererNormal();
-		if( !$renderer ) {
-			throw new Exception( 'Renderer for normal tree node is not defined' );
-		}
 
 		if( $this->nodeSelected( $node ) ) {
 			$renderer = $this->getRendererSelected();
-			if( !$renderer ) {
-				throw new Exception( 'Renderer for selected tree node is not defined' );
-			}
 		} else if( $this->nodeOpened( $node ) ) {
 			$renderer = $this->getRendererOpened();
-			if( !$renderer ) {
-				throw new Exception( 'Renderer for opened tree node is not defined' );
-			}
 		}
 
 		return $renderer;

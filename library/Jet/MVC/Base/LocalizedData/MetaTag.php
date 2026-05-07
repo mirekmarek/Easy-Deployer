@@ -42,7 +42,7 @@ class MVC_Base_LocalizedData_MetaTag extends BaseObject implements MVC_Base_Loca
 
 	/**
 	 * @param MVC_Base_LocalizedData_Interface $localized_data
-	 * @param array $data
+	 * @param array<string,string> $data
 	 *
 	 * @return static
 	 */
@@ -55,12 +55,13 @@ class MVC_Base_LocalizedData_MetaTag extends BaseObject implements MVC_Base_Loca
 		$meta_tag->setLocalizedData( $localized_data );
 
 		$meta_tag->setData( $data );
-
+		
+		/** @phpstan-ignore return.type */
 		return $meta_tag;
 	}
 
 	/**
-	 * @param array $data
+	 * @param array<string,string> $data
 	 */
 	protected function setData( array $data ): void
 	{
@@ -158,7 +159,7 @@ class MVC_Base_LocalizedData_MetaTag extends BaseObject implements MVC_Base_Loca
 	}
 
 	/**
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function toArray(): array
 	{

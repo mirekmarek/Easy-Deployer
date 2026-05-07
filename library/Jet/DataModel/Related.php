@@ -15,22 +15,24 @@ abstract class DataModel_Related extends DataModel
 {
 	/**
 	 *
-	 * @param array $where
+	 *
+	 * @param array<mixed> $where
 	 * @param DataModel_PropertyFilter|null $load_filter
 	 *
-	 * @return array
+	 * @return array<mixed>
+	 * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
 	 */
-	abstract public static function fetchRelatedData( array $where, DataModel_PropertyFilter $load_filter = null ): array;
+	abstract public static function fetchRelatedData( array $where, ?DataModel_PropertyFilter $load_filter = null ): array;
 
 	/**
 	 *
-	 * @param array $this_data
-	 * @param array  &$related_data
+	 * @param list<array<string,mixed>>|array<string,mixed> $this_data
+	 * @param array<string,array<string,mixed>> &$related_data
 	 * @param DataModel_PropertyFilter|null $load_filter
 	 *
 	 * @return mixed
 	 */
-	abstract public static function initRelatedByData( array $this_data, array &$related_data, DataModel_PropertyFilter $load_filter = null ): mixed;
+	abstract public static function initRelatedByData( array $this_data, array &$related_data, ?DataModel_PropertyFilter $load_filter = null ): mixed;
 
 	/**
 	 * @return string

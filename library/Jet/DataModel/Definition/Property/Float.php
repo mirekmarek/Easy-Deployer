@@ -19,7 +19,7 @@ class DataModel_Definition_Property_Float extends DataModel_Definition_Property
 	protected string $type = DataModel::TYPE_FLOAT;
 
 	/**
-	 * @param array $definition_data
+	 * @param array<string,mixed> $definition_data
 	 *
 	 * @throws DataModel_Exception
 	 */
@@ -40,5 +40,16 @@ class DataModel_Definition_Property_Float extends DataModel_Definition_Property
 	{
 		$value = (float)$value;
 	}
+	
+	/**
+	 *
+	 * @param mixed &$value
+	 * @return string|int|float|bool|null
+	 */
+	public function getCheckSumData( mixed &$value ): string|int|float|null|bool
+	{
+		return round($value,6);
+	}
+	
 	
 }

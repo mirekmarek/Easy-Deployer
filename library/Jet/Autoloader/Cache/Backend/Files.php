@@ -32,16 +32,16 @@ class Autoloader_Cache_Backend_Files extends Cache_Files implements Autoloader_C
 
 	/**
 	 *
-	 * @return array|null
+	 * @return array<string,string>|null
 	 */
 	public function load(): array|null
 	{
-		return $this->readData( static::KEY );
+		return $this->readData( static::KEY )?->getData();
 	}
 
 
 	/**
-	 * @param array $map
+	 * @param array<string,string> $map
 	 */
 	public function save( array $map ): void
 	{

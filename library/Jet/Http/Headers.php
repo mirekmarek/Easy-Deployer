@@ -71,7 +71,7 @@ class Http_Headers
 
 	/**
 	 * @param int $code
-	 * @param array $headers
+	 * @param array<string|int,string|array<string>> $headers
 	 * @param string $custom_response_message
 	 *
 	 */
@@ -152,7 +152,7 @@ class Http_Headers
 	/**
 	 * @param int $http_code
 	 * @param string $target_URL
-	 * @param array $headers
+	 * @param array<string,string> $headers
 	 * @param bool $application_end
 	 */
 	public static function redirect( int $http_code, string $target_URL, array $headers = [], bool $application_end = true ): void
@@ -172,7 +172,7 @@ class Http_Headers
 	/**
 	 *
 	 * @param string $target_URL target URL
-	 * @param array $headers (optional, default: none)
+	 * @param array<string,string> $headers (optional, default: none)
 	 * @param bool $application_end (optional, default: true)
 	 */
 	public static function movedPermanently( string $target_URL, array $headers = [], bool $application_end = true ): void
@@ -189,7 +189,7 @@ class Http_Headers
 	 * Temporary redirection - 302
 	 *
 	 * @param string $target_URL target URL
-	 * @param array $headers (optional, default: none)
+	 * @param array<string,string> $headers (optional, default: none)
 	 * @param bool $application_end (optional, default: true)
 	 */
 	public static function movedTemporary( string $target_URL, array $headers = [], bool $application_end = true ): void
@@ -207,8 +207,8 @@ class Http_Headers
 	/**
 	 * Reload current page
 	 *
-	 * @param array $set_GET_params (optional)
-	 * @param array $unset_GET_params (optional)
+	 * @param array<string,mixed> $set_GET_params (optional)
+	 * @param array<string> $unset_GET_params (optional)
 	 * @param null|string $set_anchor (optional, default: do not change current state)
 	 *
 	 * @param bool $application_end (optional, default: true)
@@ -250,6 +250,7 @@ class Http_Headers
 			$headers['Content-Transfer-Encoding'] = 'inline; filename="' . $file_name . '";';
 		}
 
+		/** @phpstan-ignore argument.type  */
 		static::response(static::CODE_200_OK, $headers);
 	}
 

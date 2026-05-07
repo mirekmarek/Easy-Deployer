@@ -41,7 +41,7 @@ class MVC_Page_MetaTag extends BaseObject implements MVC_Page_MetaTag_Interface
 
 	/**
 	 * @param MVC_Page_Interface $page
-	 * @param array $data
+	 * @param array<string,string> $data
 	 *
 	 * @return static
 	 */
@@ -54,13 +54,14 @@ class MVC_Page_MetaTag extends BaseObject implements MVC_Page_MetaTag_Interface
 		$meta_tag->setPage( $page );
 
 		$meta_tag->setData( $data );
-
+		
+		/** @phpstan-ignore return.type */
 		return $meta_tag;
 	}
 
 
 	/**
-	 * @param array $data
+	 * @param array<string,string> $data
 	 */
 	protected function setData( array $data ): void
 	{
@@ -77,7 +78,7 @@ class MVC_Page_MetaTag extends BaseObject implements MVC_Page_MetaTag_Interface
 		if( !$this->__page ) {
 			return MVC::getPage();
 		}
-
+		
 		return $this->__page;
 	}
 
@@ -161,7 +162,7 @@ class MVC_Page_MetaTag extends BaseObject implements MVC_Page_MetaTag_Interface
 
 
 	/**
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function toArray(): array
 	{

@@ -21,6 +21,7 @@ use Jet\Form_Field;
 use Jet\Form_Field_Input;
 use Jet\Form_Field_MultiSelect;
 use Jet\MVC_Page_Interface;
+use Jet\Locale;
 
 /**
  *
@@ -323,9 +324,11 @@ class Auth_Developer_Role extends DataModel implements Auth_Role_Interface
 	/**
 	 *
 	 *
+	 * @param bool $translate
+	 * @param Locale|null $translate_locale
 	 * @return array
 	 */
-	public static function getAvailablePrivilegesList() : array
+	public static function getAvailablePrivilegesList( bool $translate = true, ?Locale $translate_locale = null ) : array
 	{
 		return [
 			static::PRIVILEGE_USE_PROJECT => [

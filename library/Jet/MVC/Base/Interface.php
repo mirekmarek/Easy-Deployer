@@ -30,7 +30,7 @@ interface MVC_Base_Interface
 
 
 	/**
-	 * @param array $data
+	 * @param array<string,mixed> $data
 	 *
 	 * @return static
 	 */
@@ -38,7 +38,7 @@ interface MVC_Base_Interface
 
 
 	/**
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public static function _getUrlMap(): array;
 
@@ -96,6 +96,17 @@ interface MVC_Base_Interface
 	 * @param bool $is_default
 	 */
 	public function setIsDefault( bool $is_default ): void;
+	
+	/**
+	 * @param bool $redirect_to_default_url
+	 * @return void
+	 */
+	public function setRedirectToDefaultURL( bool $redirect_to_default_url ): void;
+	
+	/**
+	 * @return bool
+	 */
+	public function getRedirectToDefaultURL(): bool;
 
 	/**
 	 * @return bool
@@ -185,7 +196,7 @@ interface MVC_Base_Interface
 	 *
 	 * @param bool $get_as_string (optional, default: false)
 	 *
-	 * @return Locale[]
+	 * @return array<string,Locale|string>
 	 */
 	public function getLocales( bool $get_as_string = false ): array;
 
@@ -194,13 +205,13 @@ interface MVC_Base_Interface
 	 *
 	 * @param bool $get_as_string (optional, default: false)
 	 *
-	 * @return Locale[]
+	 * @return array<string,Locale|string>
 	 */
 	public function getActiveLocales( bool $get_as_string = false ): array;
 
 
 	/**
-	 * @param array $order
+	 * @param array<int,string> $order
 	 */
 	public function sortLocales( array $order ): void;
 
@@ -226,14 +237,26 @@ interface MVC_Base_Interface
 	 * @return MVC_Page_Interface
 	 */
 	public function getHomepage( ?Locale $locale = null ): MVC_Page_Interface;
-
+	
+	/**
+	 * @return array<string,string>
+	 */
+	public function getLayoutsList(): array;
+	
+	/**
+	 * @param string $layout_script_name
+	 * @return array<string,string>
+	 */
+	public function getLayoutOutputPositions( string $layout_script_name ): array;
+	
+	
 	/**
 	 *
 	 */
 	public function saveDataFile(): void;
 
 	/**
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function toArray(): array;
 

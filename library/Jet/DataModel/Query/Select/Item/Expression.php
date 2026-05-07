@@ -24,7 +24,7 @@ class DataModel_Query_Select_Item_Expression extends BaseObject
 
 	/**
 	 *
-	 * @var DataModel_Definition_Property[]
+	 * @var DataModel_Definition_Property[]|string[]
 	 */
 	protected array $properties = [];
 
@@ -37,7 +37,7 @@ class DataModel_Query_Select_Item_Expression extends BaseObject
 
 	/**
 	 * @param string $expression
-	 * @param array $properties
+	 * @param array<DataModel_Definition_Property|string> $properties
 	 *
 	 */
 	public function __construct( string $expression, array $properties = [] )
@@ -47,7 +47,7 @@ class DataModel_Query_Select_Item_Expression extends BaseObject
 	}
 
 	/**
-	 * @param DataModel_Definition_Property[] $properties
+	 * @param array<DataModel_Definition_Property|string> $properties
 	 */
 	public function setProperties( array $properties ): void
 	{
@@ -55,7 +55,7 @@ class DataModel_Query_Select_Item_Expression extends BaseObject
 	}
 
 	/**
-	 * @return DataModel_Definition_Property[]
+	 * @return array<DataModel_Definition_Property|string>
 	 */
 	public function getProperties(): array
 	{
@@ -80,7 +80,7 @@ class DataModel_Query_Select_Item_Expression extends BaseObject
 	 *
 	 * @return string
 	 */
-	public function toString( callable $property_name_to_backend_column_name_callback = null ): string
+	public function toString( ?callable $property_name_to_backend_column_name_callback = null ): string
 	{
 		if( !$property_name_to_backend_column_name_callback ) {
 			$property_name_to_backend_column_name_callback = function( DataModel_Definition_Property $property ) {

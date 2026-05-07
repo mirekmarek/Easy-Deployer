@@ -19,7 +19,7 @@ class Navigation_Menu_Item extends BaseObject
 	 * @var ?Navigation_Menu
 	 */
 	protected ?Navigation_Menu $menu = null;
-
+	
 	/**
 	 * @var string
 	 */
@@ -76,14 +76,16 @@ class Navigation_Menu_Item extends BaseObject
 	protected ?Locale $locale = null;
 
 	/**
-	 * @var array
+	 * @var string[]
 	 */
 	protected array $url_parts = [];
 
 	/**
-	 * @var array
+	 * @var array<string,string>
 	 */
 	protected array $get_params = [];
+	
+	protected string $source_module_name = '';
 
 	/**
 	 *
@@ -96,9 +98,21 @@ class Navigation_Menu_Item extends BaseObject
 		$this->id = $id;
 		$this->label = $label;
 	}
+	
+	public function getSourceModuleName(): string
+	{
+		return $this->source_module_name;
+	}
+	
+	public function setSourceModuleName( string $source_module_name ): void
+	{
+		$this->source_module_name = $source_module_name;
+	}
+	
+	
 
 	/**
-	 * @param array $data
+	 * @param array<string,string|int|float|bool> $data
 	 *
 	 * @throws Navigation_Menu_Exception
 	 */
@@ -139,7 +153,7 @@ class Navigation_Menu_Item extends BaseObject
 		$this->menu = $menu;
 		$this->menu_id = $menu->getId();
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -165,7 +179,7 @@ class Navigation_Menu_Item extends BaseObject
 	public function getId( bool $absolute = true ): string
 	{
 		if( $absolute ) {
-			return $this->getMenu()->getId() . '/' . $this->id;
+			return $this->menu_id . '/' . $this->id;
 		}
 
 		return $this->id;
@@ -334,7 +348,7 @@ class Navigation_Menu_Item extends BaseObject
 	}
 
 	/**
-	 * @return array
+	 * @return string[]
 	 */
 	public function getUrlParts(): array
 	{
@@ -342,7 +356,7 @@ class Navigation_Menu_Item extends BaseObject
 	}
 
 	/**
-	 * @param array $url_parts
+	 * @param string[] $url_parts
 	 */
 	public function setUrlParts( array $url_parts ): void
 	{
@@ -376,7 +390,7 @@ class Navigation_Menu_Item extends BaseObject
 	}
 
 	/**
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function getGetParams(): array
 	{
@@ -384,7 +398,7 @@ class Navigation_Menu_Item extends BaseObject
 	}
 
 	/**
-	 * @param array $get_params
+	 * @param array<string,string> $get_params
 	 */
 	public function setGetParams( array $get_params ): void
 	{
@@ -415,6 +429,43 @@ class Navigation_Menu_Item extends BaseObject
 	public function getTargetPage(): MVC_Page_Interface|null
 	{
 		return MVC::getPage( $this->page_id, $this->locale, $this->base_id );
+	}
+	
+	/**
+	 * @return array<string,string|int|bool>
+	 */
+	public function toArray(): array
+	{
+		$menu_item = [
+			'label'            => $this->getLabel(),
+			'icon'             => $this->getIcon(),
+			'index'            => $this->getIndex(),
+			'separator_before' => $this->getSeparatorBefore(),
+			'separator_after'  => $this->getSeparatorAfter(),
+		
+		];
+		
+		if( $this->getUrl() ) {
+			$menu_item['URL'] = $this->getUrl();
+		} else {
+			$menu_item['page_id'] = $this->getPageId();
+			$menu_item['base_id'] = $this->getBaseId();
+			$menu_item['locale'] = (string)$this->getLocale();
+			$menu_item['url_parts'] = $this->getUrlParts();
+			$menu_item['get_params'] = $this->getGetParams();
+		}
+		
+		foreach($menu_item as $key=>$value) {
+			if(
+				$value==='' ||
+				$value===false ||
+				$value===[]
+			) {
+				unset($menu_item[$key]);
+			}
+		}
+		
+		return $menu_item;
 	}
 
 }

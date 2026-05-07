@@ -24,7 +24,10 @@ class Db_Backend_PDO implements Db_Backend_Interface
 	protected Db_Backend_PDO_Config $config;
 
 	protected ?PDO $pdo;
-
+	
+	/**
+	 * @var array<string,PDOStatement>
+	 */
 	protected array $statements = [];
 
 	/**
@@ -35,19 +38,22 @@ class Db_Backend_PDO implements Db_Backend_Interface
 		/**
 		 * @var Db_Backend_PDO_Config $config
 		 */
-
 		$this->config = $config;
-
+		
+		$this->connect();
+	}
+	
+	protected function connect(): void
+	{
 		$this->pdo = new PDO(
-			dsn: $config->getDsn(),
-			username: $config->getUsername(),
-			password: $config->getPassword(),
+			dsn: $this->config->getDsn(),
+			username: $this->config->getUsername(),
+			password: $this->config->getPassword(),
 			options: [
 				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 				PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
 			]
 		);
-
 	}
 
 	/**
@@ -68,19 +74,21 @@ class Db_Backend_PDO implements Db_Backend_Interface
 	}
 
 	/**
+	 *
 	 * @param string $query
-	 * @param array $query_params
+	 * @param array<string,mixed> $query_params
 	 * @param ?callable $result_handler
 	 *
-	 * @return iterable
+	 * @return iterable<mixed>
+	 * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
 	 */
 	public function query( string $query, array $query_params = [], ?callable $result_handler=null ): iterable
 	{
 
 		Debug_Profiler::SQLQueryStart( $query, $query_params );
-
 		
-		try {
+		$statement = null;
+		$performQuery = function() use ( $query, $query_params, &$statement ) {
 			if($query_params) {
 				$q_hash = md5($query);
 				
@@ -94,8 +102,25 @@ class Db_Backend_PDO implements Db_Backend_Interface
 			} else {
 				$statement = $this->pdo->query( $query );
 			}
+		};
+		
+		try {
+			$performQuery();
 		} catch( PDOException $e ) {
-			throw new Db_Exception( $e->getMessage()."\n\nSQL query:\n\n".$query );
+			if(
+				str_contains( $e->errorInfo[2], 'server has gone away') ||
+				str_contains( $e->errorInfo[2], 'disconnected')
+			) {
+				try {
+					$this->disconnect();
+					$this->connect();
+					$performQuery();
+				} catch(PDOException $e ) {
+					throw new Db_Exception( $e->getMessage()."\n\nSQL query:\n\n".$query );
+				}
+			} else {
+				throw new Db_Exception( $e->getMessage()."\n\nSQL query:\n\n".$query );
+			}
 		}
 		
 
@@ -118,7 +143,7 @@ class Db_Backend_PDO implements Db_Backend_Interface
 	 * Executes command (INSERT, UPDATE, DELETE or CREATE, ...) and return affected rows
 	 *
 	 * @param string $query
-	 * @param array $query_data
+	 * @param array<string,mixed> $query_data
 	 *
 	 * @return int
 	 */
@@ -155,12 +180,15 @@ class Db_Backend_PDO implements Db_Backend_Interface
 	/**
 	 *
 	 * @param string $query
-	 * @param array $query_data (optional)
+	 * @param array<string,mixed> $query_data (optional)
 	 *
-	 * @return array|bool
+	 * @return array<string,mixed>|false
 	 */
-	public function fetchRow( string $query, array $query_data = [] ): array|bool
+	public function fetchRow( string $query, array $query_data = [] ): array|false
 	{
+		/**
+		 * @var array<string,mixed> $res
+		 */
 		$res = $this->query( $query, $query_data, function( PDOStatement $stn ) {
 			foreach( $stn as $row ) {
 				return $row;
@@ -169,9 +197,6 @@ class Db_Backend_PDO implements Db_Backend_Interface
 			return [];
 		} );
 
-		/**
-		 * @var array $res
-		 */
 		if(!$res) {
 			return false;
 		}
@@ -182,14 +207,14 @@ class Db_Backend_PDO implements Db_Backend_Interface
 	/**
 	 *
 	 * @param string $query
-	 * @param array $query_data (optional)
+	 * @param array<string,mixed> $query_data (optional)
 	 *
-	 * @return array
+	 * @return array<int,array<string,mixed>>
 	 */
 	public function fetchAll( string $query, array $query_data = [] ): array
 	{
 		/**
-		 * @var array $res
+		 * @var array<int,array<string,mixed>> $res
 		 */
 		$res =  $this->query( $query, $query_data, function( PDOStatement $stn ) {
 			return $stn->fetchAll( PDO::FETCH_ASSOC );
@@ -201,15 +226,15 @@ class Db_Backend_PDO implements Db_Backend_Interface
 	/**
 	 *
 	 * @param string $query
-	 * @param array $query_data (optional)
+	 * @param array<string,mixed> $query_data (optional)
 	 * @param string|null $key_column (optional)
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public function fetchAssoc( string $query, array $query_data = [], ?string $key_column = null ): array
 	{
 		/**
-		 * @var array $res
+		 * @var array<string,array<string,mixed>> $res
 		 */
 		$res =  $this->query( $query, $query_data, function( PDOStatement $stn ) use ($key_column) {
 			$result = [];
@@ -232,15 +257,16 @@ class Db_Backend_PDO implements Db_Backend_Interface
 	/**
 	 *
 	 * @param string $query
-	 * @param array $query_data (optional)
+	 * @param array<string,mixed> $query_data (optional)
 	 * @param string|null $column (optional, default: 1st column)
 	 *
-	 * @return array
+	 * @return array<mixed>
+	 * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
 	 */
 	public function fetchCol( string $query, array $query_data = [], ?string $column = null ): array
 	{
 		/**
-		 * @var array $res
+		 * @var array<int,mixed> $res
 		 */
 		$res =  $this->query( $query, $query_data, function( PDOStatement $stn ) use ($column) {
 			$result = [];
@@ -261,16 +287,16 @@ class Db_Backend_PDO implements Db_Backend_Interface
 	/**
 	 *
 	 * @param string $query
-	 * @param array $query_data (optional)
+	 * @param array<string,mixed> $query_data (optional)
 	 * @param string|null $key_column (optional, default: 1st column)
 	 * @param string|null $value_column (optional, default: 2nd column)
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function fetchPairs( string $query, array $query_data = [], ?string $key_column = null, ?string $value_column = null ): array
 	{
 		/**
-		 * @var array $res
+		 * @var array<string,mixed> $res
 		 */
 		$res =  $this->query( $query, $query_data, function( PDOStatement $stn ) use ($key_column, $value_column) {
 			$result = [];
@@ -296,7 +322,7 @@ class Db_Backend_PDO implements Db_Backend_Interface
 	/**
 	 *
 	 * @param string $query
-	 * @param array $query_data (optional)
+	 * @param array<string,mixed> $query_data (optional)
 	 * @param string|null $column (optional, default:1st column)
 	 *
 	 * @return mixed
@@ -304,7 +330,7 @@ class Db_Backend_PDO implements Db_Backend_Interface
 	public function fetchOne( string $query, array $query_data = [], ?string $column = null ): mixed
 	{
 		/**
-		 * @var array $res
+		 * @var array<int,mixed> $res
 		 */
 		$res =  $this->query( $query, $query_data, function( PDOStatement $stn ) use ($column) {
 			foreach( $stn as $row ) {
@@ -350,7 +376,7 @@ class Db_Backend_PDO implements Db_Backend_Interface
 		return $this->pdo->inTransaction();
 	}
 
-	public function lastInsertId( string $name = null ): string
+	public function lastInsertId( ?string $name = null ): string|false
 	{
 		try {
 			return $this->pdo->lastInsertId( $name );

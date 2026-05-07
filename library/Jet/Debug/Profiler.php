@@ -9,7 +9,6 @@
 namespace Jet;
 
 require_once 'ErrorHandler/Error/BacktraceItem.php';
-require_once 'Profiler/Run/BacktraceItem.php';
 require_once 'Profiler/Run/SQLQueryData.php';
 require_once 'Profiler/Run/Block/Message.php';
 require_once 'Profiler/Run/Block.php';
@@ -58,6 +57,9 @@ class Debug_Profiler
 
 		register_shutdown_function(
 			function() use ( $saver, $displayer ) {
+				if(!static::$enabled) {
+					return;
+				}
 
 				$run = Debug_Profiler::getRun();
 				$run->runEnd();
@@ -69,6 +71,11 @@ class Debug_Profiler
 				}
 			}
 		);
+	}
+	
+	public static function disable(): void
+	{
+		static::$enabled = false;
 	}
 
 	/**
@@ -97,7 +104,7 @@ class Debug_Profiler
 
 	/**
 	 * @param string $query
-	 * @param array $query_params
+	 * @param array<string,mixed> $query_params
 	 */
 	public static function SQLQueryStart( string $query, array $query_params = [] ): void
 	{

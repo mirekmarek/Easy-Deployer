@@ -84,7 +84,7 @@ class Auth_Controller_Admin extends BaseObject implements Auth_Controller_Interf
 	 *
 	 * @return Administrator|bool
 	 */
-	public function getCurrentUser(): Administrator|bool
+	public function getCurrentUser(): Administrator|false
 	{
 		if( $this->current_user !== null ) {
 			return $this->current_user;

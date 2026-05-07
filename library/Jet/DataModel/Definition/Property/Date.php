@@ -33,10 +33,10 @@ class DataModel_Definition_Property_Date extends DataModel_Definition_Property
 	 *
 	 * @return mixed
 	 */
-	public function getJsonSerializeValue( mixed &$property ): mixed
+	public function getJsonSerializeValue( mixed $property ): mixed
 	{
 		/**
-		 * @var Data_DateTime $property_value
+		 * @var ?Data_DateTime $property
 		 */
 		if( !$property ) {
 			return $property;
@@ -44,5 +44,16 @@ class DataModel_Definition_Property_Date extends DataModel_Definition_Property
 
 		return (string)$property;
 	}
+	
+	/**
+	 *
+	 * @param mixed &$value
+	 * @return string|int|float|bool|null
+	 */
+	public function getCheckSumData( mixed &$value ): string|int|float|null|bool
+	{
+		return $value?$value->toString():'';
+	}
+	
 	
 }

@@ -126,9 +126,11 @@ css';
 		error_messages: [
 		]
 	)]
-	protected string $blacklist = '_backup
+	protected string $blacklist = '_installer
+_backup
 _profiler
 _tools
+_var_dump
 application/config
 application/data
 js/packages
@@ -353,6 +355,22 @@ tmp';
 	protected string $web_hooks = '';
 	
 	protected ?array $_web_hooks = null;
+	
+	/**
+	 * @var string
+	 */
+	#[DataModel_Definition(
+		type: DataModel::TYPE_STRING,
+		max_len: 100
+	)]
+	#[Form_Definition(
+		type: Form_Field::TYPE_INPUT,
+		label: 'Custom charset:',
+		is_required: false,
+		error_messages: [
+		]
+	)]
+	protected string $custom_charset = '';
 	
 	
 	public static function getRoles() : array
@@ -1077,4 +1095,16 @@ tmp';
 		
 		return $this->_web_hooks;
 	}
+	
+	public function getCustomCharset(): string
+	{
+		return $this->custom_charset;
+	}
+	
+	public function setCustomCharset( string $custom_charset ): void
+	{
+		$this->custom_charset = $custom_charset;
+	}
+	
+	
 }

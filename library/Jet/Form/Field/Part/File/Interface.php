@@ -25,12 +25,12 @@ interface Form_Field_Part_File_Interface
 	public function setMaximalFileSize( int|null $maximal_file_size ): void;
 	
 	/**
-	 * @return array
+	 * @return array<string>
 	 */
 	public function getAllowedMimeTypes(): array;
 	
 	/**
-	 * @param array $allowed_mime_types
+	 * @param array<string> $allowed_mime_types
 	 */
 	public function setAllowedMimeTypes( array $allowed_mime_types ): void;
 	
@@ -46,18 +46,18 @@ interface Form_Field_Part_File_Interface
 	
 	
 	/**
-	 * @return Form_Field_File_UploadedFile[]
+	 * @return IO_UploadedFile[]
 	 */
 	public function getAllFiles(): array;
 	
 	
 	/**
-	 * @return Form_Field_File_UploadedFile[]
+	 * @return IO_UploadedFile[]
 	 */
 	public function getValidFiles(): array;
 	
 	/**
-	 * @return Form_Field_File_UploadedFile[]
+	 * @return IO_UploadedFile[]
 	 */
 	public function getProblematicFiles() : array;
 }

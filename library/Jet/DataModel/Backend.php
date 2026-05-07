@@ -19,7 +19,7 @@ abstract class DataModel_Backend extends BaseObject
 	public const TYPE_SQLITE = 'SQLite';
 	
 	/**
-	 * @var array[]
+	 * @var string[]
 	 */
 	protected static array $backend_types = [
 		self::TYPE_MYSQL,
@@ -72,7 +72,7 @@ abstract class DataModel_Backend extends BaseObject
 	
 	
 	/**
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public static function getAllBackendTypes() : array
 	{
@@ -86,7 +86,7 @@ abstract class DataModel_Backend extends BaseObject
 	}
 	
 	/**
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public static function getAvlBackendTypes() : array
 	{
@@ -395,9 +395,9 @@ abstract class DataModel_Backend extends BaseObject
 	/**
 	 * @param DataModel_Query $query
 	 * @param string $fetch_method
-	 * @param array $data
+	 * @param list<mixed> $data
 	 *
-	 * @return array
+	 * @return array<int,mixed>
 	 */
 	protected function validateResultData( DataModel_Query $query, string $fetch_method, array $data ): array
 	{
@@ -412,8 +412,7 @@ abstract class DataModel_Backend extends BaseObject
 		if( $fetch_pairs ) {
 
 			/**
-			 * @var DataModel_Query_Select_Item $item
-			 * @var DataModel_Definition_Property $key_property
+			 * @var ?DataModel_Definition_Property $key_property
 			 */
 			$key_property = null;
 			$value_property = null;
@@ -450,7 +449,6 @@ abstract class DataModel_Backend extends BaseObject
 				foreach( $query->getSelect() as $item ) {
 					/**
 					 * @var DataModel_Query_Select_Item $item
-					 * @var DataModel_Definition_Property $property
 					 */
 					$property = $item->getItem();
 
@@ -479,11 +477,11 @@ abstract class DataModel_Backend extends BaseObject
 	}
 
 	/**
-	 * @param string $string
+	 * @param ?string $string
 	 *
 	 * @return mixed
 	 */
-	protected function unserialize( string $string ): mixed
+	protected function unserialize( ?string $string ): mixed
 	{
 		if( !$string ) {
 			return null;
@@ -538,7 +536,7 @@ abstract class DataModel_Backend extends BaseObject
 	/**
 	 * @param DataModel_Definition_Model $definition
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	abstract public function helper_getUpdateCommand( DataModel_Definition_Model $definition ): array;
 

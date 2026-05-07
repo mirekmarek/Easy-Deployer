@@ -43,7 +43,7 @@ class Application_Module_Manifest extends BaseObject
 	protected string $description = '';
 
 	/**
-	 * @var array
+	 * @var array<string,string>
 	 */
 	protected array $ACL_actions = [];
 
@@ -53,9 +53,9 @@ class Application_Module_Manifest extends BaseObject
 	protected bool $is_mandatory = false;
 
 	/**
-	 * @var callable
+	 * @var ?callable
 	 */
-	protected static $compatibility_checker;
+	protected static $compatibility_checker = null;
 
 	/**
 	 * @return callable
@@ -94,7 +94,7 @@ class Application_Module_Manifest extends BaseObject
 	}
 
 	/**
-	 * @param array $manifest_data
+	 * @param array<string,mixed> $manifest_data
 	 *
 	 * @throws Application_Modules_Exception
 	 */
@@ -110,7 +110,7 @@ class Application_Module_Manifest extends BaseObject
 
 	/**
 	 *
-	 * @param array $manifest_data
+	 * @param array<string,mixed> $manifest_data
 	 *
 	 * @throws Application_Modules_Exception
 	 */
@@ -203,7 +203,7 @@ class Application_Module_Manifest extends BaseObject
 	 * @param bool $translate_description
 	 * @param ?Locale $translate_locale
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function getACLActions( bool $translate_description = true, ?Locale $translate_locale = null ): array
 	{
@@ -269,7 +269,7 @@ class Application_Module_Manifest extends BaseObject
 	}
 
 	/**
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function toArray(): array
 	{

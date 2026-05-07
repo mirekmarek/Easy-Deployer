@@ -18,12 +18,12 @@ class MVC_Base extends BaseObject implements MVC_Base_Interface
 {
 
 	/**
-	 * @var MVC_Base[]
+	 * @var static[]
 	 */
 	protected static array $bases = [];
 
 	/**
-	 * @var ?array
+	 * @var null|array<string,array<string,string>>
 	 */
 	protected static array|null $maps = null;
 
@@ -38,6 +38,11 @@ class MVC_Base extends BaseObject implements MVC_Base_Interface
 	 * @var string
 	 */
 	protected string $name = '';
+	
+	/**
+	 * @var bool
+	 */
+	protected bool $redirect_to_default_URL = true;
 
 	/**
 	 * @var string|null
@@ -77,7 +82,7 @@ class MVC_Base extends BaseObject implements MVC_Base_Interface
 
 	/**
 	 *
-	 * @var MVC_Base_LocalizedData[]
+	 * @var MVC_Base_LocalizedData_Interface[]
 	 */
 	protected array $localized_data = [];
 
@@ -87,7 +92,7 @@ class MVC_Base extends BaseObject implements MVC_Base_Interface
 	protected $initializer;
 
 	/**
-	 * @return array
+	 * @return array<string, array<list<string>|string>>
 	 */
 	protected static function getMaps(): array
 	{
@@ -164,7 +169,7 @@ class MVC_Base extends BaseObject implements MVC_Base_Interface
 	}
 
 	/**
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public static function _getUrlMap(): array
 	{
@@ -192,7 +197,7 @@ class MVC_Base extends BaseObject implements MVC_Base_Interface
 
 
 	/**
-	 * @param array $data
+	 * @param array<string,mixed> $data
 	 *
 	 * @return static
 	 */
@@ -205,14 +210,15 @@ class MVC_Base extends BaseObject implements MVC_Base_Interface
 		$base = Factory_MVC::getBaseInstance();
 		$base->id = $data['id'];
 		unset( $data['id'] );
-
+		
 		$base->setData( $data );
-
+		
+		/** @phpstan-ignore return.type */
 		return $base;
 	}
 
 	/**
-	 * @param array $data
+	 * @param array<string,mixed> $data
 	 */
 	protected function setData( array $data ): void
 	{
@@ -231,6 +237,12 @@ class MVC_Base extends BaseObject implements MVC_Base_Interface
 
 		$data['is_active'] = !empty( $data['is_active'] );
 		$data['is_default'] = !empty( $data['is_default'] );
+		
+		if(!array_key_exists('redirect_to_default_URL', $data)) {
+			$data['redirect_to_default_URL'] = true;
+		}
+		
+		$data['redirect_to_default_URL'] = !empty( $data['redirect_to_default_URL'] );
 
 		foreach( $data as $key => $val ) {
 			$this->{$key} = $val;
@@ -258,7 +270,7 @@ class MVC_Base extends BaseObject implements MVC_Base_Interface
 		$data = require $map[$id];
 
 		static::$bases[$id] = static::_createByData( $data );
-
+		
 		return static::$bases[$id];
 	}
 	
@@ -319,7 +331,7 @@ class MVC_Base extends BaseObject implements MVC_Base_Interface
 	 *
 	 * @param bool $get_as_string (optional), default: false
 	 *
-	 * @return Locale[]
+	 * @return array<string,Locale|string>
 	 */
 	public function getLocales( bool $get_as_string = false ): array
 	{
@@ -341,7 +353,7 @@ class MVC_Base extends BaseObject implements MVC_Base_Interface
 	 *
 	 * @param bool $get_as_string (optional), default: false
 	 *
-	 * @return Locale[]
+	 * @return array<string,Locale|string>
 	 */
 	public function getActiveLocales( bool $get_as_string = false ): array
 	{
@@ -363,7 +375,7 @@ class MVC_Base extends BaseObject implements MVC_Base_Interface
 	}
 
 	/**
-	 * @param array $order
+	 * @param array<int,string> $order
 	 */
 	public function sortLocales( array $order ): void
 	{
@@ -628,7 +640,25 @@ class MVC_Base extends BaseObject implements MVC_Base_Interface
 	{
 		$this->is_default = $is_default;
 	}
-
+	
+	/**
+	 * @param bool $redirect_to_default_url
+	 * @return void
+	 */
+	public function setRedirectToDefaultURL( bool $redirect_to_default_url ): void
+	{
+		$this->redirect_to_default_URL = $redirect_to_default_url;
+	}
+	
+	/**
+	 * @return bool
+	 */
+	public function getRedirectToDefaultURL(): bool
+	{
+		return $this->redirect_to_default_URL;
+	}
+	
+	
 	/**
 	 * @param Locale|null $locale (optional)
 	 *
@@ -659,9 +689,62 @@ class MVC_Base extends BaseObject implements MVC_Base_Interface
 
 		MVC_Cache::reset();
 	}
+	
+	/**
+	 * @return array<string,string>
+	 */
+	public function getLayoutsList(): array
+	{
+		$list = IO_Dir::getList( $this->getLayoutsPath(), '*.' . SysConf_Jet_MVC_View::getScriptFileSuffix(), false, true );
+		
+		$res = [];
+		
+		$len = strlen( SysConf_Jet_MVC_View::getScriptFileSuffix() ) + 1;
+		$len *= -1;
+		
+		foreach( $list as $name ) {
+			$name = substr( $name, 0, $len );
+			
+			$res[$name] = $name;
+		}
+		
+		return $res;
+	}
+	
+	/**
+	 * @param string $layout_script_name
+	 * @return array<string,string>
+	 */
+	public function getLayoutOutputPositions( string $layout_script_name ): array
+	{
+		$res = [
+			MVC_Layout::DEFAULT_OUTPUT_POSITION => Tr::_( 'Main position' )
+		];
+		
+		$layout_file_path = $this->getLayoutsPath() . $layout_script_name . '.' . SysConf_Jet_MVC_View::getScriptFileSuffix();
+		
+		if( IO_File::isReadable( $layout_file_path ) ) {
+			$layout = IO_File::read( $layout_file_path );
+			
+			if( preg_match_all(
+				'/<' . MVC_Layout::TAG_POSITION . '[ ]+name="([a-zA-Z0-9\-_ ]*)"[^\/]*\/>/i',
+				$layout,
+				$matches
+			) ) {
+				
+				foreach( $matches[1] as $p ) {
+					$res[$p] = $p;
+				}
+			}
+			
+		}
+		
+		return $res;
+	}
+	
 
 	/**
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function toArray(): array
 	{

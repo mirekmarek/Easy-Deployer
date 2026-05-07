@@ -82,7 +82,7 @@ class ErrorPages extends BaseObject
 
 		ErrorPages::display( $code );
 
-		if( !$application_end ) {
+		if( $application_end ) {
 			Application::end();
 		}
 	}
@@ -155,9 +155,9 @@ class ErrorPages extends BaseObject
 	 *
 	 * @param int $code
 	 *
-	 * @return bool|string
+	 * @return false|string
 	 */
-	public static function getErrorPageFilePath( int $code ): bool|string
+	public static function getErrorPageFilePath( int $code ): false|string
 	{
 		if( !SysConf_Jet_ErrorPages::getErrorPagesDir() ) {
 			return false;

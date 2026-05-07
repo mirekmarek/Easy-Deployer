@@ -9,14 +9,20 @@
 namespace Jet;
 
 use DateTime;
+use DateTimeZone;
 
-/**
- *
- */
+/** @phpstan-consistent-constructor */
 class Data_DateTime extends DateTime
 {
 	protected bool $only_date = false;
-
+	
+	public function __construct(
+		string $datetime = 'now',
+		?DateTimeZone $timezone = null
+	) {
+		parent::__construct($datetime, $timezone);
+	}
+	
 	/**
 	 * @return static
 	 */
@@ -33,6 +39,8 @@ class Data_DateTime extends DateTime
 	{
 		if(
 			$value==='' ||
+			$value==='0000-00-00 00:00:00' ||
+			$value==='0000-00-00' ||
 			$value===null
 		) {
 			return null;
@@ -44,6 +52,7 @@ class Data_DateTime extends DateTime
 			$value = new static( (string)$value );
 		}
 		
+		/** @phpstan-ignore return.type */
 		return $value;
 	}
 	
@@ -56,6 +65,8 @@ class Data_DateTime extends DateTime
 	{
 		if(
 			$value==='' ||
+			$value==='0000-00-00 00:00:00' ||
+			$value==='0000-00-00' ||
 			$value===null
 		) {
 			return null;
@@ -67,6 +78,8 @@ class Data_DateTime extends DateTime
 		
 		$value->setOnlyDate( true );
 		$value->setTime( 0, 0 );
+		
+		/** @phpstan-ignore return.type */
 		return $value;
 	}
 	

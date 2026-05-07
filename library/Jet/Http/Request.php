@@ -17,7 +17,7 @@ class Http_Request extends BaseObject
 	/**
 	 * PHP super global $_POST original value
 	 *
-	 * @var ?array
+	 * @var ?array<string|mixed>
 	 */
 	protected static ?array $_POST = null;
 
@@ -25,7 +25,7 @@ class Http_Request extends BaseObject
 	/**
 	 * PHP super global $_GET original value
 	 *
-	 * @var ?array
+	 * @var ?array<string|mixed>
 	 */
 	protected static ?array $_GET = null;
 
@@ -50,12 +50,12 @@ class Http_Request extends BaseObject
 
 
 	/**
-	 * @var ?string|null
+	 * @var ?string
 	 */
 	protected static ?string $raw_post_data = null;
 
 	/**
-	 * @var ?array
+	 * @var ?array<string,string>
 	 */
 	protected static ?array $headers = null;
 
@@ -121,8 +121,8 @@ class Http_Request extends BaseObject
 
 	/**
 	 *
-	 * @param array $set_GET_params (optional)
-	 * @param array $unset_GET_params (optional)
+	 * @param array<string,mixed> $set_GET_params (optional)
+	 * @param array<string> $unset_GET_params (optional)
 	 * @param null|string $set_anchor (optional, default: do not change current state)
 	 *
 	 * @return string
@@ -170,8 +170,8 @@ class Http_Request extends BaseObject
 
 	/**
 	 *
-	 * @param array $set_GET_params (optional)
-	 * @param array $unset_GET_params (optional)
+	 * @param array<string,mixed> $set_GET_params (optional)
+	 * @param array<string> $unset_GET_params (optional)
 	 * @param ?string $set_anchor (optional, default: do not change current state)
 	 *
 	 * @return string
@@ -360,7 +360,7 @@ class Http_Request extends BaseObject
 
 	/**
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public static function headers(): array
 	{
@@ -393,5 +393,31 @@ class Http_Request extends BaseObject
 		static::$headers = $headers;
 
 		return static::$headers;
+	}
+	
+	public static function headerValue( string $header_name ) : ?string
+	{
+		$header_name = strtolower( $header_name );
+		
+		foreach(static::headers() as $k=>$v) {
+			if(strtolower($k)==$header_name) {
+				return $v;
+			}
+		}
+		
+		return null;
+	}
+	
+	public static function headerExists( string $header_name ) : bool
+	{
+		$header_name = strtolower( $header_name );
+		
+		foreach(static::headers() as $k=>$v) {
+			if(strtolower($k)==$header_name) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 }

@@ -10,17 +10,24 @@ namespace Jet;
 
 trait Db_Backend_PDO_Config_sqlsrv
 {
-
 	
+	/**
+	 * @return array<string,string|int|bool>
+	 */
 	protected function sqlsrv_getDnsEntries(): array
 	{
 		
 		return [
 			'Server'    => $this->host.','.$this->port,
-			'Database'  => $this->dbname
+			'Database'  => $this->dbname,
+			'TrustServerCertificate' => 'yes',
+			'MultipleActiveResultSets' => 'False',
 		];
 	}
 	
+	/**
+	 * @return array<string,string|int|bool>
+	 */
 	protected function sqlsrv_getEntriesSchema(): array
 	{
 		return [

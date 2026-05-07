@@ -175,6 +175,10 @@ class MVC_Router extends BaseObject implements MVC_Router_Interface
 		$this->request_URL = (string)$request_URL;
 
 		if( $this->resolve_seekBaseAndLocale() ) {
+			if($this->getIs404()) {
+				return;
+			}
+			
 			if($this->resolve_seekPage()) {
 				if($this->resolve_authorizePage()) {
 					if($this->resolve_pageResolve()) {
@@ -254,7 +258,10 @@ class MVC_Router extends BaseObject implements MVC_Router_Interface
 			Translator::setCurrentLocale( $this->locale );
 		}
 
-		if( $founded_url != $this->base->getLocalizedData( $this->locale )->getDefaultURL() ) {
+		if(
+			$founded_url != $this->base->getLocalizedData( $this->locale )->getDefaultURL() &&
+			$this->base->getRedirectToDefaultURL()
+		) {
 
 			$redirect_to = (Http_Request::isHttps() ? 'https' : 'http') . '://'
 				. $this->getBase()->getLocalizedData( $this->locale )->getDefaultURL()
@@ -294,9 +301,6 @@ class MVC_Router extends BaseObject implements MVC_Router_Interface
 
 		Debug_Profiler::blockStart( 'Seeking for page' );
 
-		/**
-		 * @var MVC_Page_Interface $page_class_name
-		 */
 		$page_class_name = Factory_MVC::getPageClassName();
 
 
@@ -419,6 +423,17 @@ class MVC_Router extends BaseObject implements MVC_Router_Interface
 	{
 		return $this->base;
 	}
+	
+	
+	/**
+	 * @param Locale $locale
+	 * @return void
+	 */
+	public function setLocale( Locale $locale ): void
+	{
+		$this->locale = $locale;
+	}
+	
 
 	/**
 	 * @return ?Locale
@@ -570,5 +585,39 @@ class MVC_Router extends BaseObject implements MVC_Router_Interface
 	{
 		return $this->valid_url;
 	}
-
+	
+	/**
+	 * @param null|array<string> $allowed_files
+	 * @return bool
+	 */
+	public function tryDirectFiles( ?array $allowed_files=null ) : bool
+	{
+		if($allowed_files===null) {
+			$allowed_files = [];
+			$files = IO_Dir::getFilesList($this->getBase()->getPagesDataPath($this->getLocale()));
+			foreach($files as $file) {
+				if(!str_contains($file, '.php')) {
+					$allowed_files[] = $file;
+				}
+			}
+		}
+		
+		if(
+			in_array($this->getUrlPath(), $allowed_files)
+		) {
+			$path = $this->getBase()->getPagesDataPath($this->getLocale()).$this->getUrlPath();
+			
+			if(IO_File::isReadable($path)) {
+				header('Content-type: '.IO_File::getMimeType($path));
+				echo IO_File::read( $path );
+				die();
+			}
+			
+			$this->setIs404();
+			return true;
+		}
+		
+		return false;
+	}
+	
 }

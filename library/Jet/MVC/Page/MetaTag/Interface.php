@@ -16,7 +16,7 @@ interface MVC_Page_MetaTag_Interface
 
 	/**
 	 * @param MVC_Page_Interface $page
-	 * @param array $data
+	 * @param array<string,string> $data
 	 *
 	 * @return static
 	 */
@@ -72,4 +72,9 @@ interface MVC_Page_MetaTag_Interface
 	 * @param string $content
 	 */
 	public function setContent( string $content ): void;
+	
+	/**
+	 * @return array<string,string>
+	 */
+	public function toArray(): array;
 }

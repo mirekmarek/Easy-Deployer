@@ -27,9 +27,9 @@ return new class extends Autoloader_Loader
 	 *
 	 * @param string $class_name
 	 *
-	 * @return bool|string
+	 * @return false|string
 	 */
-	public function getScriptPath( string $class_name ): bool|string
+	public function getScriptPath( string $class_name ): false|string
 	{
 		$modules_namespace = SysConf_Jet_Modules::getModuleRootNamespace().'\\';
 		
@@ -46,11 +46,6 @@ return new class extends Autoloader_Loader
 		
 		$module_name = str_replace( '\\', '.', $module_name );
 		
-
-		if( !Application_Modules::moduleIsActivated( $module_name ) ) {
-			return false;
-		}
-
 		return Application_Modules::getModuleDir( $module_name ) . $this->classNameToPath( $class_name );
 
 	}

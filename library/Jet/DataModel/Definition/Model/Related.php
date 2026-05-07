@@ -24,7 +24,7 @@ abstract class DataModel_Definition_Model_Related extends DataModel_Definition_M
 
 	/**
 	 *
-	 * @var array
+	 * @var array<string>
 	 */
 	protected array $main_model_relation_id_properties = [];
 
@@ -41,7 +41,7 @@ abstract class DataModel_Definition_Model_Related extends DataModel_Definition_M
 
 	/**
 	 *
-	 * @var array
+	 * @var array<string>
 	 */
 	protected array $parent_model_relation_id_properties = [];
 
@@ -74,6 +74,10 @@ abstract class DataModel_Definition_Model_Related extends DataModel_Definition_M
 		$parent_model_class = $this->getClassArgument( 'parent_model_class' );
 
 		if( !$parent_model_class ) {
+			if($this->class_reflection->isAbstract()) {
+				return;
+			}
+			
 			throw new DataModel_Exception(
 				$this->class_name . ' #[DataModel_Definition(parent_model_class: SomeParent::class)] attribute is not defined ',
 				DataModel_Exception::CODE_DEFINITION_NONSENSE
@@ -146,10 +150,12 @@ abstract class DataModel_Definition_Model_Related extends DataModel_Definition_M
 			}
 
 			if( !in_array( $property_name, $main_id_relation_defined ) ) {
-				throw new DataModel_Exception(
-					'Class: \'' . $this->class_name . '\'  Main model relation property is missing! Please declare property with this attribute: #[DataModel_Definition(related_to: \'main.' . $property_name . '\')] ',
-					DataModel_Exception::CODE_DEFINITION_NONSENSE
-				);
+				if(!$this->class_reflection->isAbstract()) {
+					throw new DataModel_Exception(
+						'Class: \'' . $this->class_name . '\'  Main model relation property is missing! Please declare property with this attribute: #[DataModel_Definition(related_to: \'main.' . $property_name . '\')] ',
+						DataModel_Exception::CODE_DEFINITION_NONSENSE
+					);
+				}
 			}
 		}
 
@@ -166,10 +172,12 @@ abstract class DataModel_Definition_Model_Related extends DataModel_Definition_M
 				}
 
 				if( !in_array( $property_name, $parent_id_relation_defined ) ) {
-					throw new DataModel_Exception(
-						'Class: \'' . $this->class_name . '\'  parent model relation property is missing! Please declare property with this attribute: #[DataModel_Definition(related_to:\'parent.' . $property_name . '\')]',
-						DataModel_Exception::CODE_DEFINITION_NONSENSE
-					);
+					if(!$this->class_reflection->isAbstract()) {
+						throw new DataModel_Exception(
+							'Class: \'' . $this->class_name . '\'  parent model relation property is missing! Please declare property with this attribute: #[DataModel_Definition(related_to:\'parent.' . $property_name . '\')]',
+							DataModel_Exception::CODE_DEFINITION_NONSENSE
+						);
+					}
 				}
 			}
 		}
@@ -316,7 +324,7 @@ abstract class DataModel_Definition_Model_Related extends DataModel_Definition_M
 	/**
 	 * @param string $property_name
 	 * @param string $related_to
-	 * @param array $property_definition_data
+	 * @param array<string,mixed> $property_definition_data
 	 *
 	 * @return DataModel_Definition_Property
 	 * @throws DataModel_Exception
@@ -359,8 +367,7 @@ abstract class DataModel_Definition_Model_Related extends DataModel_Definition_M
 			);
 		}
 
-		$getRelatedPropertiesDefinitionData = function( string $class_name ): array {
-
+		$getRelatedPropertiesDefinitionData = function( string $class_name ) : array {
 			$reflection = new ReflectionClass( $class_name );
 
 			$properties_definition_data = Attributes::getClassPropertyDefinition( $reflection, DataModel_Definition::class );

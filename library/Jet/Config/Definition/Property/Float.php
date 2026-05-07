@@ -29,11 +29,11 @@ class Config_Definition_Property_Float extends Config_Definition_Property
 	protected float|null $max_value = null;
 
 	/**
-	 * @param array|null $definition_data
+	 * @param array<string,mixed>|null $definition_data
 	 *
 	 * @throws Config_Exception
 	 */
-	public function setUp( array $definition_data = null ): void
+	public function setUp( ?array $definition_data = null ): void
 	{
 		parent::setUp( $definition_data );
 	}

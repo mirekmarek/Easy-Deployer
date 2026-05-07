@@ -19,7 +19,7 @@ trait MVC_Page_Trait_Initialization
 	protected static array $pages = [];
 
 	/**
-	 * @var array
+	 * @var array<string,array<string,array<string,string|string[]>>>
 	 */
 	protected static array $maps = [];
 
@@ -27,7 +27,7 @@ trait MVC_Page_Trait_Initialization
 	 * @param MVC_Base_Interface $base
 	 * @param Locale $locale
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public static function _getRelativePathMap( MVC_Base_Interface $base, Locale $locale ): array
 	{
@@ -44,7 +44,7 @@ trait MVC_Page_Trait_Initialization
 	 * @param MVC_Base_Interface $base
 	 * @param Locale $locale
 	 *
-	 * @return array
+	 * @return array<string,array<string,string>>
 	 */
 	public static function loadMaps( MVC_Base_Interface $base, Locale $locale ): array
 	{
@@ -94,9 +94,16 @@ trait MVC_Page_Trait_Initialization
 
 		Debug_Profiler::blockStart( 'Loading module pages' );
 		Debug_Profiler::message( 'base: ' . $base_id . ' locale: ' . $locale_str );
+		
+		
+		if( !SysConf_Jet_MVC::getUseNonActiveModulePages() ) {
+			$modules = Application_Modules::activatedModulesList();
+		} else {
+			$modules = Application_Modules::allModulesList();
+		}
+		
 
-
-		foreach( Application_Modules::activatedModulesList() as $manifest ) {
+		foreach( $modules as $manifest ) {
 
 			$root_dir = $manifest->getModuleDir().SysConf_Jet_Modules::getPagesDir().'/'.$base_id.'/';
 
@@ -134,7 +141,44 @@ trait MVC_Page_Trait_Initialization
 			}
 		}
 		Debug_Profiler::blockEnd( 'Loading module pages' );
-
+		
+	}
+	
+	/**
+	 * @param Application_Module_Manifest $module_manifest
+	 * @return MVC_Page_Interface[]
+	 */
+	public static function getModulePages( Application_Module_Manifest $module_manifest ) : array
+	{
+		$pages = [];
+		foreach( MVC::getBases() as $base ) {
+			$root_dir = $module_manifest->getModuleDir().SysConf_Jet_Modules::getPagesDir().'/'.$base->getId().'/';
+			
+			$sub_dirs = IO_Dir::getList($root_dir, get_files: false);
+			foreach($sub_dirs as $dir_path=>$dir_name) {
+				$page_data_file_path = $dir_path . SysConf_Jet_MVC::getPageDataFileName();
+				if(!IO_File::isReadable($page_data_file_path)) {
+					continue;
+				}
+				
+				$page_data = require_once $page_data_file_path;
+				$page_data['relative_path'] = '' . rawurlencode( basename( $dir_path ) ) . '/';
+				
+				$page = static::_createByData( $base, $base->getDefaultLocale(), $page_data );
+				$page->setSourceModuleName( $module_manifest->getName() );
+				$page->setLocale( $base->getDefaultLocale() );
+				
+				$pages[$page->getKey()] = $page;
+			}
+		}
+		
+		return $pages;
+	}
+	
+	public function saveModulePage( Application_Module_Manifest $module_manifest ) : void
+	{
+		$path = $module_manifest->getModuleDir().SysConf_Jet_Modules::getPagesDir().'/'.$this->getBaseId().'/'.rawurldecode($this->getRelativePathFragment()).'/'.SysConf_Jet_MVC::getPageDataFileName();
+		$this->setDataFilePath( $path );
 	}
 
 
@@ -143,7 +187,7 @@ trait MVC_Page_Trait_Initialization
 	 * @param string $source_dir_path
 	 * @param string $parent_page_id
 	 * @param string $parent_path
-	 * @param array $parents
+	 * @param array<string> $parents
 	 *
 	 * @throws MVC_Page_Exception
 	 */
@@ -192,13 +236,13 @@ trait MVC_Page_Trait_Initialization
 	/**
 	 * @param string $data_file_path
 	 *
-	 * @param array|null $parent_page_data
+	 * @param array<string,mixed>|null $parent_page_data
 	 *
 	 * @param string $dir_name
 	 *
 	 * @return string
 	 */
-	protected static function loadMaps_getPageId( string $data_file_path, array $parent_page_data = null, string $dir_name = '' ): string
+	protected static function loadMaps_getPageId( string $data_file_path, ?array $parent_page_data = null, string $dir_name = '' ): string
 	{
 
 		if( !IO_File::isReadable( $data_file_path ) ) {
@@ -218,7 +262,7 @@ trait MVC_Page_Trait_Initialization
 	/**
 	 * @param MVC_Base_Interface $base
 	 * @param Locale $locale
-	 * @param array $data
+	 * @param array<string,mixed> $data
 	 *
 	 * @return static
 	 */
@@ -236,24 +280,18 @@ trait MVC_Page_Trait_Initialization
 		unset( $data['id'] );
 
 		$page->setData( $data );
-
+		
+		/** @phpstan-ignore return.type */
 		return $page;
 	}
 
 	/**
-	 * @param array $data
+	 * @param array<string,mixed> $data
 	 */
 	protected function setData( array $data ): void
 	{
-		/**
-		 * @var MVC_Page $this
-		 */
-
 		if( isset( $data['meta_tags'] ) ) {
 
-			/**
-			 * @var MVC_Page_MetaTag_Interface $class_name
-			 */
 			$class_name = Factory_MVC::getPageMetaTagClassName();
 
 			foreach( $data['meta_tags'] as $m_dat ) {
@@ -264,9 +302,6 @@ trait MVC_Page_Trait_Initialization
 		}
 
 		if( isset( $data['contents'] ) ) {
-			/**
-			 * @var MVC_Page_Content_Interface $class_name
-			 */
 			$class_name = Factory_MVC::getPageContentClassName();
 
 			foreach( $data['contents'] as $c_dat ) {
@@ -277,9 +312,6 @@ trait MVC_Page_Trait_Initialization
 		}
 
 		if( !isset( $data['relative_path'] ) ) {
-			/**
-			 * @var MVC_Page $parent
-			 */
 			$parent = $this->getParent();
 			$parent_path = $parent ? $parent->getRelativePath() : '';
 

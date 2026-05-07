@@ -25,18 +25,14 @@ trait MVC_Page_Trait_URL
 
 
 	/**
-	 * @param string|null|bool $schema
-	 * @param array $path_fragments
-	 * @param array $GET_params
+	 * @param string|null|false $schema
+	 * @param array<string> $path_fragments
+	 * @param array<string,mixed> $GET_params
 	 *
 	 * @return string
 	 */
-	protected function _createURL( string|null|bool $schema, array $path_fragments, array $GET_params ): string
+	protected function _createURL( string|null|false $schema, array $path_fragments, array $GET_params ): string
 	{
-		/**
-		 * @var MVC_Page|MVC_Page_Trait_URL $this
-		 */
-
 		$base = $this->getBase();
 
 
@@ -129,8 +125,8 @@ trait MVC_Page_Trait_URL
 
 	/**
 	 *
-	 * @param array $path_fragments
-	 * @param array $GET_params
+	 * @param array<string> $path_fragments
+	 * @param array<string,mixed> $GET_params
 	 *
 	 * @return string
 	 */
@@ -141,8 +137,8 @@ trait MVC_Page_Trait_URL
 
 	/**
 	 *
-	 * @param array $path_fragments
-	 * @param array $GET_params
+	 * @param array<string> $path_fragments
+	 * @param array<string,mixed> $GET_params
 	 *
 	 * @return string
 	 */
@@ -154,24 +150,20 @@ trait MVC_Page_Trait_URL
 
 	/**
 	 *
-	 * @param array $path_fragments
-	 * @param array $GET_params
+	 * @param array<string> $path_fragments
+	 * @param array<string,mixed> $GET_params
 	 *
 	 * @return string
 	 */
 	public function getNonSchemaURL( array $path_fragments = [], array $GET_params = [] ): string
 	{
-		/**
-		 * @var MVC_Page|MVC_Page_Trait_URL $this
-		 */
-
 		return $this->_createURL( '', $path_fragments, $GET_params );
 	}
 
 	/**
 	 *
-	 * @param array $path_fragments
-	 * @param array $GET_params
+	 * @param array<string> $path_fragments
+	 * @param array<string,mixed> $GET_params
 	 *
 	 * @return string
 	 */
@@ -182,8 +174,8 @@ trait MVC_Page_Trait_URL
 
 	/**
 	 *
-	 * @param array $path_fragments
-	 * @param array $GET_params
+	 * @param array<string> $path_fragments
+	 * @param array<string,mixed> $GET_params
 	 *
 	 * @return string
 	 */

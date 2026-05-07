@@ -18,19 +18,6 @@ class DataModel_Definition_Property_Int extends DataModel_Definition_Property
 	 */
 	protected string $type = DataModel::TYPE_INT;
 
-	/**
-	 * @param array $definition_data
-	 *
-	 */
-	public function setUp( array $definition_data ): void
-	{
-
-		if( !$definition_data ) {
-			return;
-		}
-
-		parent::setUp( $definition_data );
-	}
 
 	/**
 	 * @param mixed &$value
@@ -38,6 +25,17 @@ class DataModel_Definition_Property_Int extends DataModel_Definition_Property
 	public function checkValueType( mixed &$value ): void
 	{
 		$value = (int)$value;
+	}
+	
+	
+	/**
+	 *
+	 * @param mixed &$value
+	 * @return string|int|float|bool|null
+	 */
+	public function getCheckSumData( mixed &$value ): string|int|float|null|bool
+	{
+		return $value;
 	}
 	
 }

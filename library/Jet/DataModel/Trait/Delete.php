@@ -27,21 +27,14 @@ trait DataModel_Trait_Delete
 			);
 		}
 
-		if(
-			!$this->getIDController() ||
-			!$this->getIsSaved()
-		) {
+		if( !$this->getIsSaved() ) {
 			throw new DataModel_Exception(
 				'Nothing to delete... Object was not loaded. (Class: \'' . get_class(
 					$this
 				) . '\', Id:\'' . $this->getIDController() . '\')', DataModel_Exception::CODE_NOTHING_TO_DELETE
 			);
 		}
-
-		/**
-		 * @var DataModel_Backend $backend
-		 * @var DataModel_Definition_Model $definition
-		 */
+		
 		$backend = static::getBackendInstance();
 		$definition = static::getDataModelDefinition();
 
@@ -66,7 +59,7 @@ trait DataModel_Trait_Delete
 						if(
 							$v instanceof DataModel_Related &&
 							$v->getIsSaved()
-						) { 
+						) {
 							$v->delete();
 						}
 					}
@@ -88,8 +81,9 @@ trait DataModel_Trait_Delete
 	}
 	
 	/**
-	 * @param array $where
+	 * @param array<mixed> $where
 	 * @return void
+	 * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
 	 */
 	public static function dataDelete( array $where ) : void
 	{

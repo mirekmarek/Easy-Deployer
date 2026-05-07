@@ -34,19 +34,9 @@ class Mailing_Email_Template extends BaseObject
 	protected string $sender_id;
 
 	/**
-	 * @var array
+	 * @var array<string,string>
 	 */
 	protected array $data = [];
-
-	/**
-	 * @var array
-	 */
-	protected array $attachments = [];
-
-	/**
-	 * @var array
-	 */
-	protected array $images = [];
 
 	/**
 	 * @var string
@@ -64,7 +54,7 @@ class Mailing_Email_Template extends BaseObject
 	 * @param string $sender_id
 	 * @param Locale|null $locale
 	 */
-	public function __construct( string $template_id, string $sender_id=Mailing::DEFAULT_SENDER_ID, Locale $locale=null  )
+	public function __construct( string $template_id, string $sender_id=Mailing::DEFAULT_SENDER_ID, ?Locale $locale=null  )
 	{
 		if(!$locale) {
 			$locale = Locale::getCurrentLocale();

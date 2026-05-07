@@ -19,7 +19,7 @@ class DataModel_Definition_Property_CustomData extends DataModel_Definition_Prop
 	protected string $type = DataModel::TYPE_CUSTOM_DATA;
 
 	/**
-	 * @param array $definition_data
+	 * @param array<string,mixed> $definition_data
 	 *
 	 * @throws DataModel_Exception
 	 */
@@ -58,5 +58,16 @@ class DataModel_Definition_Property_CustomData extends DataModel_Definition_Prop
 			$value = [$value];
 		}
 	}
+	
+	/**
+	 *
+	 * @param mixed &$value
+	 * @return string|int|float|bool|null
+	 */
+	public function getCheckSumData( mixed &$value ): string|int|float|null|bool
+	{
+		return md5(serialize( $value ) );
+	}
+	
 	
 }

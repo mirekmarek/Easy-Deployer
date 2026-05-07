@@ -19,7 +19,7 @@ class Data_Paginator extends BaseObject implements BaseObject_Interface_Serializ
 	protected int $items_per_page = 20;
 
 	/**
-	 * @var array|Data_Paginator_DataSource|null
+	 * @var array<list<mixed>>|Data_Paginator_DataSource|null
 	 */
 	protected array|Data_Paginator_DataSource|null $data = null;
 
@@ -95,7 +95,7 @@ class Data_Paginator extends BaseObject implements BaseObject_Interface_Serializ
 	protected string|null $last_page_URL = null;
 
 	/**
-	 * @var array
+	 * @var array<string>
 	 */
 	protected array $pages_URL = [];
 
@@ -191,10 +191,9 @@ class Data_Paginator extends BaseObject implements BaseObject_Interface_Serializ
 			$this->next_page_URL = $creator( $this->next_page_no );
 		}
 
-		if( $this->pages_count ) {
-			for( $i = 1; $i <= $this->pages_count; $i++ ) {
-				$this->pages_URL[$i] = $creator( $i );
-			}
+
+		for( $i = 1; $i <= $this->pages_count; $i++ ) {
+			$this->pages_URL[$i] = $creator( $i );
 		}
 
 	}
@@ -216,7 +215,7 @@ class Data_Paginator extends BaseObject implements BaseObject_Interface_Serializ
 
 	/**
 	 *
-	 * @param array|Data_Paginator_DataSource $data
+	 * @param array<list<mixed>>|Data_Paginator_DataSource $data
 	 */
 	public function setData( array|Data_Paginator_DataSource $data ): void
 	{
@@ -233,11 +232,11 @@ class Data_Paginator extends BaseObject implements BaseObject_Interface_Serializ
 
 	/**
 	 *
-	 * @return iterable
+	 * @return array<list<mixed>>|Data_Paginator_DataSource
 	 * @throws Data_Paginator_Exception
 	 *
 	 */
-	public function getData(): iterable
+	public function getData(): array|Data_Paginator_DataSource
 	{
 		if( $this->data === null ) {
 			throw new Data_Paginator_Exception(
@@ -264,6 +263,13 @@ class Data_Paginator extends BaseObject implements BaseObject_Interface_Serializ
 
 		return $result;
 	}
+	
+	public function getItemsPerPage(): int
+	{
+		return $this->items_per_page;
+	}
+	
+	
 
 	/**
 	 *
@@ -401,7 +407,7 @@ class Data_Paginator extends BaseObject implements BaseObject_Interface_Serializ
 
 
 	/**
-	 * @return array
+	 * @return array<string>
 	 */
 	public function getPagesURL(): array
 	{
@@ -418,7 +424,7 @@ class Data_Paginator extends BaseObject implements BaseObject_Interface_Serializ
 
 	/**
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function jsonSerialize(): array
 	{

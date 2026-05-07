@@ -8,8 +8,6 @@
 
 namespace Jet;
 
-use Error;
-
 /**
  *
  */
@@ -57,7 +55,7 @@ abstract class BaseObject
 	/**
 	 * Default serialize rules (don't serialize __* properties)
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public function __sleep(): array
 	{
@@ -125,16 +123,13 @@ abstract class BaseObject
 
 		foreach( $properties as $key => $val ) {
 			if( is_object( $val ) ) {
-				try {
-					$this->{$key} = clone $val;
-				} catch( Error $e ) {
-				}
+				$this->{$key} = clone $val;
 			}
 		}
 	}
 
 	/**
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function __debugInfo(): array
 	{

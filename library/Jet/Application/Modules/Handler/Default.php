@@ -15,19 +15,19 @@ class Application_Modules_Handler_Default extends Application_Modules_Handler
 {
 	/**
 	 *
-	 * @var ?array
+	 * @var ?array<string>
 	 */
 	protected ?array $activated_modules_list = null;
 
 	/**
 	 *
-	 * @var ?array
+	 * @var ?array<string>
 	 */
 	protected ?array $installed_modules_list = null;
 
 	/**
 	 *
-	 * @var ?array
+	 * @var ?array<string>
 	 */
 	protected ?array $all_modules_list = null;
 
@@ -59,7 +59,7 @@ class Application_Modules_Handler_Default extends Application_Modules_Handler
 
 	/**
 	 *
-	 * @return Application_Module_Manifest[]
+	 * @return array<string,Application_Module_Manifest>
 	 */
 	public function activatedModulesList(): array
 	{
@@ -78,20 +78,27 @@ class Application_Modules_Handler_Default extends Application_Modules_Handler
 	/**
 	 *
 	 *
-	 * @return Application_Module_Manifest[]
+	 * @return array<string,Application_Module_Manifest>
 	 */
 	public function installedModulesList(): array
 	{
 		$this->_readInstalledModulesList();
-
-		return $this->installed_modules_list;
+		
+		$res = [];
+		
+		foreach( $this->installed_modules_list as $module_name ) {
+			$res[$module_name] = $this->moduleManifest( $module_name );
+			
+		}
+		
+		return $res;
 	}
 
 	/**
 	 *
 	 *
 	 *
-	 * @return Application_Module_Manifest[]
+	 * @return array<string,Application_Module_Manifest>
 	 */
 	public function allModulesList(): array
 	{
@@ -143,11 +150,6 @@ class Application_Modules_Handler_Default extends Application_Modules_Handler
 			$module_name = str_replace( '\\', '.', $module_name_prefix . $module_dir );
 
 			$module_manifest = new $manifest_class_name( $module_name );
-
-			if( !$module_manifest ) {
-				continue;
-			}
-
 
 			$this->all_modules_list[] = $module_name;
 
@@ -275,7 +277,7 @@ class Application_Modules_Handler_Default extends Application_Modules_Handler
 		}
 
 		/**
-		 * @var Application_Modules_Exception $uninstall_exception
+		 * @var ?Application_Modules_Exception $uninstall_exception
 		 */
 		$uninstall_exception = null;
 
@@ -505,7 +507,7 @@ class Application_Modules_Handler_Default extends Application_Modules_Handler
 	/**
 	 * @param string $module_name
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function readManifestData( string $module_name ) : array
 	{

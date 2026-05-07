@@ -19,6 +19,10 @@ trait DataListing_Traits_Filters
 	 */
 	protected array $filters = [];
 	
+	/**
+	 * @var ?array
+	 * @phpstan-ignore missingType.iterableValue
+	 */
 	protected ?array $filter_where = null;
 	
 	protected ?Form $filter_form = null;
@@ -90,6 +94,11 @@ trait DataListing_Traits_Filters
 	}
 	
 	
+	/**
+	 * @param array $where
+	 * @return void
+	 * @phpstan-ignore missingType.iterableValue
+	 */
 	public function addFilterWhere( array $where ): void
 	{
 		if( $this->filter_where ) {
@@ -99,11 +108,19 @@ trait DataListing_Traits_Filters
 		$this->filter_where[] = $where;
 	}
 	
+	/**
+	 * @return list<mixed>
+	 */
 	protected function getDefaultFilterWhere() : array
 	{
 		return [];
 	}
 	
+	/**
+	 * @return array
+	 *
+	 * @phpstan-ignore missingType.iterableValue
+	 */
 	public function getFilterWhere(): array
 	{
 		if( $this->filter_where === null ) {

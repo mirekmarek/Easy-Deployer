@@ -16,7 +16,7 @@ class DataModel_Query_Where extends BaseObject implements BaseObject_Interface_I
 	use DataModel_Query_Where_Trait;
 
 	/**
-	 * @var DataModel_Query_Where_Expression[]|DataModel_Query_Where[]|string
+	 * @var DataModel_Query_Where_Expression[]|DataModel_Query_Where[]|string[]
 	 */
 	protected array $expressions = [];
 
@@ -24,9 +24,10 @@ class DataModel_Query_Where extends BaseObject implements BaseObject_Interface_I
 	/**
 	 *
 	 * @param DataModel_Query $query
-	 * @param array $where
+	 * @param array<mixed> $where
 	 *
 	 * @throws DataModel_Query_Exception
+	 * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
 	 */
 	public function __construct( DataModel_Query $query, array $where = [] )
 	{

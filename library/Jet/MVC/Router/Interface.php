@@ -45,7 +45,14 @@ interface MVC_Router_Interface
 	 * @return ?MVC_Base_Interface
 	 */
 	public function getBase(): ?MVC_Base_Interface;
-
+	
+	/**
+	 * @param Locale $locale
+	 * @return void
+	 */
+	public function setLocale( Locale $locale ): void;
+	
+	
 	/**
 	 * @return ?Locale
 	 */
@@ -73,7 +80,7 @@ interface MVC_Router_Interface
 	 * @param string $target_URL
 	 * @param int $http_code
 	 */
-	public function setIsRedirect( string $target_URL, int $http_code = Http_Headers::CODE_302_MOVED_TEMPORARY );
+	public function setIsRedirect( string $target_URL, int $http_code = Http_Headers::CODE_302_MOVED_TEMPORARY ) : void;
 
 	/**
 	 *
@@ -138,5 +145,11 @@ interface MVC_Router_Interface
 	 * @return string
 	 */
 	public function getValidUrl(): string;
+	
+	/**
+	 * @param null|array<string> $allowed_files
+	 * @return bool
+	 */
+	public function tryDirectFiles( ?array $allowed_files=null ) : bool;
 
 }

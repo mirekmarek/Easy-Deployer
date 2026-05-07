@@ -23,7 +23,7 @@ class DataModel_Query_Select extends BaseObject implements BaseObject_Interface_
 	/**
 	 *
 	 * @param DataModel_Query $query
-	 * @param array $items
+	 * @param array<string|int,string|DataModel_Definition_Property|DataModel_Query_Select_Item_Expression> $items
 	 *
 	 * @throws DataModel_Query_Exception
 	 */
@@ -57,7 +57,11 @@ class DataModel_Query_Select extends BaseObject implements BaseObject_Interface_
 
 				$properties = [];
 				foreach( $val->getProperties() as $k => $p ) {
-					$properties[$k] = $query->getPropertyAndSetRelation( $p );
+					if(is_string($p)) {
+						$properties[$k] = $query->getPropertyAndSetRelation( $p );
+					} else {
+						$properties[$k] = $p;
+					}
 				}
 				$val->setProperties( $properties );
 
@@ -70,6 +74,7 @@ class DataModel_Query_Select extends BaseObject implements BaseObject_Interface_
 			}
 
 
+			/** @phpstan-ignore deadCode.unreachable */
 			throw new DataModel_Query_Exception(
 				'I\'m sorry, but I did not understand what you want to define ...',
 				DataModel_Query_Exception::CODE_QUERY_PARSE_ERROR

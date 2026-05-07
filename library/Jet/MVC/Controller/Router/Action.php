@@ -28,23 +28,26 @@ class MVC_Controller_Router_Action extends BaseObject
 	 * @var string
 	 */
 	protected string $module_action = '';
-
+	
 	/**
-	 * @var callable|null
+	 * @var null|callable
 	 */
 	protected $resolver = null;
-
 	/**
-	 * @var callable
+	 * @var null|callable
 	 */
-	protected $URI_creator;
+	protected $URI_creator = null;
+	/**
+	 * @var null|callable
+	 */
+	protected $authorizer = null;
 
 	/**
 	 * @param MVC_Controller_Router $router
 	 * @param string $controller_action
 	 * @param string $module_action
 	 */
-	public function __construct( MVC_Controller_Router $router, string $controller_action, string $module_action )
+	public function __construct( MVC_Controller_Router $router, string $controller_action, string $module_action='' )
 	{
 		$this->router = $router;
 		$this->controller_action = $controller_action;
@@ -86,10 +89,6 @@ class MVC_Controller_Router_Action extends BaseObject
 
 
 	/**
-	 * Callback prototype:
-	 *
-	 * someCallback( MVC_Controller_Router_Action $action )
-	 *
 	 * Callback return value: bool, true if resolved
 	 *
 	 * @param callable $resolver
@@ -114,13 +113,21 @@ class MVC_Controller_Router_Action extends BaseObject
 
 		return $this;
 	}
+	
+	public function setAuthorizer( callable $authorizer ): static
+	{
+		$this->authorizer = $authorizer;
+		
+		return $this;
+	}
 
+	
 
 	/**
 	 *
-	 * @return bool|string
+	 * @return false|string
 	 */
-	public function resolve(): bool|string
+	public function resolve(): false|string
 	{
 		if( !$this->resolver ) {
 			return false;
@@ -134,16 +141,21 @@ class MVC_Controller_Router_Action extends BaseObject
 
 	/**
 	 *
-	 * @param array $arguments
+	 * @param mixed[] $arguments
 	 *
-	 * @return string|bool
+	 * @return string|false
+	 * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
 	 */
-	public function URI( ...$arguments ): string|bool
+	public function URI( ...$arguments ): string|false
 	{
+		if(!$this->URI_creator) {
+			return false;
+		}
+		
 		if( !$this->authorize() ) {
 			return false;
 		}
-
+		
 		return call_user_func_array( $this->URI_creator, $arguments );
 	}
 
@@ -153,6 +165,11 @@ class MVC_Controller_Router_Action extends BaseObject
 	 */
 	public function authorize(): bool
 	{
+		if($this->authorizer) {
+			$authorizer = $this->authorizer;
+			
+			return $authorizer();
+		}
 
 		$module_action = $this->getModuleAction();
 

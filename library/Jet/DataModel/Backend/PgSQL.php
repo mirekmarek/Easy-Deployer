@@ -16,7 +16,7 @@ class DataModel_Backend_PgSQL extends DataModel_Backend
 	use DataModel_Backend_Trait_Fetch;
 	
 	/**
-	 * @var array
+	 * @var array<string>
 	 */
 	protected static array $valid_key_types = [
 		DataModel::KEY_TYPE_PRIMARY,
@@ -344,7 +344,7 @@ class DataModel_Backend_PgSQL extends DataModel_Backend
 			case DataModel::TYPE_FLOAT:
 				return 'real DEFAULT ' . (float)$default_value;
 			case DataModel::TYPE_LOCALE:
-				return 'varchar(20) NOT NULL';
+				return 'varchar(20) DEFAULT NULL';
 			case DataModel::TYPE_DATE:
 				return 'date DEFAULT NULL';
 			case DataModel::TYPE_DATE_TIME:
@@ -451,7 +451,7 @@ class DataModel_Backend_PgSQL extends DataModel_Backend
 	/**
 	 * @param DataModel_Definition_Model $definition
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	public function helper_getUpdateCommand( DataModel_Definition_Model $definition ): array
 	{
@@ -526,7 +526,7 @@ class DataModel_Backend_PgSQL extends DataModel_Backend
 	 * @param bool $quote
 	 * @param bool $add_table_name
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	protected function _getRecord( DataModel_RecordData $record, bool $quote = true, bool $add_table_name = false ): array
 	{
@@ -676,7 +676,7 @@ class DataModel_Backend_PgSQL extends DataModel_Backend
 	 *
 	 * @return string
 	 */
-	protected function _getSqlQueryWherePart( DataModel_Query_Where $query = null, int $level = 0 ): string
+	protected function _getSqlQueryWherePart( ?DataModel_Query_Where $query = null, int $level = 0 ): string
 	{
 		if( !$query ) {
 			return '';
@@ -939,7 +939,7 @@ class DataModel_Backend_PgSQL extends DataModel_Backend
 	 *
 	 * @return string
 	 */
-	protected function _getSqlQueryHavingPart( DataModel_Query_Having $query = null, int $level = 0 ): string
+	protected function _getSqlQueryHavingPart( ?DataModel_Query_Having $query = null, int $level = 0 ): string
 	{
 		if( !$query ) {
 			return '';
@@ -968,10 +968,6 @@ class DataModel_Backend_PgSQL extends DataModel_Backend
 			
 			/**
 			 * @var DataModel_Query_Having_Expression $qp
-			 */
-			
-			/**
-			 * @var DataModel_Definition_Property $prop
 			 */
 			$item = $qp->getProperty()->getSelectAs();
 			
@@ -1033,6 +1029,7 @@ class DataModel_Backend_PgSQL extends DataModel_Backend
 				continue;
 			}
 			
+			/** @phpstan-ignore instanceof.alwaysTrue */
 			if( $property instanceof DataModel_Query_Select_Item_Expression ) {
 				$backend_function_call = $property->toString( $mapper );
 				
@@ -1049,7 +1046,7 @@ class DataModel_Backend_PgSQL extends DataModel_Backend
 	 *
 	 * @return string
 	 */
-	protected function _getSqlQueryGroupPart( DataModel_Query $query = null ): string
+	protected function _getSqlQueryGroupPart( ?DataModel_Query $query = null ): string
 	{
 		$group_by = $query->getGroupBy();
 		if( !$group_by ) {
@@ -1059,14 +1056,9 @@ class DataModel_Backend_PgSQL extends DataModel_Backend
 		$group_by_qp = [];
 		
 		foreach( $group_by as $val ) {
-			/**
-			 * @var DataModel_Query_Select_Item $val
-			 */
 			if( $val instanceof DataModel_Definition_Property ) {
-				/**
-				 * @var DataModel_Definition_Property $val
-				 */
 				$val = $this->_getColumnName( $val );
+				/** @phpstan-ignore instanceof.alwaysTrue */
 			} else if( $val instanceof DataModel_Query_Select_Item ) {
 				$val = $this->_quoteName( $val->getSelectAs() );
 			}
@@ -1093,12 +1085,10 @@ class DataModel_Backend_PgSQL extends DataModel_Backend
 		$order_qp = [];
 		
 		foreach( $order_by as $ob ) {
-			/**
-			 * @var DataModel_Query_OrderBy_Item $ob
-			 */
 			$item = $ob->getItem();
 			if( $item instanceof DataModel_Definition_Property ) {
 				$item = $this->_getColumnName( $item );
+				/** @phpstan-ignore instanceof.alwaysTrue */
 			} else if( $item instanceof DataModel_Query_Select_Item ) {
 				$item = $this->_quoteName( $item->getSelectAs() );
 			}

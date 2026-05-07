@@ -26,7 +26,7 @@ trait MVC_Page_Trait_Tree
 
 
 	/**
-	 * @var array
+	 * @var array<string>
 	 */
 	protected array $children = [];
 
@@ -52,9 +52,6 @@ trait MVC_Page_Trait_Tree
 	 */
 	public function getParent(): static|null
 	{
-		/**
-		 * @var MVC_Page_Interface|MVC_Page_Trait_Tree $this
-		 */
 		if( !$this->parent_id ) {
 			return null;
 		}
@@ -62,12 +59,13 @@ trait MVC_Page_Trait_Tree
 		if( !$this->__parent ) {
 			$this->__parent = static::_get( $this->parent_id, $this->getLocale(), $this->getBase()->getId() );
 		}
-
+		
+		/** @phpstan-ignore return.type */
 		return $this->__parent;
 	}
 
 	/**
-	 * @return array
+	 * @return array<string>
 	 */
 	public function getPath(): array
 	{
@@ -87,10 +85,6 @@ trait MVC_Page_Trait_Tree
 	 */
 	public function getChildren(): array
 	{
-		/**
-		 * @var MVC_Page_Interface|MVC_Page_Trait_Tree $this
-		 */
-
 		if( $this->__children === null ) {
 			$this->__children = [];
 
@@ -105,14 +99,7 @@ trait MVC_Page_Trait_Tree
 			uasort(
 				$this->__children,
 				function( MVC_Page $a, MVC_Page $b ) {
-					$a_order = $a->getOrder();
-					$b_order = $b->getOrder();
-
-					if( $a_order == $b_order ) {
-						return 0;
-					}
-
-					return ($a_order < $b_order) ? -1 : 1;
+					return $a->getOrder() <=> $b->getOrder();
 				}
 			);
 
@@ -123,7 +110,7 @@ trait MVC_Page_Trait_Tree
 
 
 	/**
-	 * @return array
+	 * @return array<string>
 	 */
 	public function getChildrenKeys(): array
 	{
@@ -137,7 +124,7 @@ trait MVC_Page_Trait_Tree
 	}
 
 	/**
-	 * @return array
+	 * @return array<string>
 	 */
 	public function getChildrenIds(): array
 	{

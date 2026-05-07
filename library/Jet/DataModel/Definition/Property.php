@@ -71,14 +71,14 @@ abstract class DataModel_Definition_Property extends BaseObject
 	protected bool $do_not_export = false;
 
 	/**
-	 * @var array
+	 * @var array<string,array<string,mixed>>
 	 */
 	protected array $backend_options = [];
 
 	/**
 	 * @param string $data_model_class_name
 	 * @param string $name
-	 * @param ?array $definition_data (optional)
+	 * @param ?array<string,mixed> $definition_data (optional)
 	 */
 	public function __construct( string $data_model_class_name, string $name, ?array $definition_data = null )
 	{
@@ -91,7 +91,7 @@ abstract class DataModel_Definition_Property extends BaseObject
 	}
 
 	/**
-	 * @param array $definition_data
+	 * @param array<string,mixed> $definition_data
 	 *
 	 * @throws DataModel_Exception
 	 */
@@ -282,9 +282,16 @@ abstract class DataModel_Definition_Property extends BaseObject
 
 		$r = new ReflectionObject( $i );
 		$p = $r->getProperty( $this->getName() );
-		$p->setAccessible(true);
-
-		return $p->getValue($i);
+		
+		if(PHP_VERSION_ID >= 80400) {
+			/** @phpstan-ignore-next-line */
+			return $p->getRawValue( $i );
+		} else {
+			if(PHP_VERSION_ID<80100) {
+				$p->setAccessible(true);
+			}
+			return $p->getValue( $i );
+		}
 	}
 
 	/**
@@ -292,11 +299,19 @@ abstract class DataModel_Definition_Property extends BaseObject
 	 * @param mixed &$value
 	 */
 	abstract public function checkValueType( mixed &$value ): void;
+	
+	/**
+	 *
+	 * @param mixed &$value
+	 * @return string|int|float|null|bool
+	 */
+	abstract public function getCheckSumData( mixed &$value ): string|int|float|null|bool;
+	
 
 	/**
 	 * @param string $backend_type
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function getBackendOptions( string $backend_type ): array
 	{
@@ -306,21 +321,37 @@ abstract class DataModel_Definition_Property extends BaseObject
 
 		return $this->backend_options[$backend_type];
 	}
-
+	
 	/**
-	 * @param mixed &$property
-	 * @param mixed $data
-	 *
+	 * @param object $obj
+	 * @param string $property_name
+	 * @param array<string,mixed> $data
+	 * @return void
 	 */
-	public function loadPropertyValue( mixed &$property, array $data ): void
+	public function loadPropertyValue( object $obj, string $property_name, array $data ): void
 	{
 		if( !array_key_exists( $this->getName(), $data ) ) {
 			return;
 		}
 
-		$property = $data[$this->getName()];
+		$value = $data[$this->getName()];
+		
+		$this->checkValueType( $value );
+		
+		$r = new ReflectionObject( $obj );
+		$p = $r->getProperty( $property_name );
 
-		$this->checkValueType( $property );
+		if(PHP_VERSION_ID >= 80400) {
+			/** @phpstan-ignore-next-line */
+			$p->setRawValue( $obj, $value );
+		} else {
+			if(PHP_VERSION_ID<80100) {
+				$p->setAccessible(true);
+				$p->setValue( $obj, $value );
+			} else {
+				$p->setValue( $obj, $value );
+			}
+		}
 	}
 
 	/**
@@ -338,7 +369,7 @@ abstract class DataModel_Definition_Property extends BaseObject
 	 *
 	 * @return mixed
 	 */
-	public function getJsonSerializeValue( mixed &$property ): mixed
+	public function getJsonSerializeValue( mixed $property ): mixed
 	{
 		return $property;
 	}

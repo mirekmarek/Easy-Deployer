@@ -11,7 +11,7 @@ trait DataModel_Backend_Trait_Fetch {
 	/**
 	 * @param DataModel_Query $query
 	 *
-	 * @return mixed
+	 * @return list<mixed>
 	 */
 	public function fetchAll( DataModel_Query $query ): mixed
 	{
@@ -21,7 +21,7 @@ trait DataModel_Backend_Trait_Fetch {
 	/**
 	 * @param DataModel_Query $query
 	 *
-	 * @return mixed
+	 * @return array<string,mixed>
 	 */
 	public function fetchAssoc( DataModel_Query $query ): mixed
 	{
@@ -31,7 +31,7 @@ trait DataModel_Backend_Trait_Fetch {
 	/**
 	 * @param DataModel_Query $query
 	 *
-	 * @return mixed
+	 * @return array<string,mixed>
 	 */
 	public function fetchPairs( DataModel_Query $query ): mixed
 	{
@@ -41,7 +41,7 @@ trait DataModel_Backend_Trait_Fetch {
 	/**
 	 * @param DataModel_Query $query
 	 *
-	 * @return mixed
+	 * @return array<string,mixed>
 	 */
 	public function fetchRow( DataModel_Query $query ): mixed
 	{
@@ -61,7 +61,7 @@ trait DataModel_Backend_Trait_Fetch {
 	/**
 	 * @param DataModel_Query $query
 	 *
-	 * @return mixed
+	 * @return list<mixed>
 	 */
 	public function fetchCol( DataModel_Query $query ): array
 	{
@@ -70,7 +70,6 @@ trait DataModel_Backend_Trait_Fetch {
 		foreach( $query->getSelect() as $property_name=>$pd ) {
 			/**
 			 * @var DataModel_Query_Select_Item $pd
-			 * @var DataModel_Definition_Property $property
 			 */
 			$property = $pd->getItem();
 			
@@ -80,10 +79,6 @@ trait DataModel_Backend_Trait_Fetch {
 			
 			$property_definition = $property;
 			break;
-		}
-		
-		if(!$property_definition) {
-			[];
 		}
 		
 		

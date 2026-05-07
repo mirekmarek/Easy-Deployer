@@ -83,26 +83,23 @@ class Deployment_Backend_FTP extends Deployment_Backend
 
 	public function getList( $dir='.' ): array
 	{
-		$raw= ftp_rawlist( $this->connection, $dir, false );
-
+		$raw = ftp_mlsd( $this->connection, $dir );
 
 		$list = array();
 		foreach( $raw as $l ) {
-
-			if(!preg_match_all('/^([drwxs+-]{10})\s+(\d+)\s+(\w+)\s+(\w+)\s+(\d+)\s+(.{12}) (.*)$/m', $l, $matches, PREG_SET_ORDER)) {
-				//var_dump( $l );
-				continue;
-			}
-
-			$params = $matches[0][1];
-			$size = $matches[0][5];
-			$name = $matches[0][7];
+			
+			
+			
+			$type = $l['type'];
+			$size = $l['size']??0;
+			$name = $l['name'];
+			
 
 			if($name=='.' || $name=='..') {
 				continue;
 			}
 
-			$is_dir = $params[0]=='d';
+			$is_dir = $type=='dir';
 
 			if(!$is_dir) {
 				$pi = pathinfo($name);

@@ -86,7 +86,7 @@ class Auth_Controller_Deployer extends BaseObject implements Auth_Controller_Int
 	 *
 	 * @return Auth_Developer_User|null
 	 */
-	public function getCurrentUser(): Auth_Developer_User|bool
+	public function getCurrentUser(): Auth_Developer_User|false
 	{
 		if( $this->current_user !== null ) {
 			return $this->current_user;

@@ -21,7 +21,7 @@ class PackageCreator_CSS_Default extends PackageCreator_CSS
 	/**
 	 *
 	 * @param string $media
-	 * @param array $URIs
+	 * @param array<string> $URIs
 	 */
 	public function __construct( string $media, array $URIs )
 	{
@@ -74,6 +74,10 @@ class PackageCreator_CSS_Default extends PackageCreator_CSS
 					$path[0] == "'"
 				) {
 					$path = substr( $path, 1, -1 );
+				}
+				
+				if(str_starts_with($path, 'data:')) {
+					continue;
 				}
 
 

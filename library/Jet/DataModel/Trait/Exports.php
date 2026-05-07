@@ -26,20 +26,13 @@ trait DataModel_Trait_Exports
 	}
 
 	/**
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function jsonSerialize(): array
 	{
-		/**
-		 * @var DataModel $this
-		 * @var DataModel_Definition_Model $definition
-		 */
 		$definition = static::getDataModelDefinition();
 		$properties = $definition->getProperties();
 
-		/**
-		 * @var DataModel_PropertyFilter $load_filter
-		 */
 		$load_filter = $this->getLoadFilter();
 
 		$result = [];
@@ -54,8 +47,8 @@ trait DataModel_Trait_Exports
 			) {
 				continue;
 			}
-
-
+			
+			
 			$result[$property_name] = $property->getJsonSerializeValue( $this->{$property_name} );
 
 		}

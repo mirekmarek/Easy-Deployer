@@ -8,9 +8,7 @@
 
 namespace Jet;
 
-/**
- *
- */
+/** @phpstan-consistent-constructor */
 class DataModel_Query extends BaseObject
 {
 	public const L_O_OR = 'OR';
@@ -30,7 +28,7 @@ class DataModel_Query extends BaseObject
 	public const JOIN_TYPE_LEFT_OUTER_JOIN = 'LEFT_OUTER_JOIN';
 
 	/**
-	 * @var array
+	 * @var array<string>
 	 */
 	public const AVAILABLE_OPERATORS = [
 		self::O_NOT_EQUAL,
@@ -72,7 +70,7 @@ class DataModel_Query extends BaseObject
 
 	/**
 	 *
-	 * @var DataModel_Query_OrderBy|DataModel_Query_OrderBy_Item[]|null
+	 * @var DataModel_Query_OrderBy|array<DataModel_Query_OrderBy_Item>|null
 	 */
 	protected DataModel_Query_OrderBy|array|null $order_by = null;
 
@@ -102,9 +100,10 @@ class DataModel_Query extends BaseObject
 	/**
 	 *
 	 * @param DataModel_Definition_Model $main_data_model_definition
-	 * @param array $where
+	 * @param array<mixed> $where
 	 *
 	 * @return DataModel_Query
+	 * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
 	 */
 	public static function createQuery( DataModel_Definition_Model $main_data_model_definition, array $where = [] ): DataModel_Query
 	{
@@ -146,7 +145,7 @@ class DataModel_Query extends BaseObject
 
 	/**
 	 *
-	 * @param array $items
+	 * @param array<string|int,string|DataModel_Definition_Property|DataModel_Query_Select_Item_Expression> $items
 	 *
 	 * @return DataModel_Query|null
 	 *
@@ -167,9 +166,10 @@ class DataModel_Query extends BaseObject
 	}
 
 	/**
-	 * @param array $where
+	 * @param array<mixed> $where
 	 *
 	 * @return DataModel_Query
+	 * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
 	 */
 	public function setWhere( array $where ): DataModel_Query
 	{
@@ -187,9 +187,10 @@ class DataModel_Query extends BaseObject
 	}
 
 	/**
-	 * @param array $having
+	 * @param array<mixed> $having
 	 *
 	 * @return DataModel_Query
+	 * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
 	 */
 	public function setHaving( array $having ): DataModel_Query
 	{
@@ -222,7 +223,7 @@ class DataModel_Query extends BaseObject
 	}
 
 	/**
-	 * @return DataModel_Query_OrderBy|DataModel_Query_OrderBy_Item[]|null
+	 * @return DataModel_Query_OrderBy|array<DataModel_Query_OrderBy_Item>|null
 	 */
 	public function getOrderBy(): DataModel_Query_OrderBy|array|null
 	{

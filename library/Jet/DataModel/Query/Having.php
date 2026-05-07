@@ -16,16 +16,17 @@ class DataModel_Query_Having extends BaseObject implements BaseObject_Interface_
 	use DataModel_Query_Where_Trait;
 
 	/**
-	 * @var DataModel_Query_Having_Expression[]|string[]
+	 * @var array<DataModel_Query_Having_Expression>|array<DataModel_Query_Having>|array<string>
 	 */
 	protected array $expressions = [];
 
 	/**
 	 *
 	 * @param DataModel_Query $query
-	 * @param array $having
+	 * @param array<mixed> $having
 	 *
 	 * @throws DataModel_Query_Exception
+	 * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
 	 */
 	public function __construct( DataModel_Query $query, array $having = [] )
 	{
@@ -204,11 +205,11 @@ class DataModel_Query_Having extends BaseObject implements BaseObject_Interface_
 	//------------------------------------------------------------------------------------------------------------
 
 	/**
-	 * @return DataModel_Query_Having_Expression|string
+	 * @return DataModel_Query_Having_Expression|DataModel_Query_Having|string
 	 * @see \Iterator
 	 *
 	 */
-	public function current(): DataModel_Query_Having_Expression|string
+	public function current(): DataModel_Query_Having_Expression|DataModel_Query_Having|string
 	{
 		return current( $this->expressions );
 	}

@@ -28,7 +28,7 @@ trait Form_Field_Part_Select_Trait
 	protected $select_options_creator = null;
 	
 	/**
-	 * @var ?array
+	 * @var ?array<Form_Field_Select_Option_Interface>
 	 */
 	#[Form_Definition_FieldOption(
 		type: Form_Definition_FieldOption::TYPE_ASSOC_ARRAY,
@@ -56,7 +56,7 @@ trait Form_Field_Part_Select_Trait
 	}
 	
 	/**
-	 * @param array|Iterator $options
+	 * @param array<string,string|Form_Field_Select_Option|Form_Field_Select_Option_Interface>|Iterator $options
 	 */
 	public function setSelectOptions( array|Iterator $options ): void
 	{
@@ -94,22 +94,4 @@ trait Form_Field_Part_Select_Trait
 		$this->select_options_creator = $select_options_creator;
 	}
 	
-	
-	
-	/**
-	 * @return array
-	 */
-	public function getRequiredErrorCodes(): array
-	{
-		$codes = [];
-		
-		$codes[] = Form_Field::ERROR_CODE_INVALID_VALUE;
-		
-		if( $this->is_required ) {
-			$codes[] = Form_Field::ERROR_CODE_EMPTY;
-		}
-		
-		
-		return $codes;
-	}
 }

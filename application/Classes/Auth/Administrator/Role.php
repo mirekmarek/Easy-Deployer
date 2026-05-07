@@ -24,6 +24,7 @@ use Jet\MVC;
 use Jet\MVC_Page;
 use Jet\Form;
 use Jet\Form_Field;
+use Jet\Locale;
 
 /**
  *
@@ -327,9 +328,11 @@ class Auth_Administrator_Role extends DataModel implements Auth_Role_Interface
 	}
 
 	/**
+	 * @param bool $translate
+	 * @param Locale|null $translate_locale
 	 * @return string[]
 	 */
-	public static function getAvailablePrivilegesList(): array
+	public static function getAvailablePrivilegesList( bool $translate = true, ?Locale $translate_locale = null ): array
 	{
 
 		return [

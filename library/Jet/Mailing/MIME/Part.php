@@ -34,7 +34,7 @@ class Mailing_MIME_Part {
 	protected string $body = '';
 	
 	/**
-	 * @var static[]
+	 * @var Mailing_MIME_Part[]
 	 */
 	protected array $parts = [];
 	
@@ -156,11 +156,17 @@ class Mailing_MIME_Part {
 		$this->body = $body;
 	}
 	
+	/**
+	 * @return Mailing_MIME_Part[]
+	 */
 	public function getParts(): array
 	{
 		return $this->parts;
 	}
 	
+	/**
+	 * @param Mailing_MIME_Part[] $parts
+	 */
 	public function setParts( array $parts ): void
 	{
 		$this->parts = $parts;

@@ -15,14 +15,16 @@ trait Form_Field_Trait_Validation
 {
 
 	/**
-	 * @var array
+	 * @var array<string,string>
 	 */
 	protected array $error_messages = [];
 
+	protected string $_validator_type;
+	
 	/**
-	 * @var callable
+	 * @var ?Validator
 	 */
-	protected $validator;
+	protected ?Validator $validator = null;
 
 	/**
 	 *
@@ -46,32 +48,100 @@ trait Form_Field_Trait_Validation
 	 * @var string
 	 */
 	protected string $last_error_message = '';
-
-
-	/**
-	 * @return callable|null
-	 */
-	public function getValidator(): callable|null
+	
+	public function validatorFactory(): Validator
 	{
-		return $this->validator;
+		$validator = Factory_Validator::getValidatorInstance( $this->_validator_type );
+		$this->initValidator( $validator );
+		
+		return $validator;
 	}
 
 	/**
-	 * @param callable $validator
+	 * @return Validator
 	 */
-	public function setValidator( callable $validator ) : void
+	public function getValidator(): Validator
 	{
+		if(!$this->validator) {
+			$this->validator = $this->validatorFactory();
+		}
+		
+		return $this->validator;
+	}
+	
+	protected function initValidator( Validator $validator ) : void
+	{
+		$validator->setErrorMessageGenerator( new class( $this ) extends Validator_ErrorMessageGenerator {
+			protected Form_Field $field;
+			
+			public function __construct( Form_Field $field )
+			{
+				$this->field = $field;
+			}
+			
+			public function generateErrorMessage( string $error_code, array $error_data ): string
+			{
+				return $this->field->getErrorMessage( $error_code, $error_data );
+			}
+		});
+		$validator->setIsRequired( $this->getIsRequired() );
+		
+	}
+
+	/**
+	 * @param callable|Validator $validator
+	 */
+	public function setValidator( callable|Validator $validator ) : void
+	{
+		if(is_callable($validator)) {
+			$validator = new class($this, $validator) extends Validator {
+				protected Form_Field $field;
+				/**
+				 * @var callable $validator;
+				 */
+				protected $validator;
+				
+				public function __construct( Form_Field $field, callable $validator )
+				{
+					$this->field = $field;
+					$this->validator = $validator;
+				}
+				
+				public function validate_value( mixed $value ): bool
+				{
+					$validator = $this->validator;
+					return $validator( $this->field );
+				}
+				
+				public function getErrorCodeScope(): array
+				{
+					$error_codes = [];
+					
+					if( $this->is_required ) {
+						$error_codes[] = static::ERROR_CODE_EMPTY;
+					}
+
+					return $error_codes;
+				}
+			};
+		}
+		
+		$this->initValidator( $validator );
+		
 		$this->validator = $validator;
 	}
 
 	/**
-	 * @return array
+	 * @return array<string>
 	 */
-	abstract public function getRequiredErrorCodes(): array;
+	public function getRequiredErrorCodes(): array
+	{
+		return $this->getValidator()->getErrorCodeScope();
+	}
 
 	/**
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function getErrorMessages(): array
 	{
@@ -80,7 +150,7 @@ trait Form_Field_Trait_Validation
 
 	/**
 	 *
-	 * @param array $error_messages
+	 * @param array<string,string> $error_messages
 	 *
 	 */
 	public function setErrorMessages( array $error_messages ): void
@@ -93,11 +163,11 @@ trait Form_Field_Trait_Validation
 
 	/**
 	 * @param string $code
-	 * @param array $data
+	 * @param array<string,mixed> $data
 	 *
-	 * @return string|bool
+	 * @return string|false
 	 */
-	public function getErrorMessage( string $code, array $data=[] ): string|bool
+	public function getErrorMessage( string $code, array $data=[] ): string|false
 	{
 		$message = $this->error_messages[$code] ?? false;
 
@@ -107,25 +177,11 @@ trait Form_Field_Trait_Validation
 
 	/**
 	 * @param string $code
-	 * @param array $data
+	 * @param array<string,string> $data
 	 */
 	public function setError( string $code, array $data = [] ): void
 	{
-		/**
-		 * @var Form_Field $this
-		 * @var Form $form
-		 */
-		$form = $this->_form;
-		
-		$message = $this->getErrorMessage( $code, $data );
-		
-		$this->is_valid = false;
-		$form->setIsNotValid();
-		
-		$this->errors[] = new Form_ValidationError($this, $code, $message);
-		
-		$this->last_error_code = $code;
-		$this->last_error_message = $message;
+		$this->getValidator()->setError( $code, $data );
 	}
 	
 	/**
@@ -161,8 +217,8 @@ trait Form_Field_Trait_Validation
 	{
 		$this->is_valid = true;
 		$this->errors = [];
-		$this->last_error_code = false;
-		$this->last_error_message = false;
+		$this->last_error_code = '';
+		$this->last_error_message = '';
 	}
 
 	/**
@@ -175,45 +231,34 @@ trait Form_Field_Trait_Validation
 	}
 	
 	/**
-	 * @return bool
-	 */
-	protected function validate_required() : bool
-	{
-		if(
-			$this->is_required &&
-			(
-				$this->_value === '' ||
-				$this->_value === null
-			)
-		) {
-			$this->setError( Form_Field::ERROR_CODE_EMPTY );
-			
-			return false;
-		}
-
-		return true;
-	}
-	
-	/**
-	 * @return bool
-	 */
-	protected function validate_validator() : bool
-	{
-		$validator = $this->getValidator();
-		if(
-			$validator &&
-			!$validator( $this )
-		) {
-			return false;
-		}
-		
-		return true;
-	}
-
-	/**
 	 *
 	 * @return bool
 	 */
-	abstract public function validate(): bool;
+	public function validate(): bool
+	{
+		$this->setIsValid();
+		$validator = $this->getValidator();
+		
+		if($validator->validate( $this->getInputCatcher()->getValueRaw() )) {
+			return true;
+		}
+		
+		/**
+		 * @var Form $form
+		 */
+		$form = $this->_form;
+		$this->is_valid = false;
+		$form->setIsNotValid();
+		
+		$this->last_error_code = $validator->getLastErrorCode();
+		$this->last_error_message = $validator->getLastErrorMessage();
+		
+		
+		foreach($validator->getAllErrors() as $error) {
+			$this->errors[] = new Form_ValidationError( $this, $error->getCode(), $error->getMessage() );
+		}
+		
+		return false;
+	}
 
 }
