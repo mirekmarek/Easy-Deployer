@@ -26,4 +26,6 @@ return [
 	'<b>Your account is blocked!</b><br/>Please contact your system administrator.' => '<b>Váš uživatelský účet je zablokován!</b><br/>Prosím kontaktujte vašeho správce systému.',
 	'Invalid username or password!' => 'Neplatné uživatelské jméno, nebo heslo',
 	'Invalid value' => '',
+	'Week password' => '',
+	'Password verification does not match' => '',
 ];

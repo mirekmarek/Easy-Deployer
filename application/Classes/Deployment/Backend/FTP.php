@@ -58,6 +58,8 @@ class Deployment_Backend_FTP extends Deployment_Backend
 					$this->project->getConnectionUsername(),
 					$this->project->getConnectionPassword()
 				) ) {
+					ftp_set_option($this->connection, FTP_USEPASVADDRESS, false);
+					
 					if(ftp_pasv( $this->connection, true )) {
 						if(ftp_chdir( $this->connection, $this->project->getConnectionBasePath() )) {
 							return true;
@@ -80,13 +82,90 @@ class Deployment_Backend_FTP extends Deployment_Backend
 
 		return true;
 	}
-
+	
+	/** @noinspection XmlDeprecatedElement
+	 * @noinspection HtmlDeprecatedTag
+	 */
 	public function getList( $dir='.' ): array
 	{
-		$raw = ftp_mlsd( $this->connection, $dir );
+		$_list = ftp_mlsd( $this->connection, $dir );
+		
+		if($_list===false) {
+			$raw = @ftp_rawlist( $this->connection, $dir );
+			if ($raw === false) {
+				return [];
+			}
+			
+			$_list = [];
+			
+			foreach ($raw as $line) {
+				$line = trim($line);
+				if(!$line ) {
+					continue;
+				}
+				
+				$unix_pattern = '/^([\w\-]{10})\s+\d+\s+[\w\-]+\s+[\w\-]+\s+(\d+)\s+([A-Za-z]{3}\s+\d+\s+[\d:]+)\s+(.+)$/';
+				$win_pattern = '/^(\d{2}-\d{2}-\d{2,4}\s+\d{2}:\d{2}(?:AM|PM))\s+(<DIR>|\d+)\s+(.+)$/i';
+				
+				if (preg_match($unix_pattern, $line, $matches)) {
+					$name = $matches[4];
+					if(
+						$name === '.' ||
+						$name === '..'
+					) {
+						continue;
+					}
+					
+					$is_dir = ($matches[1][0] === 'd');
+					$size = (int)$matches[2];
+					
+					$_list[] = [
+						'name'   => $name,
+						'type'   => $is_dir ? 'dir' : 'file',
+						'size'   => $size,
+					];
+				}
+				elseif (preg_match($win_pattern, $line, $matches)) {
+					$name = $matches[3];
+					if(
+						$name === '.' ||
+						$name === '..'
+					) {
+						continue;
+					}
+					
+					$is_dir = (strtoupper($matches[2]) === '<DIR>');
+					$size = $is_dir ? 0 : (int)$matches[2];
+					
+					$_list[] = [
+						'name'   => $name,
+						'type'   => $is_dir ? 'dir' : 'file',
+						'size'   => $size,
+					];
+				}
+			}
+			foreach ($raw as $line) {
+				$pattern = '/^([\w\-]{10})\s+\d+\s+([\w\-]+)\s+([\w\-]+)\s+(\d+)\s+([A-Za-z]{3}\s+\d+\s+[\d:]+)\s+(.+)$/';
+				if (preg_match($pattern, $line, $matches)) {
+					$name = $matches[6];
+					if ($name === '.' || $name === '..') {
+						continue;
+					}
+					
+					$type = ($matches[1][0] === 'd') ? 'dir' : 'file';
+					$size = (int)$matches[4];
+					
+					$_list[] = [
+						'name' => $name,
+						'type' => $type,
+						'size' => $size,
+					];
+				}
+			}
+		}
 
-		$list = array();
-		foreach( $raw as $l ) {
+		$list = [];
+		foreach( $_list as $l ) {
 			
 			
 			
