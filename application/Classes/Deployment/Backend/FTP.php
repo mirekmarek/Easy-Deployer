@@ -144,24 +144,6 @@ class Deployment_Backend_FTP extends Deployment_Backend
 					];
 				}
 			}
-			foreach ($raw as $line) {
-				$pattern = '/^([\w\-]{10})\s+\d+\s+([\w\-]+)\s+([\w\-]+)\s+(\d+)\s+([A-Za-z]{3}\s+\d+\s+[\d:]+)\s+(.+)$/';
-				if (preg_match($pattern, $line, $matches)) {
-					$name = $matches[6];
-					if ($name === '.' || $name === '..') {
-						continue;
-					}
-					
-					$type = ($matches[1][0] === 'd') ? 'dir' : 'file';
-					$size = (int)$matches[4];
-					
-					$_list[] = [
-						'name' => $name,
-						'type' => $type,
-						'size' => $size,
-					];
-				}
-			}
 		}
 
 		$list = [];
