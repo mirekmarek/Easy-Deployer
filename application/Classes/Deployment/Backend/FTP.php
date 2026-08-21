@@ -91,7 +91,7 @@ class Deployment_Backend_FTP extends Deployment_Backend
 		$_list = ftp_mlsd( $this->connection, $dir );
 		
 		if($_list===false) {
-			$raw = @ftp_rawlist( $this->connection, $dir );
+			$raw = ftp_rawlist( $this->connection, $dir );
 			if ($raw === false) {
 				return [];
 			}
@@ -104,25 +104,22 @@ class Deployment_Backend_FTP extends Deployment_Backend
 					continue;
 				}
 				
-				$unix_pattern = '/^([\w\-]{10})\s+\d+\s+[\w\-]+\s+[\w\-]+\s+(\d+)\s+([A-Za-z]{3}\s+\d+\s+[\d:]+)\s+(.+)$/';
+				$unix_pattern = '/^([\w\-]{10})\s+\d+\s+([\w\-]+)\s+([\w\-]+)\s+(\d+)\s+([A-Za-z]{3}\s+\d+\s+[\d:]+)\s+(.+)$/';
 				$win_pattern = '/^(\d{2}-\d{2}-\d{2,4}\s+\d{2}:\d{2}(?:AM|PM))\s+(<DIR>|\d+)\s+(.+)$/i';
 				
 				if (preg_match($unix_pattern, $line, $matches)) {
-					$name = $matches[4];
-					if(
-						$name === '.' ||
-						$name === '..'
-					) {
+					$name = $matches[6];
+					if ($name === '.' || $name === '..') {
 						continue;
 					}
 					
-					$is_dir = ($matches[1][0] === 'd');
-					$size = (int)$matches[2];
+					$type = ($matches[1][0] === 'd') ? 'dir' : 'file';
+					$size = (int)$matches[4];
 					
 					$_list[] = [
-						'name'   => $name,
-						'type'   => $is_dir ? 'dir' : 'file',
-						'size'   => $size,
+						'name' => $name,
+						'type' => $type,
+						'size' => $size,
 					];
 				}
 				elseif (preg_match($win_pattern, $line, $matches)) {
